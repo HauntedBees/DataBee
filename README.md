@@ -18,7 +18,7 @@ The following third-party files and versions (or any compatible versions) are re
 * [jQuery UI Touch Punch v0.2.3](http://touchpunch.furf.com/) ([MIT License](https://opensource.org/licenses/MIT)) as **js/jquery.ui.touch-punch.js**.
 * [PouchDB v7.1.1](https://pouchdb.com/download.html) ([Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)) as **js/pouchdb.js**.
 
-Additionally, [Cordova v9.0.0](https://cordova.apache.org/) is required to build the project to a native mobile app.
+Additionally, [Cordova v9.0.0](https://cordova.apache.org/) ([Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)) is required to build the project to a native mobile app.
 
 If running the app in your browser, Cordova isn't needed, but not all features may not be fully functional.
 
