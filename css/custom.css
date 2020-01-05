@@ -1,0 +1,253 @@
+/* Material Icons */
+@font-face {
+    font-family: "Material Icons";
+    font-style: normal;
+    font-weight: 400;
+    src: url(../font/MaterialIcons-Regular.eot); /* For IE6-8 */
+    src: local("../font/Material Icons"),
+         local("../font/MaterialIcons-Regular"),
+         url(../font/MaterialIcons-Regular.woff2) format("woff2"),
+         url(../font/MaterialIcons-Regular.woff) format("woff"),
+         url(../font/MaterialIcons-Regular.ttf) format("truetype");
+}
+.material-icons {
+    font-family: "Material Icons";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;  /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+    /* Support for IE. */
+    font-feature-settings: "liga";
+}
+.by-icon {
+    position: absolute;
+    margin-left: 5px;
+}
+
+/* Modals */
+.modal {
+    background-color: #00000099;
+    display: none;
+    height: 100%;
+    left: 0;
+    overflow: auto;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+}
+.modal > div {
+    margin: 60% auto;
+    padding: 0.5em;
+    width: 80%;
+}
+.modalHeader { font-weight: bold }
+.modalContent { padding: 0.5em 0.5em 0 }
+#modalInfo .modalContent { padding-bottom: 0.5em; padding-top: 0 }
+.modalContent > input { width: 100% }
+.modalFooter { font-size: small; text-align: center }
+.modalFooter > * { margin: 0 0.5em }
+input.comeOn { border: 1px solid #FF0000 !important }
+
+/* Buttons */
+.btn, .addBtn, nav li { cursor: pointer }
+.addBtn {
+    border-radius: 50%;
+    height: 30px;
+    width: 35px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 5px;
+}
+
+/* Header */
+header {
+    left: 0;
+    top: 0;
+    padding-top: 0.25rem;
+    position: sticky;
+    font-size: 1.25em;
+    z-index: 10;
+}
+#backBtn { display: none }
+#title { font-weight: bold }
+#menuBtn { padding: 0.25em }
+#menuRight { float: right; padding: 0.25em }
+
+/* General Shit */
+#bMain > h4, #bCredits > p:first-child { padding-top: 1em }
+#bCredits > * { font-size: 0.8em }
+* { -webkit-tap-highlight-color: rgba(255, 255, 255, 0) }
+#front {
+    background-color: #000000;
+    color: #FFFF00;
+    height: 100%;
+    left: 0;
+    overflow: auto;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+#front > div {
+    text-align: center;
+    margin: 60% auto;
+    padding: 0.5em;
+    width: 80%;
+}
+#front > div > * { margin-bottom: 0 }
+
+/* Sidebar */
+#cover { z-index: 15 }
+nav {
+    transition: 1s;
+    z-index: 20;
+    top: 0;
+    left: -100%;
+    width: 55%;
+    position: fixed;
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    padding: 5px 10px;
+}
+nav.active { left: 0; transition: 0.35s }
+#rightbar {
+    left: unset;
+    right: -100%;
+    border-right: unset;
+}
+#rightbar.active { right: 0 }
+
+/* Body Elements */
+#content.listView { padding: 0; width: 100% }
+.body { display: none }
+body { font-size: 2em }
+
+/* Checklist */
+#btnAddItemModal, #btnAddChecklist {
+    position: fixed;
+    bottom: 0.5em;
+    right: 0.5em;
+}
+#btnAddChecklist {
+    bottom: 1em;
+    position: absolute;
+}
+.cbitem, .settingsItem {
+    padding: 0.3em 0.5em 0.15em;
+    margin-bottom: 0;
+}
+#checkListData > li:first-child { margin-top: 0.5em }
+
+.cbitem > span { margin-left: 0.5em }
+.cbitem > .edit, .cbitem > .handle {
+    float: right;
+    font-size: 1.25em;
+    padding: 0.25em;
+    padding-right: 0;
+}
+.cbitem > .important {
+    font-size: 1.35em;
+    margin-top: 0.5em;
+}
+.cbitem > .important + span {
+    position: absolute;
+    font-weight: bold;
+    margin-left: 5px;
+    margin-top: 0.5em;
+}
+
+/* Checklist Settings */
+.settings { text-align: right }
+.lefty .settings { text-align: left }
+.option {
+    border-radius: 2px;
+    display: inline-block;
+    text-align: center;
+    padding: 0 0.5em;
+    min-width: 2em;
+}
+.option > i { font-size: 1.5em }
+.option > div { font-size: 0.5em }
+
+/* General Settings */
+.box {
+    border: 1px solid black;
+    display: inline-block;
+    height: 1.8em;
+    padding-top: 0.2em;
+    text-align: center;
+    width: 2em;
+}
+.box > .material-icons { font-weight: bold; margin-top: 0.15em }
+.box.theme0 { color: #B3B3B3; background: linear-gradient(0deg, #000000 80%, #FB9807 80%) }
+.box.theme1 { color: #000000;  background: linear-gradient(0deg, #FFFFFF 80%, #A0A0FF 80%) }
+.box.theme2 { color: #000000; background: linear-gradient(0deg, #FFCCCC 80%, #AA0000 80%) }
+.settingsItem > div { text-align: center }
+.settingsButton { margin-top: 0.5em }
+
+/* Themes */
+:root {
+    --bg-color: #000000;
+    --bg-color-important: #660000;
+    --text-color: #B3B3B3;
+    --text-color-brighter: #DDDDDD;
+    --secondary-bg-color: #FB9807;
+    --secondary-border-color: #B56B05;
+    --header-bg-color: #B3B3B3;
+    --header-text-color: #FFFFFF;
+    --button-text-color: #FFFFFF;
+}
+body { background: var(--bg-color); color: var(--text-color) }
+.button-primary { background-color: var(--secondary-bg-color) !important; border: 1px solid var(--secondary-border-color) !important }
+header { background: var(--header-bg-color); color: var(--header-text-color) }
+.addBtn {
+    background-color: var(--secondary-bg-color);
+    border: 1px solid var(--secondary-border-color);
+    color: var(--button-text-color);
+}
+nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-color) }
+.cbitem.important { background-color: var(--bg-color-important) }
+.cbitem, .settingsItem { background: var(--bg-color); border-bottom: 1px solid var(--header-bg-color) }
+#rightbar { border-left: 2px solid var(--secondary-bg-color) }
+.option { background-color: var(--bg-color); border: 1px solid var(--header-bg-color) }
+.cbitem > .edit { color: var(--text-color-brighter) }
+.box { border: 1px solid var(--header-bg-color) }
+.modal > div {
+    background-color: var(--bg-color);
+    border: 1px solid var(--header-bg-color);
+}
+.modalContent > input { border-color: var(--header-bg-color) }
+.modalContent > input:focus { border-color: var(--secondary-bg-color) }
+
+/*.theme1 header { background: #AAAAFF; border-bottom: 2px solid black }
+.theme1 .addBtn {
+    background-color: #33C3F0;
+    border: 1px solid #1EAEDB;
+    color: #FFFFFF;
+}
+.theme1 nav { background: #FFAAAA; border-right: 2px solid black }
+.theme1 .cbitem.important { background-color: #EEDDDD }
+.theme1 .cbitem, .theme1 .settingsItem { background-color: #EEEEEE; border-bottom: 1px solid black }
+.theme1 #rightbar { border-left: 2px solid black }
+.theme1 .option { background-color: #DDDDDD; border: 1px solid black }*/
+
+/*! jQuery UI - v1.12.1 - 2020-01-03
+* http://jqueryui.com
+* Includes: sortable.css
+* Copyright jQuery Foundation and other contributors; Licensed MIT */
+.ui-sortable-handle { -ms-touch-action: none; touch-action: none }

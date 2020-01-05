@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>DataBee</title>
+        <meta name="description" content="A data management app personally tailored for me, but you might like it, too.">
+        <meta name="author" content="Haunted Bees Productions">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/skeleton.css">
+        <link rel="stylesheet" href="css/custom.css">
+        <link rel="icon" type="image/png" href="images/favicon.png">
+    </head>
+    <body>
+        <div id="front">
+            <div>
+                <h1>DataBee</h1>
+                <h6>Version 0JAN04</h6>
+                <h3>Now Lording</h3>
+            </div>
+        </div>
+        <header id="head">
+            <i id="menuBtn" class="btn material-icons">view_headline</i>
+            <i id="backBtn" class="btn material-icons">chevron_left</i>
+            <span id="title" class="by-icon">DataBee - Welcome!</span>
+            <i id="menuRight" class="btn material-icons">more_vert</i>
+        </header>
+        <nav id="sidebar">
+            <!--<ul>
+                <li><i class="material-icons">home</i><span class="by-icon">Overview</span></li>
+                <li id="btnSearch"><i class="material-icons">search</i><span class="by-icon">Search</span></li>
+                <li><i class="material-icons">settings_backup_restore</i><span class="by-icon">Recently Viewed</span></li>
+            </ul>-->
+            <ul id="sidebarData"></ul>
+            <ul>
+                <li id="btnSettings"><i class="material-icons">settings</i><span class="by-icon">Settings</span></li>
+                <li id="btnCredits"><i class="material-icons">copyright</i><span class="by-icon">Credits</span></li>
+            </ul>
+            <div id="btnAddChecklist" class="addBtn">
+                <i class="material-icons">add</i>
+            </div>
+        </nav>
+        <nav id="rightbar">
+            <h4>Checklist Settings</h4>
+            <ul>
+                <li id="renameChecklist"><i class="material-icons">edit</i><span class="by-icon">Rename Checklist</span></li>
+                <li id="deleteChecklist"><i class="material-icons">delete</i><span class="by-icon">Delete Checklist</span></li>
+                <li id="sortChecklist"><i class="material-icons">sort</i><span class="by-icon">Sort Items</span></li>
+                <li id="removeCompleted"><i class="material-icons">cancel</i><span class="by-icon">Remove Completed</span></li>
+            </ul>
+        </nav>
+        <div id="cover" class="modal"></div>
+        <div id="content" class="container">
+            <div class="row">
+                <div id="bSettings" class="body one-half column">
+                    <ul>
+                        <li id="themes" class="settingsItem">
+                            <strong>Theme</strong>
+                            <div>
+                                <div class="box theme0" data-id="0"></div>
+                                <div class="box theme1" data-id="1"></div>
+                                <div class="box theme2" data-id="2"></div>
+                            </div>
+                        </li>
+                        <li class="settingsItem">
+                            <strong>Left-Handed Mode</strong>
+                            <div><button class="settingsButton" data-setting="leftHanded">Disabled</button></div>
+                        </li>
+                        <li class="settingsItem">
+                            <strong>Move Items Down After Being Checked</strong>
+                            <div><button class="settingsButton" data-setting="moveDownOnCheck">Disabled</button></div>
+                            <strong>Move Items Up After Being Unchecked</strong>
+                            <div><button class="settingsButton" data-setting="moveUpOnUncheck">Disabled</button></div>
+                        </li>
+                        <li class="settingsItem">
+                            <strong>Erase All Data</strong>
+                            <div><button id="btnDeleteAll" class="button-primary">Erase Data</button></div>
+                        </li>
+                    </ul>
+                </div>
+                <div id="bCredits" class="body one-half column">
+                    <p><strong>DataBee &copy; 2020 Haunted Bees Productions</strong></p>
+                    <p>DataBee is licensed under the <a target="_blank" href="https://www.gnu.org/licenses/agpl-3.0.en.html">GNU AGPLv3</a> license, and its source code is available on <a target="_blank" href="https://github.com/HauntedBees/DataBee">GitHub</a>.</p>
+                    <p>DataBee uses the following third-party elements:</p>
+                    <ul>
+                        <li><a target="_blank" href="http://getskeleton.com/">Skeleton</a>, under the <a target="_blank" href="https://opensource.org/licenses/MIT">MIT License</a>.</li>
+                        <li><a target="_blank" href="https://material.io/resources/icons/">Material Icons</a>, under the <a target="_blank" href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.</li>
+                        <li><a target="_blank" href="https://jquery.com/">jQuery</a>, under the <a target="_blank" href="https://opensource.org/licenses/MIT">MIT License</a>.</li>
+                        <li><a target="_blank" href="https://jqueryui.com/">jQuery UI</a>, under the <a target="_blank" href="https://opensource.org/licenses/MIT">MIT License</a>.</li>
+                        <li><a target="_blank" href="http://touchpunch.furf.com/">Touch Punch</a>, under the <a target="_blank" href="https://opensource.org/licenses/MIT">MIT License</a>.</li>
+                        <li><a target="_blank" href="https://pouchdb.com/">PouchDB</a>, under the <a target="_blank" href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.</li>
+                    </ul>
+                    <p>There's no Privacy Policy because we don't do anything with your data. We don't even collect it! Everything is kept locally on your device.</p>
+                </div>
+                <div id="bChecklist" class="body one-half column">
+                    <ul id="checkListData"></ul>
+                    <div id="btnAddItemModal" class="addBtn">
+                        <i class="material-icons">add</i>
+                    </div>
+                </div>
+                <div id="bMain" class="body one-half column">
+                    <h4>Hello, this is an app!</h4>
+                    <p>Tap the <i class="material-icons">view_headline</i> in the upper-left, then tap the <i class="material-icons">add</i> button
+                        at the bottom to create a new checklist! From there you can add items, delete them, sort them, whatever!</p>
+                    <p>I suppose it'd be polite of me to add, like, actual instructions or whatever, but, counterpoint: I'm lazy.</p>
+                </div>
+            </div>
+        </div>
+        <div id="modalInfo" class="modal">
+            <div>
+                <div class="modalHeader"></div>
+                <div class="modalContent"></div>
+                <div class="modalFooter">
+                    <button id="btnConfirmModalInfo" class="button-primary">OK</button>
+                    <button class="btnCancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div id="modalInput" class="modal">
+            <div>
+                <div class="modalHeader"></div>
+                <div class="modalContent"><input id="txtModalInput" type="text" placeholder="Entry"></div>
+                <div class="modalFooter">
+                    <button id="btnConfirmModalInput" class="button-primary">OK</button>
+                    <button class="btnCancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/pouchdb.js"></script>
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <script type="text/javascript" src="js/jquery-ui.js"></script>
+        <script type="text/javascript" src="js/jquery.ui.touch-punch.js"></script>
+        <script type="text/javascript" src="js/data.js"></script>
+        <script type="text/javascript" src="js/display.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+    </body>
+</html>

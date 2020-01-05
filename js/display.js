@@ -1,0 +1,182 @@
+/* Modals */
+function ShowModal(id, reset) {
+    const $modal = $(`#${id}`);
+    $modal.show();
+    stateForBackButton = stateForBackButton + "|" + id;
+    if(reset) { ResetElements($modal); }
+}
+function ShowInfoModal(type, title, body, buttonText) {
+    $("#modalInfo").attr("data-type", type);
+    $("#modalInfo > div > .modalHeader").html(title);
+    $("#modalInfo > div > .modalContent").html(body);
+    $("#btnConfirmModalInfo").text(buttonText || "OK");
+    ShowModal("modalInfo", true);
+}
+function ShowInputModal(type, title, placeholder, buttonText, dataId) {
+    $("#modalInput").attr("data-type", type);
+    if(dataId) {
+        $("#modalInput").attr("data-id", dataId);
+    }
+    $("#modalInput > div > .modalHeader").html(title);
+    $("#txtModalInput").attr("placeholder", placeholder);
+    $("#txtModalInput").val("");
+    $("#btnConfirmModalInput").text(buttonText);
+    ShowModal("modalInput", true);
+    $("#txtModalInput").focus(); 
+}
+function ResetElements(elem) {
+    elem.find("input").each(function() {
+       $(this).val("");
+       $(this).removeClass("comeOn"); 
+    });
+}
+function CloseModal(id) {
+    $(`#${id}`).hide();
+    if(stateForBackButton.indexOf("|") > 0) {
+        stateForBackButton = stateForBackButton.split("|")[0];
+    }
+}
+
+function DrawAll() {
+    if(dbData.settings.leftHanded) { $("body").addClass("lefty"); }
+    else { $("body").removeClass("lefty"); }
+    SetTheme();
+    $("#front").hide();
+    DrawSidebar();
+    DrawMain();
+    $(`#themes .box.theme${dbData.settings.theme}`).html(`<i class="material-icons">check</i>`);
+}
+
+/* Sidebar */
+function ShowSidebar() {
+    $("#sidebar").addClass("active");
+    $("#rightbar").removeClass("active");
+    $("#cover").show();
+    stateForBackButton = "sidebar";
+}
+function ShowRightbar() {
+    if(dbData.currentScreen < 0) { return; }
+    $("#rightbar").addClass("active");
+    $("#sidebar").removeClass("active");
+    $("#cover").show();
+    stateForBackButton = "sidebar";
+}
+function HideSidebars(e) {
+    if(e !== undefined && (e.toElement.id === "menuBtn" || e.toElement.id === "menuRight")) { return; }
+    $("#sidebar, #rightbar").removeClass("active");
+    $("#cover").hide();
+    stateForBackButton = "home";
+}
+function BodyHideSidebars(e) {
+    if(e.toElement !== undefined && e.toElement.tagName.toLowerCase() === "html") {
+        HideSidebars(e);
+    }
+}
+function DrawSidebar() {
+    const $data = $("#sidebarData");
+    $data.empty();
+    const html = dbData.dbList.map((e, i) => `<li data-id="${i}">${e.name}</li>`);
+    $data.html(html.join(""));
+}
+function SelectChecklist() {
+    const id = parseInt($(this).attr("data-id"));
+    if(isNaN(id) || id >= dbData.dbList.length) { return; }
+    HideSidebars();
+    dbData.currentScreen = id;
+    stateForBackButton = "home";
+    DrawMain();
+    data.Save();
+}
+function ShowSettings() {
+    for(const setting in dbData.settings) {
+        const value = dbData.settings[setting];
+        if(typeof value !== "boolean") { continue; }
+        const $setting = $(`[data-setting="${setting}"]`);
+        if($setting.length === 0) { continue; }
+        $setting.attr("data-val", value).text(value ? "Enabled" : "Disabled");
+        if(value) { $setting.addClass("button-primary"); }
+    }
+    $("#bChecklist, #bMain, #menuBtn, #menuRight").hide();
+    $("#bSettings, #backBtn").show();
+    HideSidebars();
+    $("#title").text("DataBee - Settings");
+    stateForBackButton = "secondary";
+}
+function ShowCredits() {
+    $("#bChecklist, #bMain, #menuBtn, #menuRight").hide();
+    $("#bCredits, #backBtn").show();
+    HideSidebars();
+    $("#title").text("DataBee - Credits");
+    stateForBackButton = "secondary";
+}
+
+/* Main */
+const themes = [
+  {
+    "--bg-color": "#000000",            "--text-color": "#B3B3B3",
+    "--bg-color-important": "#660000",  "--text-color-brighter": "#DDDDDD",
+    "--secondary-bg-color": "#FB9807",  "--secondary-border-color": "#B56B05",
+    "--header-bg-color": "#B3B3B3",     "--header-text-color": "#FFFFFF",
+    "--button-text-color": "#FFFFFF"
+  },
+  {
+    "--bg-color": "#FFFFFF",            "--text-color": "#191919",
+    "--bg-color-important": "#88FFFF",  "--text-color-brighter": "#4C4C4C",
+    "--secondary-bg-color": "#A0A0FF",  "--secondary-border-color": "#7070B2",
+    "--header-bg-color": "#A0A0FF",     "--header-text-color": "#000000",
+    "--button-text-color": "#000000"
+  },
+  {
+    "--bg-color": "#FFCCCC",            "--text-color": "#191919",
+    "--bg-color-important": "#FF8888",  "--text-color-brighter": "#4C4C4C",
+    "--secondary-bg-color": "#AA0000",  "--secondary-border-color": "#5B0000",
+    "--header-bg-color": "#AA0000",     "--header-text-color": "#FFFFFF",
+    "--button-text-color": "#FFFFFF"
+  }
+];
+function SetTheme() {
+    const theme = themes[dbData.settings.theme || 0];
+    const root = document.documentElement;
+    for(const varName in theme) {
+        root.style.setProperty(varName, theme[varName]);
+    }
+}
+function DrawMain() {
+    if(dbData.currentScreen === -1) {
+        $("#title").text("DataBee - Welcome!");
+        $(".body").hide();
+        $("#bMain").show();
+        return;
+    } else if(dbData.currentScreen < 0 || dbData.currentScreen >= dbData.dbList.length) { return; }
+    $(".body").hide();
+    $("#bChecklist").show();
+    $("#content").addClass("listView");
+    const checklist = dbData.dbList[dbData.currentScreen];
+    const $data = $("#checkListData");
+    $data.empty();
+    $("#title").text(`${checklist.name}`);
+    const html = checklist.data.map((e, i) => GetCheckboxItemHTML(e, i));
+    $data.html(html.join(""));
+}
+function GetCheckboxItemHTML(e, i) {
+    return `<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
+        <input type="checkbox"${e.checked ? " checked" : ""}>
+        ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
+        <span class="name">${e.val}</span>
+        <i class="material-icons handle">unfold_more</i>
+        <i class="edit material-icons">more_horiz</i>
+        </li>`;
+}
+function ToggleCheckboxItemSettings($e, i) {
+    if($e.find(".settings").length) {
+        $e.find(".settings").remove();
+        stateForBackButton = "home";
+    } else {
+        stateForBackButton = "checkboxSettings";
+        $e.append(`<div class="settings" data-id="${i}">
+        <div class="btn option ci-rename"><i class="material-icons">edit</i><div>Rename</div></div>
+        <div class="btn option ci-delete"><i class="material-icons">delete</i><div>Delete</div></div>
+        <div class="btn option ci-important"><i class="material-icons">error_outline</i><div>Important</div></div>
+        </div>`);
+    }
+}
