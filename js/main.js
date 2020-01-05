@@ -27,9 +27,9 @@ $(function() {
         const newVal = $(this).attr("data-val") !== "true";
         data.ChangeSetting($(this).attr("data-setting"), newVal);
         if(newVal) {
-            $(this).addClass("button-primary").text("Enabled");
+            $(this).addClass("button-primary").text("Enabled").attr("data-val", newVal);
         } else {
-            $(this).removeClass("button-primary").text("Disabled");
+            $(this).removeClass("button-primary").text("Disabled").attr("data-val", newVal);
         }
     });
     $("#btnDeleteAll").on("click", function() {
