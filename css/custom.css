@@ -89,6 +89,7 @@ header {
 
 /* General Shit */
 #bMain > h4, #bCredits > p:first-child { padding-top: 1em }
+#bCredits { padding: 0 1em }
 #bCredits > * { font-size: 0.8em }
 * { -webkit-tap-highlight-color: rgba(255, 255, 255, 0) }
 #front {
