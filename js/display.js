@@ -14,7 +14,7 @@ function ShowInfoModal(type, title, body, buttonText) {
 }
 function ShowInputModal(type, title, placeholder, buttonText, dataId) {
     $("#modalInput").attr("data-type", type);
-    if(dataId) {
+    if(dataId !== undefined) {
         $("#modalInput").attr("data-id", dataId);
     }
     $("#modalInput > div > .modalHeader").html(title);
