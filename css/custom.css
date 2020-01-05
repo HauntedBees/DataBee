@@ -233,21 +233,3 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
 }
 .modalContent > input { border-color: var(--header-bg-color) }
 .modalContent > input:focus { border-color: var(--secondary-bg-color) }
-
-/*.theme1 header { background: #AAAAFF; border-bottom: 2px solid black }
-.theme1 .addBtn {
-    background-color: #33C3F0;
-    border: 1px solid #1EAEDB;
-    color: #FFFFFF;
-}
-.theme1 nav { background: #FFAAAA; border-right: 2px solid black }
-.theme1 .cbitem.important { background-color: #EEDDDD }
-.theme1 .cbitem, .theme1 .settingsItem { background-color: #EEEEEE; border-bottom: 1px solid black }
-.theme1 #rightbar { border-left: 2px solid black }
-.theme1 .option { background-color: #DDDDDD; border: 1px solid black }*/
-
-/*! jQuery UI - v1.12.1 - 2020-01-03
-* http://jqueryui.com
-* Includes: sortable.css
-* Copyright jQuery Foundation and other contributors; Licensed MIT */
-.ui-sortable-handle { -ms-touch-action: none; touch-action: none }
