@@ -33,7 +33,6 @@ function ShowTagsModal() {
         const e = currentChecklist.tags[id];
         tagHTMLs.push(GetTagModalHTML(e, i++));
     }
-    //const tagHTMLs = currentChecklist.tags.map(GetTagModalHTML); // TODO: test quotes
     $("#modalTagList").html(tagHTMLs.join(""));
     ctx.tagsToDelete = [];
     ShowModal("modalTags");

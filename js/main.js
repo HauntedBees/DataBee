@@ -160,7 +160,7 @@ $(function() {
     $("#checkListData").disableSelection();
 
     // Modals
-    $(".btnCancel").on("click", function() { $(this).closest(".modal").hide(); });
+    $(".btnCancel").on("click", function() { CloseModal($(this).closest(".modal").attr("id")); });
     window.addEventListener("click", function(e) {
         if(e.target.classList.contains("modal")) {
             CloseModal(e.target.id);
@@ -271,6 +271,7 @@ function BackButtonPress() {
 // Swiping
 let potentialSwitch = "", potentialX = 0;
 function TouchPress(e) {
+    if(ctx.stateForBackButton === "secondary" || ctx.stateForBackButton.indexOf("|") >= 0) { return; }
     const touch = e.originalEvent.touches[0];
     const max = window.screen.width;
     const current = touch.clientX;
