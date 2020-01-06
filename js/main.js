@@ -1,5 +1,8 @@
 const db = new PouchDB("databee");
-let stateForBackButton = "home";
+const ctx = {
+    stateForBackButton: "home",
+    tagsToDelete: []
+};
 $(function() {
     data.Load(DrawAll);
     window.oncontextmenu = function(e) {
@@ -9,7 +12,7 @@ $(function() {
     };
 
     // Settings
-    $(".box").on("click", function() {
+    $(".box").on("click", function() { // TODO: selected box drops down
         const newTheme = parseInt($(this).attr("data-id"));
         $(`#themes .box.theme${dbData.settings.theme}`).html("");
         $(`#themes .box.theme${newTheme}`).html(`<i class="material-icons">check</i>`);
@@ -20,7 +23,7 @@ $(function() {
     $("#backBtn").on("click", function() {
         $("#bChecklist, #menuBtn, #menuRight").show();
         $("#bSettings, #bCredits, #backBtn").hide();
-        stateForBackButton = "home";
+        ctx.stateForBackButton = "home";
         DrawMain();
     });
     $(".settingsButton").on("click", function() {
@@ -82,11 +85,11 @@ $(function() {
                 data.AddData(new Checklist(val));
                 DrawSidebar();
                 CloseModal("modalInput");
-                stateForBackButton = "sidebar";
+                ctx.stateForBackButton = "sidebar";
                 return;
         }
         CloseModal("modalInput");
-        stateForBackButton = "home";
+        ctx.stateForBackButton = "home";
     });
     $("#removeCompleted").on("click", function() {
         ShowInfoModal("removeCompleted", "Remove Completed Items", "Are you sure you want to remove all completed items? This cannot be undone.", "Clear");
@@ -109,7 +112,33 @@ $(function() {
                 break;
         }
         CloseModal("modalInfo");
-        stateForBackButton = "home";
+        ctx.stateForBackButton = "home";
+    });
+
+    // Tags
+    $("#manageTags").on("click", ShowTagsModal);
+    $("#btnAddNewTag").on("click", function() {
+        const max = $("#modalTagList > li").length;
+        const newTag = new Tag("", `tagColor${max % 10}`);
+        $("#modalTagList").append(GetTagModalHTML(newTag, max));
+    });
+    $("#btnSaveTags").on("click", function() {
+        const newTags = {};
+        $("#modalTagList > li").each(function() {
+            const text = $("input", this);
+            const color = $("div.modalTagColor", this);
+            const myId = $(this).attr("data-id");
+            newTags[myId] = new Tag((text.val() === "" ? text.attr("placeholder") : text.val()), color.attr("data-color"), myId);
+        });
+        if(ctx.tagsToDelete.length > 0) { DrawMain(); }
+        data.SaveNewTags(dbData.currentScreen, newTags, ctx.tagsToDelete);
+        CloseModal("modalTags");
+    });
+    $(document).on("click", ".deleteTag", function() {
+        const $tag = $(this).closest("li");
+        const myId = $tag.attr("data-id");
+        ctx.tagsToDelete.push(myId);
+        $tag.remove();
     });
     
     // TODO: swap modal buttons for right/left hand?
@@ -150,7 +179,7 @@ $(function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.DeleteDataItem(dbData.currentScreen, idx);
         $(this).closest("li").remove();
-        stateForBackButton = "home";
+        ctx.stateForBackButton = "home";
     });
     $("#checkListData").on("click", ".ci-rename", function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
@@ -162,7 +191,30 @@ $(function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.ToggleDataItemImportance(dbData.currentScreen, idx);
         $(this).closest("li").replaceWith(GetCheckboxItemHTML(dbData.dbList[dbData.currentScreen].data[idx], idx));
-        stateForBackButton = "home";
+        ctx.stateForBackButton = "home";
+    });
+    $("#checkListData").on("click", ".ci-tags", function() {
+        const $parent = $(this).closest(".settings");
+        const allTagsObj = dbData.dbList[dbData.currentScreen].tags;
+        const allTags = Object.keys(allTagsObj).map(key => allTagsObj[key]);
+        const idx = parseInt($parent.attr("data-id"));
+        const myTags = dbData.dbList[dbData.currentScreen].data[idx].tags;
+        if($(this).hasClass("active")) {
+            $(this).removeClass("active");
+            $parent.parent().find(".tagList").remove();
+        } else {
+            $(this).addClass("active");
+            const tagHTML = allTags.map(e => `<div class="tag${myTags.indexOf(e.id) < 0 ? "" : " active"}" data-id="${e.id}">${e.tag}</div>`);
+            $parent.after("<div class='tagList'>" + tagHTML.join("") +"</div>");
+        }
+    });
+    $(document).on("click", ".tagList > .tag", function() {
+        const $parent = $(this).closest("li");
+        const idx = parseInt($parent.attr("data-id"));
+        const tagId = $(this).attr("data-id");
+        data.ToggleTag(dbData.currentScreen, idx, tagId);
+        $(this).toggleClass("active");
+        // TODO: add or remove tags from display immediately
     });
 
     // Swipe Handlers
@@ -189,12 +241,12 @@ function ChecklistItemClick(e, $t) {
     }
 }
 function BackButtonPress() {
-    if(stateForBackButton.indexOf("|") > 0) {
-        const modalId = stateForBackButton.split("|")[1];
+    if(ctx.stateForBackButton.indexOf("|") > 0) {
+        const modalId = ctx.stateForBackButton.split("|")[1];
         CloseModal(modalId);
         return;
     }
-    switch(stateForBackButton) {
+    switch(ctx.stateForBackButton) {
         case "sidebar":
             HideSidebars();
             break;
@@ -203,7 +255,7 @@ function BackButtonPress() {
             break;
         case "checkboxSettings":
             $(".settings").remove();
-            stateForBackButton = "home";
+            ctx.stateForBackButton = "home";
             break;
         case "home":
             navigator.app.exitApp();
@@ -234,14 +286,14 @@ function TouchMove(e) {
     const dx = current - potentialX;
     const dP = dx / max;
     if(potentialSwitch === "left" && dP > 0.1) {
-        if(stateForBackButton === "sidebar") {
+        if(ctx.stateForBackButton === "sidebar") {
             HideSidebars();
         } else {
             ShowSidebar();
         }
         potentialSwitch = "";
     } else if(potentialSwitch === "right" && dP < -0.1) {
-        if(stateForBackButton === "sidebar") {
+        if(ctx.stateForBackButton === "sidebar") {
             HideSidebars();
         } else {
             ShowRightbar();

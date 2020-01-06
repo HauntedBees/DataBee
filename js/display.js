@@ -2,7 +2,7 @@
 function ShowModal(id, reset) {
     const $modal = $(`#${id}`);
     $modal.show();
-    stateForBackButton = stateForBackButton + "|" + id;
+    ctx.stateForBackButton = ctx.stateForBackButton + "|" + id;
     if(reset) { ResetElements($modal); }
 }
 function ShowInfoModal(type, title, body, buttonText) {
@@ -24,6 +24,28 @@ function ShowInputModal(type, title, placeholder, buttonText, dataId) {
     ShowModal("modalInput", true);
     $("#txtModalInput").focus(); 
 }
+function ShowTagsModal() {
+    const currentChecklist = dbData.dbList[dbData.currentScreen];
+    $("#modalTags > div > .modalHeader > em").text(currentChecklist.name);
+    const tagHTMLs = [];
+    let i = 0;
+    for(const id in currentChecklist.tags) {
+        const e = currentChecklist.tags[id];
+        tagHTMLs.push(GetTagModalHTML(e, i++));
+    }
+    //const tagHTMLs = currentChecklist.tags.map(GetTagModalHTML); // TODO: test quotes
+    $("#modalTagList").html(tagHTMLs.join(""));
+    ctx.tagsToDelete = [];
+    ShowModal("modalTags");
+}
+function GetTagModalHTML(e, i) {
+    return `<li data-id="${e.id}">
+        <div class='modalTagColor ${e.color}' data-color="${e.color}"></div>
+        <input type="text" placeholder="Tag ${i}" value="${e.tag.replace(/"/g, '\\"')}">
+        <i class='deleteTag material-icons'>delete</i>
+    </li>`;
+}
+
 function ResetElements(elem) {
     elem.find("input").each(function() {
        $(this).val("");
@@ -32,8 +54,8 @@ function ResetElements(elem) {
 }
 function CloseModal(id) {
     $(`#${id}`).hide();
-    if(stateForBackButton.indexOf("|") > 0) {
-        stateForBackButton = stateForBackButton.split("|")[0];
+    if(ctx.stateForBackButton.indexOf("|") > 0) {
+        ctx.stateForBackButton = ctx.stateForBackButton.split("|")[0];
     }
 }
 
@@ -52,27 +74,27 @@ function ShowSidebar() {
     $("#sidebar").addClass("active");
     $("#rightbar").removeClass("active");
     $("#cover").show();
-    stateForBackButton = "sidebar";
+    ctx.stateForBackButton = "sidebar";
 }
 function ShowRightbar() {
     if(dbData.currentScreen < 0) { return; }
     $("#rightbar").addClass("active");
     $("#sidebar").removeClass("active");
     $("#cover").show();
-    stateForBackButton = "sidebar";
+    ctx.stateForBackButton = "sidebar";
 }
 function HideSidebars(e) {
     if(e !== undefined && (e.toElement.id === "menuBtn" || e.toElement.id === "menuRight")) { return; }
     $("#sidebar, #rightbar").removeClass("active");
     $("#cover").hide();
-    stateForBackButton = "home";
+    ctx.stateForBackButton = "home";
 }
 function BodyHideSidebars(e) {
     if(e.toElement !== undefined && e.toElement.tagName.toLowerCase() === "html") {
         HideSidebars(e);
     }
 }
-function DrawSidebar() {
+function DrawSidebar() { // TODO: make me prettier
     const $data = $("#sidebarData");
     $data.empty();
     const html = dbData.dbList.map((e, i) => `<li data-id="${i}">${e.name}</li>`);
@@ -83,7 +105,7 @@ function SelectChecklist() {
     if(isNaN(id) || id >= dbData.dbList.length) { return; }
     HideSidebars();
     dbData.currentScreen = id;
-    stateForBackButton = "home";
+    ctx.stateForBackButton = "home";
     DrawMain();
     data.Save();
 }
@@ -100,14 +122,14 @@ function ShowSettings() {
     $("#bSettings, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Settings");
-    stateForBackButton = "secondary";
+    ctx.stateForBackButton = "secondary";
 }
 function ShowCredits() {
     $("#bChecklist, #bMain, #menuBtn, #menuRight").hide();
     $("#bCredits, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Credits");
-    stateForBackButton = "secondary";
+    ctx.stateForBackButton = "secondary";
 }
 
 /* Main */
@@ -158,25 +180,32 @@ function DrawMain() {
     const html = checklist.data.map((e, i) => GetCheckboxItemHTML(e, i));
     $data.html(html.join(""));
 }
-function GetCheckboxItemHTML(e, i) {
+function GetCheckboxItemHTML(e, i) { // TODO: make the checkbox pretty?
+    const allTags = dbData.dbList[dbData.currentScreen].tags;
+    console.log(e);
+    const tagsHTML = e.tags.map(tag => `<div class="tagBox ${allTags[tag].color}"></div>`).join("");
     return `<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
         <input type="checkbox"${e.checked ? " checked" : ""}>
         ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
+        ${tagsHTML}
         <span class="name">${e.val}</span>
         <i class="material-icons handle">unfold_more</i>
         <i class="edit material-icons">more_horiz</i>
         </li>`;
 }
 function ToggleCheckboxItemSettings($e, i) {
+    const important = $e.hasClass("important");
     if($e.find(".settings").length) {
         $e.find(".settings").remove();
-        stateForBackButton = "home";
+        $e.find(".tagList").remove();
+        ctx.stateForBackButton = "home";
     } else {
-        stateForBackButton = "checkboxSettings";
+        ctx.stateForBackButton = "checkboxSettings";
         $e.append(`<div class="settings" data-id="${i}">
-        <div class="btn option ci-rename"><i class="material-icons">edit</i><div>Rename</div></div>
         <div class="btn option ci-delete"><i class="material-icons">delete</i><div>Delete</div></div>
-        <div class="btn option ci-important"><i class="material-icons">error_outline</i><div>Important</div></div>
+        <div class="btn option ci-rename"><i class="material-icons">edit</i><div>Rename</div></div>
+        <div class="btn option ci-tags"><i class="material-icons">label</i><div>Tags</div></div>
+        <div class="btn option ci-important${important ? " active" : ""}"><i class="material-icons">error_outline</i><div>Important</div></div>
         </div>`);
     }
 }

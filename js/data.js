@@ -3,6 +3,7 @@ class DataObj {
         this.name = name;
         this.type = type;
         this.data = [];
+        this.tags = {};
         this.sortType = 0;
         this.filterChecks = 0;
     }
@@ -15,6 +16,14 @@ class ChecklistItem {
         this.val = val;
         this.checked = false;
         this.important = false;
+        this.tags = [];
+    }
+}
+class Tag {
+    constructor(tag, color, id) {
+        this.id = id || data.GetGUID();
+        this.tag = tag;
+        this.color = color;
     }
 }
 let dbData = {
@@ -37,18 +46,54 @@ const data = {
             delete dbData.leftHanded;
             hasChanges = true;
         }
-        for(let i = 0; i < dbData.dbList.length; i++) { // 0JAN03 to 0JAN04
+        for(let i = 0; i < dbData.dbList.length; i++) {
             const dObj = dbData.dbList[i];
-            if(dObj.sortType === undefined) {
+            if(dObj.sortType === undefined) { // 0JAN03 to 0JAN04
                 dObj.sortType = 0;
                 dObj.filterChecks = true;
                 hasChanges = true;
+            }
+            if(dObj.tags == undefined) { // 0JAN04 to 0JAN05
+                dObj.tags = {};
+                hasChanges = true;
+            }
+            const dData = dObj.data;
+            for(let j = 0; j < dData.length; j++) {
+                const dItem = dData[j];
+                if(dItem.tags === undefined) { // 0JAN04 to 0JAN05
+                    dItem.tags = [];
+                    hasChanges = true;
+                }
             }
         }
         if(hasChanges) {
             console.log("UPDATING!");
             data.Save();
         }
+    },
+    SaveNewTags: function(dataIdx, tags, toDelete, dontSave) {
+        console.log(toDelete);
+        const clist = dbData.dbList[dataIdx];
+        clist.tags = tags;
+        for(let i = 0; i < toDelete.length; i++) {
+            const deleteId = toDelete[i];
+            for(let j = 0; j < clist.data.length; j++) {
+                const obj = clist.data[j];
+                obj.tags = obj.tags.filter(e => e !== deleteId);
+            }
+        }
+        if(dontSave !== true) { data.Save(); }
+    },
+    ToggleTag: function(dataIdx, elemIdx, tagId, dontSave) {
+        const clist = dbData.dbList[dataIdx];
+        const elem = clist.data[elemIdx];
+        const tagIdx = elem.tags.indexOf(tagId);
+        if(tagIdx < 0) {
+            elem.tags.push(tagId);
+        } else {
+            elem.tags.splice(tagIdx, 1);
+        }
+        if(dontSave !== true) { data.Save(); }
     },
     ChangeSetting: function(key, val, dontSave) {
         dbData.settings[key] = val;
@@ -166,7 +211,8 @@ const data = {
             dbData = Object.assign(dbData, doc);
             data.AddressVersionChanges();
             if(callback !== undefined) { callback(); }
-        }).catch(function() {
+        }).catch(function(e) {
+            console.log(e);
             data.dbList = [];
             db.put(dbData).then(function(res) {
                 dbData._rev = res.rev;
@@ -183,5 +229,14 @@ const data = {
         }).catch(function(err) {
             alert(JSON.stringify(err));
         });
+    },
+    GetGUID: function() {
+        let dt = new Date().getTime();
+        const guid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+            const r = (dt + Math.random() * 16) % 16 | 0;
+            dt = Math.floor(dt / 16);
+            return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+        return guid;
     }
 };

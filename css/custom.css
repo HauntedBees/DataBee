@@ -87,6 +87,37 @@ header {
 #menuBtn { padding: 0.25em }
 #menuRight { float: right; padding: 0.25em }
 
+/* Tags */
+#modalTags > div { margin: 40% auto }
+.modalTagColor {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    border: 1px solid var(--text-color);
+}
+#modalTagList > li > input { width: 80% }
+#modalTags > div > .modalContent > div { text-align: center }
+.tagColor0 { background-color: #FF0000 }
+.tagColor1 { background-color: #00FF00 }
+.tagColor2 { background-color: #0000FF }
+.tagColor3 { background-color: #FFFF00 }
+.tagColor4 { background-color: #FF00FF }
+.tagColor5 { background-color: #00FFFF }
+.tagColor6 { background-color: #999999 }
+.tagColor7 { background-color: #333333 }
+.tagColor8 { background-color: #FFAA33 }
+.tagColor9 { background-color: #33AAFF }
+.tagBox {
+    width: 0.5em;
+    height: 0.5em;
+    margin-right: 0.25em;
+    display: inline-block;
+    border: 1px solid var(--text-color);
+}
+.tagBox + .name {
+    margin-left: 0;
+}
+
 /* General Shit */
 #bMain > h4, #bCredits > p:first-child { padding-top: 1em }
 #bCredits { padding: 0 1em }
@@ -184,6 +215,19 @@ body { font-size: 2em }
 }
 .option > i { font-size: 1.5em }
 .option > div { font-size: 0.5em }
+.option.active {
+    background-color: var(--secondary-bg-color);
+    color: var(--bg-color);
+}
+.tagList > .tag {
+    border: 1px solid var(--secondary-border-color);
+    border-radius: 2px;
+    display: inline-block;
+    font-size: 0.5em;
+    padding: 0.25em 0.5em;
+    margin-right: 0.25em;
+}
+.tagList > .tag.active { background-color: var(--secondary-bg-color); color: var(--bg-color) }
 
 /* General Settings */
 .box {
