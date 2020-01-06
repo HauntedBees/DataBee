@@ -183,16 +183,18 @@ function DrawMain() {
 function GetCheckboxItemHTML(e, i) { // TODO: make the checkbox pretty?
     const allTags = dbData.dbList[dbData.currentScreen].tags;
     console.log(e);
-    const tagsHTML = e.tags.map(tag => `<div class="tagBox ${allTags[tag].color}"></div>`).join("");
+    const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
     return `<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
         <input type="checkbox"${e.checked ? " checked" : ""}>
         ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
-        ${tagsHTML}
+        <div class="tagGroup">${tagsHTML}</div>
         <span class="name">${e.val}</span>
         <i class="material-icons handle">unfold_more</i>
         <i class="edit material-icons">more_horiz</i>
         </li>`;
 }
+function GetTagHTML(allTags, tagId) { return `<div class="tagBox ${allTags[tagId].color}" data-id="${tagId}"></div>`; }
+
 function ToggleCheckboxItemSettings($e, i) {
     const important = $e.hasClass("important");
     if($e.find(".settings").length) {

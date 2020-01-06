@@ -114,6 +114,7 @@ header {
     display: inline-block;
     border: 1px solid var(--text-color);
 }
+.tagGroup { display: inline-block }
 .tagBox + .name {
     margin-left: 0;
 }

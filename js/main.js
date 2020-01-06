@@ -213,8 +213,13 @@ $(function() {
         const idx = parseInt($parent.attr("data-id"));
         const tagId = $(this).attr("data-id");
         data.ToggleTag(dbData.currentScreen, idx, tagId);
+        if($(this).hasClass("active")) {
+            $(`[data-id="${tagId}"`, $parent.find(".tagGroup")).remove();
+        } else {
+            const allTags = dbData.dbList[dbData.currentScreen].tags;
+            $parent.find(".tagGroup").append(GetTagHTML(allTags, tagId));
+        }
         $(this).toggleClass("active");
-        // TODO: add or remove tags from display immediately
     });
 
     // Swipe Handlers
