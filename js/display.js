@@ -200,9 +200,11 @@ function GetCheckboxItemHTML(e, i) { // TODO: make the checkbox pretty?
     const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
     return `<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
         <input type="checkbox"${e.checked ? " checked" : ""}>
-        ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
-        <div class="tagGroup">${tagsHTML}</div>
-        <span class="name">${e.val}</span>
+        <span class="itemContainer">
+            ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
+            <div class="tagGroup">${tagsHTML}</div>
+            <span class="name">${e.val}</span>
+        </span>
         ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
         <i class="edit material-icons">more_horiz</i>
         </li>`;
