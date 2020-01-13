@@ -240,6 +240,13 @@ body { font-size: 2em }
     font-size: 0.66em;
     padding: 0.33em;
 }
+#sortTypes { display: none }
+#sortTypes > li.active {
+    background-color: var(--bg-color-important);
+    border: 1px solid var(--text-color);
+    border-radius: 0.5em;
+}
+#sortDirIcon { float: right }
 
 /* General Settings */
 .box {

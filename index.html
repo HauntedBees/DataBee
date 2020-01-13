@@ -43,10 +43,19 @@
         <nav id="rightbar">
             <h4>Checklist Settings</h4>
             <ul>
+                <li id="deleteChecklist"><i class="material-icons">delete</i><span class="by-icon">Delete Checklist</span></li>
                 <li id="renameChecklist"><i class="material-icons">edit</i><span class="by-icon">Rename Checklist</span></li>
                 <li id="manageTags"><i class="material-icons">label</i><span class="by-icon">Manage Tags</span></li>
-                <li id="deleteChecklist"><i class="material-icons">delete</i><span class="by-icon">Delete Checklist</span></li>
-                <li id="sortChecklist"><i class="material-icons">sort</i><span class="by-icon">Sort Items</span></li>
+                <li>
+                    <span id="sortChecklist"><i class="material-icons">sort</i><span class="by-icon">Sort Items</span></span>
+                    <ul id="sortTypes">
+                        <li id="sortmanual" data-type="manual"><i class="material-icons">swap_vert</i><span class="by-icon">Manual</span></li>
+                        <li id="sortalphabetical" data-type="alphabetical"><i class="material-icons">sort_by_alpha</i><span class="by-icon">Alphabetical</span></li>
+                        <li id="sortimportance" data-type="importance"><i class="material-icons">error_outline</i><span class="by-icon">Importance</span></li>
+                        <li id="sortdate" data-type="date"><i class="material-icons">access_time</i><span class="by-icon">Date</span></li>
+                        <!--<li id="sorttag" data-type="tag"><i class="material-icons">label</i><span class="by-icon">Tag</span></li>-->
+                    </ul>
+                </li>
                 <li id="removeCompleted"><i class="material-icons">cancel</i><span class="by-icon">Remove Completed</span></li>
             </ul>
         </nav>

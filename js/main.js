@@ -114,6 +114,38 @@ $(function() {
         CloseModal("modalInfo");
         ctx.stateForBackButton = "home";
     });
+    $("#sortChecklist").on("click", function() {
+        const $subList = $("#sortTypes");
+        if($subList.hasClass("active")) {
+            $subList.hide().removeClass("active");
+        } else {
+            const mySort = dbData.dbList[dbData.currentScreen].sortType;
+            $("li", $subList).removeClass("active");
+            const $child = $(`#sort${mySort}`);
+            $child.addClass("active");
+            if(mySort !== "manual") { AddSortOrderImg($child, mySort); }
+            $subList.show().addClass("active");
+        }
+    });
+    $("#sortTypes > li").on("click", function() {
+        const currData = dbData.dbList[dbData.currentScreen];
+        const oldSort = currData.sortType;
+        const newSort = $(this).attr("data-type");
+        if(oldSort === newSort) {
+            if(newSort === "manual") { return; }
+            currData.sortDir = -currData.sortDir;
+            AddSortOrderImg($(this));
+        } else {
+            $("#sortTypes > li.active").removeClass("active");
+            $(this).addClass("active");
+            currData.sortType = newSort;
+            AddSortOrderImg($(this), newSort);
+        }
+        data.SortDataItems(dbData.currentScreen);
+        DrawMain();
+        data.Save();
+    });
+
 
     // Tags
     $("#manageTags").on("click", ShowTagsModal);

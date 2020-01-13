@@ -4,8 +4,10 @@ class DataObj {
         this.type = type;
         this.data = [];
         this.tags = {};
-        this.sortType = 0;
+        this.sortType = "manual";
+        this.sortDir = 1;
         this.filterChecks = 0;
+        this.date = +new Date();
     }
 }
 class Checklist extends DataObj {
@@ -38,7 +40,7 @@ let dbData = {
     }
 };
 const data = {
-    IsManualSorting: function(dataIdx) { return dbData.dbList[dataIdx || dbData.currentScreen].sortType === 0; },
+    IsManualSorting: function(dataIdx) { return dbData.dbList[dataIdx || dbData.currentScreen].sortType === "manual"; },
     AddressVersionChanges: function() {
         let hasChanges = false;
         if(dbData.leftHanded !== undefined) {           // 0JAN03 to 0JAN04
@@ -52,6 +54,10 @@ const data = {
                 dObj.sortType = 0;
                 dObj.filterChecks = true;
                 hasChanges = true;
+            } else if(typeof dObj.sortType === "number") { // 0JAN05 to 0JAN12
+                dObj.sortType = "manual";
+                dObj.sortDir = 1;
+                hasChanges = true;
             }
             if(dObj.tags == undefined) { // 0JAN04 to 0JAN05
                 dObj.tags = {};
@@ -62,6 +68,10 @@ const data = {
                 const dItem = dData[j];
                 if(dItem.tags === undefined) { // 0JAN04 to 0JAN05
                     dItem.tags = [];
+                    hasChanges = true;
+                }
+                if(dItem.date === undefined) { //0JAN05 to 0JAN12
+                    dItem.date = +new Date();
                     hasChanges = true;
                 }
             }
@@ -118,7 +128,7 @@ const data = {
     },
     AddDataItem: function(dataIdx, elem, dontSave) {
         let doRedraw = false;
-        if(dbData.settings.moveDownOnCheck) {
+        if(dbData.dbList[dataIdx].sortType === "manual" && dbData.settings.moveDownOnCheck) {
             const data = dbData.dbList[dataIdx].data;
             let idx = -1;
             for(let i = 0; i < data.length; i++) {
@@ -154,38 +164,54 @@ const data = {
     },
     SortDataItems: function(dataIdx) {
         const sortType = dbData.dbList[dataIdx].sortType;
-        if(sortType === 0) { return false; } // manual
+        const sortDir = dbData.dbList[dataIdx].sortDir;
+        if(sortType === "manual") { return false; }
         const doFilter = dbData.dbList[dataIdx].filterChecks;
         const list = dbData.dbList[dataIdx].data;
         switch(sortType) {
-            case 1: // alphabetical
+            case "alphabetical": 
                 list.sort((a, b) => {
                     if(doFilter) {
                         if(a.checked && !b.checked) { return 1; }
                         if(!a.checked && b.checked) { return -1; }
                     }
                     const aL = a.val.toLowerCase(), bL = b.val.toLowerCase();
-                    if(aL < bL) { return -1; }
-                    if(aL > bL) { return 1; }
+                    if(aL < bL) { return -sortDir; }
+                    if(aL > bL) { return sortDir; }
                     return 0;
                 });
                 break;
-            case 2: // importance
+            case "importance": 
                 list.sort((a, b) => {
                     if(doFilter) {
                         if(a.checked && !b.checked) { return 1; }
                         else if(!a.checked && b.checked) { return -1; }
                     }
-                    if(a.important && !b.important) { return -1; }
-                    else if(!a.important && b.important) { return 1; }
+                    if(a.important && !b.important) { return -sortDir; }
+                    else if(!a.important && b.important) { return sortDir; }
                     const aL = a.val.toLowerCase(), bL = b.val.toLowerCase();
-                    if(aL < bL) { return -1; }
-                    if(aL > bL) { return 1; }
+                    if(aL < bL) { return -sortDir; }
+                    if(aL > bL) { return sortDir; }
                     return 0;
                 });
                 break;
+            case "date": 
+                list.sort((a, b) => {
+                    if(doFilter) {
+                        if(a.checked && !b.checked) { return 1; }
+                        else if(!a.checked && b.checked) { return -1; }
+                    }
+                    if(a.date > b.date) { return -sortDir; }
+                    else if(a.date < b.date) { return sortDir; }
+                    const aL = a.val.toLowerCase(), bL = b.val.toLowerCase();
+                    if(aL < bL) { return -sortDir; }
+                    if(aL > bL) { return sortDir; }
+                    return 0;
+                });
+                break;
+            // case "tag"?
         }
-        return true;//DrawMain();
+        return true;
     },
     ToggleDataItemImportance: function(dataIdx, elemIdx, dontSave) {
         const list = dbData.dbList[dataIdx].data;
@@ -201,13 +227,14 @@ const data = {
     UpdateDataItem: function(dataIdx, elemIdx, name, checked, dontSave) {
         const list = dbData.dbList[dataIdx].data;
         if(elemIdx < 0 || elemIdx >= list.length) { return; }
-        const me = list[elemIdx];
-        if(name !== undefined) { me.val = name; }
+        const elem = list[elemIdx];
+        elem.date = +new Date();
+        if(name !== undefined) { elem.val = name; }
         if(checked !== undefined) {
-            me.checked = checked;
+            elem.checked = checked;
             if(checked && dbData.settings.moveDownOnCheck) {
                 list.splice(elemIdx, 1);
-                list.push(me);
+                list.push(elem);
             } else if(!checked && dbData.settings.moveUpOnUncheck) {
                 list.splice(elemIdx, 1);
                 let newIdx = 0;
@@ -216,7 +243,7 @@ const data = {
                     newIdx = i;
                     if(elem.checked) { break; }
                 }
-                list.splice(newIdx, 0, me);
+                list.splice(newIdx, 0, elem);
             }
         }
         data.SortDataItems(dataIdx);

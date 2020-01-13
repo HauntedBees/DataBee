@@ -181,13 +181,14 @@ function DrawMain() {
 }
 function GetCheckboxItemHTML(e, i) { // TODO: make the checkbox pretty?
     const allTags = dbData.dbList[dbData.currentScreen].tags;
+    const showHandle = dbData.dbList[dbData.currentScreen].sortType === "manual";
     const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
     return `<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
         <input type="checkbox"${e.checked ? " checked" : ""}>
         ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
         <div class="tagGroup">${tagsHTML}</div>
         <span class="name">${e.val}</span>
-        <i class="material-icons handle">unfold_more</i>
+        ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
         <i class="edit material-icons">more_horiz</i>
         </li>`;
 }
@@ -224,4 +225,9 @@ function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags
             $settingsPanel.after(`<div class="tagList">${tagHTML.join("")}</div>`);
         }
     }
+}
+function AddSortOrderImg($li, sortOrder) {
+    $("#sortDirIcon").remove();
+    if(sortOrder === "manual") { return; }
+    $li.append(`<i id="sortDirIcon" class="material-icons">keyboard_arrow_${dbData.dbList[dbData.currentScreen].sortDir > 0 ? "up" : "down"}</i>`);
 }
