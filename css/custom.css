@@ -186,7 +186,11 @@ body { font-size: 2em }
 }
 #checkListData > li:first-child { margin-top: 0.5em }
 
-.cbitem > span { margin-left: 0.5em }
+.cbitem > span {
+    display: inline-block;
+    margin-left: 0.5em;
+    max-width: 75%;
+}
 .cbitem > .edit, .cbitem > .handle {
     float: right;
     font-size: 1.25em;
