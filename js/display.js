@@ -232,8 +232,7 @@ function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags
         $settingsPanel.parent().find(".tagList").remove();
     } else {
         $tagButton.addClass("active");
-        if(myTags.length === 0) {
-            console.log(myTags);
+        if(allTags.length === 0) {
             $settingsPanel.after(`<div class="tagList noTags">This checklist does not have any tags for it. Go to the Checklist Settings and select "Manage Tags" to add some.</div>`);
         } else {
             const tagHTML = allTags.map(e => `<div class="tag${myTags.indexOf(e.id) < 0 ? "" : " active"}" data-id="${e.id}">${e.tag}</div>`);
