@@ -118,6 +118,8 @@ function SelectChecklist() {
     const id = parseInt($(this).attr("data-id"));
     if(isNaN(id) || id >= dbData.dbList.length) { return; }
     HideSidebars();
+    $("#menuBtn, #menuRight").show();
+    $("#backBtn").hide();
     dbData.currentScreen = id;
     ctx.stateForBackButton = "home";
     DrawMain();
