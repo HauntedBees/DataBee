@@ -145,6 +145,18 @@ $(function() {
         DrawMain();
         data.Save();
     });
+    $("#checkAll").on("click", function() {
+        dbData.dbList[dbData.currentScreen].data.forEach(e => { e.checked = true });
+        data.SortDataItems(dbData.currentScreen);
+        data.Save(DrawMain);
+        HideSidebars();
+    });
+    $("#uncheckAll").on("click", function() {
+        dbData.dbList[dbData.currentScreen].data.forEach(e => { e.checked = false });
+        data.SortDataItems(dbData.currentScreen);
+        data.Save(DrawMain);
+        HideSidebars();
+    });
 
     // Tags
     $("#manageTags").on("click", ShowTagsModal);
