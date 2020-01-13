@@ -263,44 +263,36 @@ function BackButtonPress() {
 }
 
 // Swiping
-let potentialSwitch = "", potentialX = 0;
+let potentialSwitch = false, potentialX = 0;
 function TouchPress(e) {
     if(ctx.stateForBackButton === "secondary" || ctx.stateForBackButton.indexOf("|") >= 0) { return; }
     const touch = e.originalEvent.touches[0];
-    const max = window.screen.width;
-    const current = touch.clientX;
-    const diff = current / max;
-    if(diff <= 0.3) {
-        potentialSwitch = "left";
-        potentialX = current;
-    } else if(diff >= 0.7) {
-        potentialSwitch = "right";
-        potentialX = current;
-    }
+    potentialSwitch = true;
+    potentialX = touch.clientX;
 }
 function TouchMove(e) {
-    if(potentialSwitch === "") { return; }
+    if(!potentialSwitch) { return; }
     const touch = e.originalEvent.touches[0];
     const max = window.screen.width;
     const current = touch.clientX;
     const dx = current - potentialX;
     const dP = dx / max;
-    if(potentialSwitch === "left" && dP > 0.1) {
+    if(dP > 0.1) {
         if(ctx.stateForBackButton === "sidebar") {
             HideSidebars();
         } else {
             ShowSidebar();
         }
-        potentialSwitch = "";
-    } else if(potentialSwitch === "right" && dP < -0.1) {
+        potentialSwitch = false;
+    } else if(dP < -0.1) {
         if(ctx.stateForBackButton === "sidebar") {
             HideSidebars();
         } else {
             ShowRightbar();
         }
-        potentialSwitch = "";
+        potentialSwitch = false;
     }
 }
 function TouchRelease() {
-    potentialSwitch = "";
+    potentialSwitch = false;
 }
