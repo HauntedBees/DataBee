@@ -186,6 +186,7 @@ $(function() {
         const name = $(this).closest("li").find(".name").text();
         $(this).closest(".settings").remove();
         ShowInputModal("renameItem", `Rename <em>${name}</em>.`, "Entry Name", "Rename", idx);
+        $("#txtModalInput").val(name).select();
     });
     $("#checkListData").on("click", ".ci-important", function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
