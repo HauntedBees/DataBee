@@ -226,16 +226,16 @@ const data = {
             case "tag":
                 const allTags = dbData.dbList[dataIdx].tags;
                 const arrSort = function(arrA, arrB, idx) {
-                    if(arrA.length < idx && arrB.length >= idx) { return -sortDir; }
-                    else if(arrA.length >= idx && arrB.length < idx) { return sortDir; }
+                    if(arrA.length < idx && arrB.length >= idx) { return sortDir; }
+                    else if(arrA.length >= idx && arrB.length < idx) { return -sortDir; }
                     else if(idx >= arrA.length && idx >= arrB.length) { return 0; }
                     const elemA = arrA[idx], elemB = arrB[idx];
                     if(elemA === elemB) {
                         return arrSort(arrA, arrB, idx + 1);
                     } else if(elemA < elemB) {
-                        return sortDir;
-                    } else if(elemA > elemB) {
                         return -sortDir;
+                    } else if(elemA > elemB) {
+                        return sortDir;
                     }
                 };
                 list.sort((a, b) => {
