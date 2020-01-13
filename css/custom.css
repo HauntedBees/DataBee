@@ -247,6 +247,11 @@ body { font-size: 2em }
     border-radius: 0.5em;
 }
 #sortDirIcon { float: right }
+#moveChecklists > li {
+    border: 1px solid var(--text-color);
+    border-radius: 0.5em;
+    text-align: center;
+}
 
 /* General Settings */
 .box {

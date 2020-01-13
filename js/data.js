@@ -213,6 +213,10 @@ const data = {
         }
         return true;
     },
+    MoveDataItem: function(oldDataIdx, newDataIdx, elemIdx, dontSave) {
+        const elem = dbData.dbList[oldDataIdx].data.splice(elemIdx, 1)[0];
+        data.AddDataItem(newDataIdx, elem, dontSave);
+    },
     ToggleDataItemImportance: function(dataIdx, elemIdx, dontSave) {
         const list = dbData.dbList[dataIdx].data;
         if(elemIdx < 0 || elemIdx >= list.length) { return; }

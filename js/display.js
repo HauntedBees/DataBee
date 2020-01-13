@@ -44,6 +44,16 @@ function GetTagModalHTML(e, i) {
         <i class='deleteTag material-icons'>delete</i>
     </li>`;
 }
+function ShowMoveModal(elemIdx) {
+    const currentChecklist = dbData.dbList[dbData.currentScreen];
+    const currentItem = currentChecklist.data[elemIdx];
+    $("#modalMove > div > .modalHeader > em").text(currentItem.name);
+    $("#modalMove").attr("data-id", elemIdx);
+    const html = dbData.dbList.map((e, i) => `<li data-id="${i}">${e.name}</li>`);
+    html.splice(dbData.currentScreen, 1);
+    $("#moveChecklists").html(html.join(""));
+    ShowModal("modalMove");
+}
 
 function ResetElements(elem) {
     elem.find("input").each(function() {
@@ -205,6 +215,7 @@ function ToggleCheckboxItemSettings($e, i) {
         $e.append(`<div class="settings" data-id="${i}">
         <div class="btn option ci-delete"><i class="material-icons">delete</i><div>Delete</div></div>
         <div class="btn option ci-rename"><i class="material-icons">edit</i><div>Rename</div></div>
+        <div class="btn option ci-move"><i class="material-icons">arrow_forward</i><div>Move</div></div>
         <div class="btn option ci-tags"><i class="material-icons">label</i><div>Tags</div></div>
         <div class="btn option ci-important${important ? " active" : ""}"><i class="material-icons">error_outline</i><div>Important</div></div>
         </div>`);

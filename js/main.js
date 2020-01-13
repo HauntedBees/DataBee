@@ -146,7 +146,6 @@ $(function() {
         data.Save();
     });
 
-
     // Tags
     $("#manageTags").on("click", ShowTagsModal);
     $("#btnAddNewTag").on("click", function() {
@@ -246,6 +245,17 @@ $(function() {
             $parent.find(".tagGroup").append(GetTagHTML(allTags, tagId));
         }
         $(this).toggleClass("active");
+    });
+    $("#checkListData").on("click", ".ci-move", function() {
+        const $parent = $(this).closest(".settings");
+        const idx = parseInt($parent.attr("data-id"));
+        ShowMoveModal(idx);
+    });
+    $(document).on("click", "#moveChecklists > li", function() {
+        const listIdx = parseInt($(this).attr("data-id"));
+        const elemIdx = parseInt($("#modalMove").attr("data-id"));
+        data.MoveDataItem(dbData.currentScreen, listIdx, elemIdx);
+        DrawMain();
     });
 
     // Swipe Handlers
