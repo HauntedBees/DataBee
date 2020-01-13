@@ -256,6 +256,7 @@ $(function() {
         const elemIdx = parseInt($("#modalMove").attr("data-id"));
         data.MoveDataItem(dbData.currentScreen, listIdx, elemIdx);
         DrawMain();
+        CloseModal("modalMove");
     });
 
     // Swipe Handlers
