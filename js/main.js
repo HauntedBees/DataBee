@@ -200,14 +200,7 @@ $(function() {
         const allTags = Object.keys(allTagsObj).map(key => allTagsObj[key]);
         const idx = parseInt($parent.attr("data-id"));
         const myTags = dbData.dbList[dbData.currentScreen].data[idx].tags;
-        if($(this).hasClass("active")) {
-            $(this).removeClass("active");
-            $parent.parent().find(".tagList").remove();
-        } else {
-            $(this).addClass("active");
-            const tagHTML = allTags.map(e => `<div class="tag${myTags.indexOf(e.id) < 0 ? "" : " active"}" data-id="${e.id}">${e.tag}</div>`);
-            $parent.after("<div class='tagList'>" + tagHTML.join("") +"</div>");
-        }
+        SetSettingsTagSelectionHTML($(this), $parent, allTags, myTags);
     });
     $(document).on("click", ".tagList > .tag", function() {
         const $parent = $(this).closest("li");

@@ -209,3 +209,19 @@ function ToggleCheckboxItemSettings($e, i) {
         </div>`);
     }
 }
+
+function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags) {
+    if($tagButton.hasClass("active")) {
+        $tagButton.removeClass("active");
+        $settingsPanel.parent().find(".tagList").remove();
+    } else {
+        $tagButton.addClass("active");
+        if(myTags.length === 0) {
+            console.log(myTags);
+            $settingsPanel.after(`<div class="tagList noTags">This checklist does not have any tags for it. Go to the Checklist Settings and select "Manage Tags" to add some.</div>`);
+        } else {
+            const tagHTML = allTags.map(e => `<div class="tag${myTags.indexOf(e.id) < 0 ? "" : " active"}" data-id="${e.id}">${e.tag}</div>`);
+            $settingsPanel.after(`<div class="tagList">${tagHTML.join("")}</div>`);
+        }
+    }
+}

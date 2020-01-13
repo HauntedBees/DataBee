@@ -233,6 +233,12 @@ body { font-size: 2em }
     margin-right: 0.25em;
 }
 .tagList > .tag.active { background-color: var(--secondary-bg-color); color: var(--bg-color) }
+.tagList.noTags {
+    border: 1px solid var(--text-color);
+    border-radius: 0.5em;
+    font-size: 0.66em;
+    padding: 0.33em;
+}
 
 /* General Settings */
 .box {
