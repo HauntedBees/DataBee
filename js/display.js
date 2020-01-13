@@ -153,9 +153,9 @@ const themes = [
   {
     "--bg-color": "#000000",            "--text-color": "#B3B3B3",
     "--bg-color-important": "#660000",  "--text-color-brighter": "#DDDDDD",
-    "--secondary-bg-color": "#FB9807",  "--secondary-border-color": "#B56B05",
+    "--secondary-bg-color": "#FBFB07",  "--secondary-border-color": "#898937",
     "--header-bg-color": "#B3B3B3",     "--header-text-color": "#FFFFFF",
-    "--button-text-color": "#FFFFFF"
+    "--button-text-color": "#4C4C4C"
   },
   {
     "--bg-color": "#FFFFFF",            "--text-color": "#191919",
