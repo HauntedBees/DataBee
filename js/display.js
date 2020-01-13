@@ -196,12 +196,12 @@ function DrawMain() {
     const html = checklist.data.map((e, i) => GetCheckboxItemHTML(e, i));
     $data.html(html.join(""));
 }
-function GetCheckboxItemHTML(e, i) { // TODO: make the checkbox pretty?
+function GetCheckboxItemHTML(e, i) {
     const allTags = dbData.dbList[dbData.currentScreen].tags;
     const showHandle = dbData.dbList[dbData.currentScreen].sortType === "manual";
     const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
     return `<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
-        <input type="checkbox"${e.checked ? " checked" : ""}>
+        <input class="checkbox" type="checkbox"${e.checked ? " checked" : ""}>
         <span class="itemContainer">
             ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
             <div class="tagGroup">${tagsHTML}</div>

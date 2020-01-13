@@ -282,6 +282,32 @@ body { font-size: 2em }
     --header-text-color: #FFFFFF;
     --button-text-color: #4C4C4C;
 }
+input.checkbox {
+    -webkit-appearance: none;
+    border: 0.1em solid var(--secondary-bg-color);
+    border-radius: 0.25em;
+    color: var(--bg-color);
+    display: inline-block;
+    height: 1.25em;
+    margin-top: 0.5em;
+    padding-left: 1em;
+    position: relative;
+    vertical-align: middle;
+    width: 1em;
+}
+.itemContainer { vertical-align: middle; margin-bottom: 0.25em }
+input.checkbox:checked { background: var(--secondary-bg-color) }
+input.checkbox::before {
+    content: "✔";
+    font-size: 1em;
+    font-weight: bold;
+    position: absolute;
+    right: 0.1em;
+    top: -0.2em;
+    visibility: hidden;
+}
+input.checkbox:checked::before { visibility: visible }
+
 body { background: var(--bg-color); color: var(--text-color) }
 button { color: var(--text-color) !important }
 .button-primary {
