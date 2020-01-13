@@ -95,6 +95,7 @@ function ShowRightbar() {
 function HideSidebars(e) {
     if(e !== undefined && (e.toElement.id === "menuBtn" || e.toElement.id === "menuRight")) { return; }
     $("#sidebar, #rightbar").removeClass("active");
+    $("#sortTypes").hide().removeClass("active");
     $("#cover").hide();
     if($("#bSettings").is(":visible") || $("#bCredits").is(":visible")) {
         ctx.stateForBackButton = "secondary";
