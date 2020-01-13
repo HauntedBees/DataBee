@@ -96,7 +96,11 @@ function HideSidebars(e) {
     if(e !== undefined && (e.toElement.id === "menuBtn" || e.toElement.id === "menuRight")) { return; }
     $("#sidebar, #rightbar").removeClass("active");
     $("#cover").hide();
-    ctx.stateForBackButton = "home";
+    if($("#bSettings").is(":visible") || $("#bCredits").is(":visible")) {
+        ctx.stateForBackButton = "secondary";
+    } else {
+        ctx.stateForBackButton = "home";
+    }
 }
 function BodyHideSidebars(e) {
     if(e.toElement !== undefined && e.toElement.tagName.toLowerCase() === "html") {

@@ -307,7 +307,7 @@ function BackButtonPress() {
 // Swiping
 let potentialSwitch = false, potentialX = 0;
 function TouchPress(e) {
-    if(ctx.stateForBackButton === "secondary" || ctx.stateForBackButton.indexOf("|") >= 0) { return; }
+    if(ctx.stateForBackButton.indexOf("|") >= 0) { return; }
     const touch = e.originalEvent.touches[0];
     potentialSwitch = true;
     potentialX = touch.clientX;
@@ -329,7 +329,7 @@ function TouchMove(e) {
     } else if(dP < -0.1) {
         if(ctx.stateForBackButton === "sidebar") {
             HideSidebars();
-        } else {
+        } else if(ctx.stateForBackButton !== "secondary") {
             ShowRightbar();
         }
         potentialSwitch = false;
