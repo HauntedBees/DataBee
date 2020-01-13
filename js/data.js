@@ -117,8 +117,28 @@ const data = {
         if(dontSave !== true) { data.Save(DrawSidebar); }
     },
     AddDataItem: function(dataIdx, elem, dontSave) {
-        dbData.dbList[dataIdx].data.push(elem);
-        data.SortDataItems(dataIdx);
+        let doRedraw = false;
+        if(dbData.settings.moveDownOnCheck) {
+            const data = dbData.dbList[dataIdx].data;
+            let idx = -1;
+            for(let i = 0; i < data.length; i++) {
+                const obj = data[i];
+                if(obj.checked) {
+                    idx = i;
+                    break;
+                }
+            }
+            if(idx < 0) {
+                dbData.dbList[dataIdx].data.push(elem);
+            } else {
+                doRedraw = true;
+                dbData.dbList[dataIdx].data.splice(idx, 0, elem);
+            }
+        } else {
+            dbData.dbList[dataIdx].data.push(elem);
+        }
+        doRedraw |= data.SortDataItems(dataIdx);
+        if(doRedraw) { DrawMain(); }
         if(dontSave !== true) { data.Save(); }
     },
     DeleteDataItem: function(dataIdx, elemIdx, dontSave) {
@@ -134,7 +154,7 @@ const data = {
     },
     SortDataItems: function(dataIdx) {
         const sortType = dbData.dbList[dataIdx].sortType;
-        if(sortType === 0) { return; } // manual
+        if(sortType === 0) { return false; } // manual
         const doFilter = dbData.dbList[dataIdx].filterChecks;
         const list = dbData.dbList[dataIdx].data;
         switch(sortType) {
@@ -165,7 +185,7 @@ const data = {
                 });
                 break;
         }
-        DrawMain();
+        return true;//DrawMain();
     },
     ToggleDataItemImportance: function(dataIdx, elemIdx, dontSave) {
         const list = dbData.dbList[dataIdx].data;
@@ -174,6 +194,7 @@ const data = {
         const oldVal = me.important;
         me.important = !oldVal;
         data.SortDataItems(dataIdx);
+        DrawMain()
         if(dontSave !== true) { data.Save(); }
         return me.important;
     },
@@ -199,6 +220,7 @@ const data = {
             }
         }
         data.SortDataItems(dataIdx);
+        DrawMain();
         if(dontSave !== true) { data.Save(); }
     },
     ClearCompletedDataItems: function(dataIdx, dontSave) {

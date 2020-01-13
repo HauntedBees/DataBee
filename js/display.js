@@ -181,7 +181,6 @@ function DrawMain() {
 }
 function GetCheckboxItemHTML(e, i) { // TODO: make the checkbox pretty?
     const allTags = dbData.dbList[dbData.currentScreen].tags;
-    console.log(e);
     const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
     return `<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
         <input type="checkbox"${e.checked ? " checked" : ""}>
