@@ -46,6 +46,7 @@ $(function() {
             const $me = $(e.originalEvent.target).closest("li");
             const oldIdx = parseInt($me.attr("data-id"));
             const newIdx = $("#sidebarData > li").index($me[0]);
+            const currentName = dbData.dbList[dbData.currentScreen].name;
             data.SwapDatas(oldIdx, newIdx);
         }
     });
@@ -82,7 +83,7 @@ $(function() {
             case "renameItem":
                 const idx = parseInt($("#modalInput").attr("data-id"));
                 data.UpdateDataItem(dbData.currentScreen, idx, val);
-                if(data.IsManualSorting()) { $(`#cbitem${idx} > span`).text(val); }
+                if(data.IsManualSorting()) { $(`#cbitem${idx} > span.itemContainer > span.name`).text(val); }
                 break;
             case "newItem":
                 const newItem = new ChecklistItem(val);
