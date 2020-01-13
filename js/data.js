@@ -126,6 +126,20 @@ const data = {
         dbData.currentScreen = -1;
         if(dontSave !== true) { data.Save(DrawSidebar); }
     },
+    SwapDatas: function(oldIdx, newIdx, dontSave) {
+        const currentName = dbData.dbList[dbData.currentScreen].name;
+        const elem = dbData.dbList[oldIdx];
+        dbData.dbList.splice(oldIdx, 1);
+        dbData.dbList.splice(newIdx, 0, elem);
+        for(let i = 0; i < dbData.dbList.length; i++) {
+            const elem = dbData.dbList[i];
+            if(elem.name === currentName) {
+                dbData.currentScreen = i;
+                break;
+            }
+        }
+        if(dontSave !== true) { data.Save(); }
+    },
     AddDataItem: function(dataIdx, elem, dontSave) {
         let doRedraw = false;
         if(dbData.dbList[dataIdx].sortType === "manual" && dbData.settings.moveDownOnCheck) {

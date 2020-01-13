@@ -38,6 +38,17 @@ $(function() {
     $("#btnDeleteAll").on("click", function() {
         ShowInfoModal("deleteAll", "Erase All Data", "Are you sure you want to delete <em>everything</em>? This cannot be undone. As a reminder, this app shares no data with the internet or cloud or whatever; only you can access this data.", "Delete");
     });
+    $("#sidebarData").sortable({
+        delay: 100,
+        handle: ".handle",
+        update: function(e) {
+            if(e === undefined || e.originalEvent === undefined || e.originalEvent.target === undefined) { return; }
+            const $me = $(e.originalEvent.target).closest("li");
+            const oldIdx = parseInt($me.attr("data-id"));
+            const newIdx = $("#sidebarData > li").index($me[0]);
+            data.SwapDatas(oldIdx, newIdx);
+        }
+    });
 
     // Sidebar
     $("#menuBtn").on("click", ShowSidebar);
@@ -82,6 +93,12 @@ $(function() {
                 $txtBox.focus();
                 return;
             case "newChecklist":
+                if(dbData.dbList.some(e => e.name === val)) {
+                    $txtBox.val(`${val} already exists!`);
+                    $txtBox.addClass("comeOn");
+                    $txtBox.select();
+                    return;
+                }
                 data.AddData(new Checklist(val));
                 DrawSidebar();
                 CloseModal("modalInput");

@@ -35,6 +35,7 @@
     position: absolute;
     margin-left: 5px;
 }
+#sidebarData > li > i.material-icons { margin-top: 0.25em }
 
 /* Modals */
 .modal {
