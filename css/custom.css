@@ -185,6 +185,7 @@ body { font-size: 2em }
     padding: 0.3em 0.5em 0.15em;
     margin-bottom: 0;
 }
+.cbitem:last-child { margin-bottom: 3em }
 #checkListData > li:first-child { margin-top: 0.5em }
 
 .cbitem > span {
@@ -302,8 +303,7 @@ input.checkbox::before {
     font-size: 1em;
     font-weight: bold;
     position: absolute;
-    right: 0.1em;
-    top: -0.2em;
+    right: 0em;
     visibility: hidden;
 }
 input.checkbox:checked::before { visibility: visible }
