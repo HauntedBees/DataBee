@@ -111,7 +111,8 @@ function BodyHideSidebars(e) {
 function DrawSidebar() { // TODO: make me prettier
     const $data = $("#sidebarData");
     $data.empty();
-    const html = dbData.dbList.map((e, i) => `<li data-id="${i}"><i class="material-icons handle">unfold_more</i><span class="by-icon">${e.name}</span></li>`);
+    const current = dbData.currentScreen;
+    const html = dbData.dbList.map((e, i) => `<li data-id="${i}"${current === i ? ` class="active"` : ""}><i class="material-icons handle">unfold_more</i><span class="by-icon">${e.name}</span></li>`);
     $data.html(html.join(""));
 }
 function SelectChecklist() {
@@ -122,6 +123,8 @@ function SelectChecklist() {
     $("#backBtn").hide();
     dbData.currentScreen = id;
     ctx.stateForBackButton = "home";
+    $("#sidebarData > li.active").removeClass("active");
+    $(this).addClass("active");
     DrawMain();
     data.Save();
 }
