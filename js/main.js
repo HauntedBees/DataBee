@@ -12,7 +12,7 @@ $(function() {
     };
 
     // Settings
-    $(".box").on("click", function() { // TODO: selected box drops down
+    $(".box").on("click", function() {
         const newTheme = parseInt($(this).attr("data-id"));
         $(`#themes .box.theme${dbData.settings.theme}`).html("");
         $(`#themes .box.theme${newTheme}`).html(`<i class="material-icons">check</i>`);
@@ -26,7 +26,7 @@ $(function() {
         ctx.stateForBackButton = "home";
         DrawMain();
     });
-    $(".settingsButton").on("click", function() {
+    $(".settingsButton").on("click", function() { // TODO: maybe delete?
         const newVal = $(this).attr("data-val") !== "true";
         data.ChangeSetting($(this).attr("data-setting"), newVal);
         if(newVal) {
@@ -49,6 +49,20 @@ $(function() {
             data.SwapDatas(oldIdx, newIdx);
             DrawSidebar();
         }
+    });
+    $("#btnExport").on("click", function() {
+        const b = new Blob([JSON.stringify(dbData)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(b);
+        a.download = `export_${+new Date()}.databee`;
+        a.dispatchEvent(new MouseEvent("click"));
+    });
+    $("#btnImport").on("click", function() {
+        const input = document.createElement("input");
+        input.setAttribute("type", "file");
+        input.setAttribute("accept", ".databee");
+        input.setAttribute("onchange", "data.Import(this.files)");
+        input.dispatchEvent(new MouseEvent("click"));
     });
 
     // Sidebar

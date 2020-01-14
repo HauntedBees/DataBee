@@ -287,6 +287,30 @@ const data = {
             alert(JSON.stringify(err));
         });
     },
+    Import: function(files) {
+        const file = files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const str = e.target.result;
+            if(str.indexOf("databee") < 0) {
+                alert("Import Failed. Invalid databee format.");
+                return;
+            }
+            try {
+                const oldRev = dbData._rev;
+                dbData = JSON.parse(str);
+                dbData._rev = oldRev;
+                data.Save(function() {
+                    alert("Data Imported!");
+                    DrawSidebar();
+                });
+            } catch {
+                alert("Import Failed. Invalid databee json format.");
+            }
+        };
+        reader.onerror = function() { alert("Import Failed. Reading file as text was unsuccessful."); };
+        reader.readAsText(file);
+    },
     GetGUID: function() {
         let dt = new Date().getTime();
         const guid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
