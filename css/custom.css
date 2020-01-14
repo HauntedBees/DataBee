@@ -173,6 +173,22 @@ nav.active { left: 0; transition: 0.35s }
 body { font-size: 2em }
 
 /* Checklist */
+#savingIcon {
+    bottom: 0;
+    display: none;
+    left: 0.5em;
+    position: fixed;
+}
+#savingIcon > i {
+    font-size: 2em;
+    animation: fade 1s linear;
+    animation-iteration-count: infinite;
+}
+@keyframes fade {
+    0% { opacity: 100% }
+    50% { opacity: 33% }
+    100% { opacity: 99% }
+}
 #btnAddItemModal, #btnAddChecklist {
     position: fixed;
     bottom: 0.5em;
