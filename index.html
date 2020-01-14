@@ -51,15 +51,22 @@
             </ul>
             <h4>Checklist Settings</h4>
             <ul>
-                <li id="manageTags"><i class="material-icons">label</i><span class="by-icon">Tags</span></li>
+                <li id="manageTags"><i class="material-icons">label</i><span class="by-icon">Tags</span><i class="sideMore material-icons">more_horiz</i></li>
                 <li>
-                    <span id="sortChecklist"><i class="material-icons">sort</i><span class="by-icon">Sort Order</span></span>
+                    <span id="sortChecklist"><i class="material-icons">sort</i><span class="by-icon">Sort Order</span><i class="sideMore material-icons">more_horiz</i></span>
                     <ul id="sortTypes">
                         <li id="sortmanual" data-type="manual"><i class="material-icons">swap_vert</i><span class="by-icon">Manual</span></li>
                         <li id="sortalphabetical" data-type="alphabetical"><i class="material-icons">sort_by_alpha</i><span class="by-icon">Alphabetical</span></li>
                         <li id="sortimportance" data-type="importance"><i class="material-icons">error_outline</i><span class="by-icon">Importance</span></li>
                         <li id="sortdate" data-type="date"><i class="material-icons">access_time</i><span class="by-icon">Date</span></li>
                         <li id="sorttag" data-type="tag"><i class="material-icons">label</i><span class="by-icon">Tag</span></li>
+                    </ul>
+                </li>
+                <li>
+                    <span id="checkedItems"><i class="material-icons">check_box</i><span class="by-icon">Checked Items</span><i class="sideMore material-icons">more_horiz</i></span>
+                    <ul id="filterTypes">
+                        <li id="checkedDown" data-val="true"><i class="material-icons">vertical_align_bottom</i><span class="by-icon">Keep Down</span></li>
+                        <li id="checkedFine" data-val="false"><i class="material-icons">vertical_align_center</i><span class="by-icon">Stay in Place</span></li i>
                     </ul>
                 </li>
             </ul>
@@ -80,12 +87,6 @@
                         <li class="settingsItem">
                             <strong>Left-Handed Mode</strong>
                             <div><button class="settingsButton" data-setting="leftHanded">Disabled</button></div>
-                        </li>
-                        <li class="settingsItem">
-                            <strong>Move Items Down After Being Checked</strong>
-                            <div><button class="settingsButton" data-setting="moveDownOnCheck">Disabled</button></div>
-                            <strong>Move Items Up After Being Unchecked</strong>
-                            <div><button class="settingsButton" data-setting="moveUpOnUncheck">Disabled</button></div>
                         </li>
                         <li class="settingsItem">
                             <strong>Erase All Data</strong>

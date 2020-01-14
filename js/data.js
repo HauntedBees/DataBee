@@ -34,9 +34,7 @@ let dbData = {
     currentScreen: -1,
     settings: {
         theme: 0, 
-        leftHanded: false, 
-        moveDownOnCheck: true,
-        moveUpOnUncheck: true
+        leftHanded: false
     }
 };
 const data = {
@@ -142,28 +140,8 @@ const data = {
         if(dontSave !== true) { data.Save(); }
     },
     AddDataItem: function(dataIdx, elem, dontSave) {
-        let doRedraw = false;
-        if(dbData.dbList[dataIdx].sortType === "manual" && dbData.settings.moveDownOnCheck) {
-            const data = dbData.dbList[dataIdx].data;
-            let idx = -1;
-            for(let i = 0; i < data.length; i++) {
-                const obj = data[i];
-                if(obj.checked) {
-                    idx = i;
-                    break;
-                }
-            }
-            if(idx < 0) {
-                dbData.dbList[dataIdx].data.push(elem);
-            } else {
-                doRedraw = true;
-                dbData.dbList[dataIdx].data.splice(idx, 0, elem);
-            }
-        } else {
-            dbData.dbList[dataIdx].data.push(elem);
-        }
-        doRedraw |= data.SortDataItems(dataIdx);
-        if(doRedraw) { DrawMain(); }
+        dbData.dbList[dataIdx].data.push(elem);
+        data.SortDataItems(dataIdx);
         if(dontSave !== true) { data.Save(); }
     },
     DeleteDataItem: function(dataIdx, elemIdx, dontSave) {
@@ -180,10 +158,18 @@ const data = {
     SortDataItems: function(dataIdx) {
         const sortType = dbData.dbList[dataIdx].sortType;
         const sortDir = dbData.dbList[dataIdx].sortDir;
-        if(sortType === "manual") { return false; }
         const doFilter = dbData.dbList[dataIdx].filterChecks;
         const list = dbData.dbList[dataIdx].data;
         switch(sortType) {
+            case "manual":
+                list.sort((a, b) => {
+                    if(doFilter) {
+                        if(a.checked && !b.checked) { return 1; }
+                        if(!a.checked && b.checked) { return -1; }
+                    }
+                    return 0;
+                });
+                break;
             case "alphabetical": 
                 list.sort((a, b) => {
                     if(doFilter) {
@@ -242,7 +228,6 @@ const data = {
                 });
                 break;
         }
-        return true;
     },
     MoveDataItem: function(oldDataIdx, newDataIdx, elemIdx, dontSave) {
         const elem = dbData.dbList[oldDataIdx].data.splice(elemIdx, 1)[0];
@@ -265,22 +250,7 @@ const data = {
         const elem = list[elemIdx];
         elem.date = +new Date();
         if(name !== undefined) { elem.val = name; }
-        if(checked !== undefined) {
-            elem.checked = checked;
-            if(checked && dbData.settings.moveDownOnCheck) {
-                list.splice(elemIdx, 1);
-                list.push(elem);
-            } else if(!checked && dbData.settings.moveUpOnUncheck) {
-                list.splice(elemIdx, 1);
-                let newIdx = 0;
-                for(let i = 0; i < list.length; i++) {
-                    const elem = list[i];
-                    newIdx = i;
-                    if(elem.checked) { break; }
-                }
-                list.splice(newIdx, 0, elem);
-            }
-        }
+        if(checked !== undefined) { elem.checked = checked; }
         data.SortDataItems(dataIdx);
         DrawMain();
         if(dontSave !== true) { data.Save(); }

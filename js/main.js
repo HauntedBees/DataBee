@@ -87,9 +87,8 @@ $(function() {
                 break;
             case "newItem":
                 const newItem = new ChecklistItem(val);
-                const html = GetCheckboxItemHTML(newItem, dbData.dbList[dbData.currentScreen].data.length);
-                $("#checkListData").append(html);
                 data.AddDataItem(dbData.currentScreen, newItem);
+                DrawMain();
                 $txtBox.val("");
                 $txtBox.focus();
                 return;
@@ -159,6 +158,35 @@ $(function() {
             currData.sortType = newSort;
             AddSortOrderImg($(this), newSort);
         }
+        data.SortDataItems(dbData.currentScreen);
+        DrawMain();
+        data.Save();
+    });
+    $("#checkedItems").on("click", function() {
+        const $subList = $("#filterTypes");
+        if($subList.hasClass("active")) {
+            $subList.hide().removeClass("active");
+        } else {
+            const doFilterChecks = dbData.dbList[dbData.currentScreen].filterChecks;
+            $("li", $subList).removeClass("active");
+            if(doFilterChecks) {
+                $("#checkedDown").addClass("active");
+            } else {
+                $("#checkedFine").addClass("active");
+            }
+            $subList.show().addClass("active");
+        }
+    });
+    $("#filterTypes > li").on("click", function() {
+        const doFilterChecks = $(this).attr("data-val") === "true";
+        if(dbData.dbList[dbData.currentScreen].filterChecks === doFilterChecks) { return; }
+        $("#filterTypes > li").removeClass("active");
+        if(doFilterChecks) {
+            $("#checkedDown").addClass("active");
+        } else {
+            $("#checkedFine").addClass("active");
+        }
+        dbData.dbList[dbData.currentScreen].filterChecks = doFilterChecks;
         data.SortDataItems(dbData.currentScreen);
         DrawMain();
         data.Save();
@@ -308,9 +336,8 @@ function ChecklistItemClick(e, $t) {
         return;
     } // otherwise it's the checkbox
     data.UpdateDataItem(dbData.currentScreen, idx, undefined, $i.prop("checked"));
-    if(dbData.settings.moveDownOnCheck || dbData.settings.moveUpOnUncheck) {
-        DrawMain();
-    }
+    data.SortDataItems(dbData.currentScreen);
+    DrawMain();
 }
 function BackButtonPress() {
     if(ctx.stateForBackButton.indexOf("|") > 0) {

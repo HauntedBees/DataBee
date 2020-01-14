@@ -167,6 +167,7 @@ nav.active { left: 0; transition: 0.35s }
 }
 #rightbar > h4 { padding: 0 0.25em }
 #rightbar.active { right: 0 }
+.sideMore { float: right }
 
 /* Body Elements */
 #content.listView { padding: 0; width: 100% }
@@ -194,6 +195,10 @@ body { font-size: 2em }
     position: fixed;
     bottom: 0.5em;
     right: 0.5em;
+}
+.lefty #btnAddItemModal, .lefty #btnAddChecklist {
+    right: inherit;
+    left: 0.5em;
 }
 #btnAddChecklist {
     bottom: 1em;
@@ -260,8 +265,8 @@ body { font-size: 2em }
     font-size: 0.66em;
     padding: 0.33em;
 }
-#sortTypes { display: none }
-#sortTypes > li.active {
+#sortTypes, #filterTypes { display: none }
+#sortTypes > li.active, #filterTypes > li.active {
     background-color: var(--bg-color-important);
     border: 1px solid var(--text-color);
     border-radius: 0.5em;

@@ -224,13 +224,15 @@ function ToggleCheckboxItemSettings($e, i) {
         ctx.stateForBackButton = "home";
     } else {
         ctx.stateForBackButton = "checkboxSettings";
-        $e.append(`<div class="settings" data-id="${i}">
-        <div class="btn option ci-delete"><i class="material-icons">delete</i><div>Delete</div></div>
-        <div class="btn option ci-rename"><i class="material-icons">edit</i><div>Rename</div></div>
-        <div class="btn option ci-move"><i class="material-icons">arrow_forward</i><div>Move</div></div>
-        <div class="btn option ci-tags"><i class="material-icons">label</i><div>Tags</div></div>
-        <div class="btn option ci-important${important ? " active" : ""}"><i class="material-icons">error_outline</i><div>Important</div></div>
-        </div>`);
+        const settings = [
+            `<div class="btn option ci-delete"><i class="material-icons">delete</i><div>Delete</div></div>`,
+            `<div class="btn option ci-rename"><i class="material-icons">edit</i><div>Rename</div></div>`,
+            `<div class="btn option ci-move"><i class="material-icons">arrow_forward</i><div>Move</div></div>`,
+            `<div class="btn option ci-tags"><i class="material-icons">label</i><div>Tags</div></div>`,
+            `<div class="btn option ci-important${important ? " active" : ""}"><i class="material-icons">error_outline</i><div>Important</div></div>`
+        ];
+        if(dbData.settings.leftHanded) { settings.reverse(); }
+        $e.append(`<div class="settings" data-id="${i}">${settings.join("")}</div>`);
     }
 }
 
