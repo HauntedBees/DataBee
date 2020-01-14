@@ -6,7 +6,7 @@ class DataObj {
         this.tags = {};
         this.sortType = "manual";
         this.sortDir = 1;
-        this.filterChecks = 0;
+        this.filterChecks = false;
         this.date = +new Date();
     }
 }
@@ -43,34 +43,34 @@ const data = {
     IsManualSorting: function(dataIdx) { return dbData.dbList[dataIdx || dbData.currentScreen].sortType === "manual"; },
     AddressVersionChanges: function() {
         let hasChanges = false;
-        if(dbData.leftHanded !== undefined) {           // 0JAN03 to 0JAN04
+        if(dbData.leftHanded !== undefined) {               // 0JAN03 to 0JAN04
             dbData.settings.leftHanded = dbData.leftHanded;
             delete dbData.leftHanded;
             hasChanges = true;
         }
         for(let i = 0; i < dbData.dbList.length; i++) {
             const dObj = dbData.dbList[i];
-            if(dObj.sortType === undefined) { // 0JAN03 to 0JAN04
+            if(dObj.sortType === undefined) {               // 0JAN03 to 0JAN04
                 dObj.sortType = 0;
                 dObj.filterChecks = true;
                 hasChanges = true;
-            } else if(typeof dObj.sortType === "number") { // 0JAN05 to 0JAN12
+            } else if(typeof dObj.sortType === "number") {  // 0JAN05 to 0JAN12
                 dObj.sortType = "manual";
                 dObj.sortDir = 1;
                 hasChanges = true;
             }
-            if(dObj.tags == undefined) { // 0JAN04 to 0JAN05
+            if(dObj.tags == undefined) {                    // 0JAN04 to 0JAN05
                 dObj.tags = {};
                 hasChanges = true;
             }
             const dData = dObj.data;
             for(let j = 0; j < dData.length; j++) {
                 const dItem = dData[j];
-                if(dItem.tags === undefined) { // 0JAN04 to 0JAN05
+                if(dItem.tags === undefined) {              // 0JAN04 to 0JAN05
                     dItem.tags = [];
                     hasChanges = true;
                 }
-                if(dItem.date === undefined) { //0JAN05 to 0JAN12
+                if(dItem.date === undefined) {              //0JAN05 to 0JAN12
                     dItem.date = +new Date();
                     hasChanges = true;
                 }
@@ -123,7 +123,8 @@ const data = {
     },
     DeleteData: function(dataIdx, dontSave) {
         dbData.dbList.splice(dataIdx, 1);
-        dbData.currentScreen = -1;
+        dbData.currentScreen = dataIdx - 1;
+        if(dbData.currentScreen < 0 && dbData.dbList.length > 0) { dbData.currentScreen = 0; }
         if(dontSave !== true) { data.Save(DrawSidebar); }
     },
     SwapDatas: function(oldIdx, newIdx, dontSave) {
@@ -306,10 +307,13 @@ const data = {
         });
     },
     Save: function(callback) {
+        $("#savingIcon").show();
         db.put(dbData).then(function(res) {
             dbData._rev = res.rev;
+            $("#savingIcon").hide();
             if(callback !== undefined) { callback(); }
         }).catch(function(err) {
+            $("#savingIcon").hide();
             alert(JSON.stringify(err));
         });
     },

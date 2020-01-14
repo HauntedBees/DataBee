@@ -165,6 +165,7 @@ nav.active { left: 0; transition: 0.35s }
     right: -100%;
     border-right: unset;
 }
+#rightbar > h4 { padding: 0 0.25em }
 #rightbar.active { right: 0 }
 
 /* Body Elements */
