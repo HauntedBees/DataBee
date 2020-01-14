@@ -52,17 +52,33 @@ $(function() {
     });
     $("#btnExport").on("click", function() {
         const b = new Blob([JSON.stringify(dbData)], { type: "application/json" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(b);
-        a.download = `export_${+new Date()}.databee`;
-        a.dispatchEvent(new MouseEvent("click"));
+        if(typeof cordova !== "undefined") {
+            window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory + "Download", function(entry) {
+                entry.getFile(`databee_${+new Date()}.json`, { create: true, exclusive: false }, function(file) {
+                    file.createWriter(function(writer) {
+                        writer.onwriteend = function() { ShowAlert("Export Successful!", "Check your Download folder!"); }
+                        writer.onerror = function(e) { ShowAlert("Export Failed", e); }
+                        writer.write(b);
+                    });
+                }, function(e) { ShowAlert("File Export Failed", e) });
+            }, function(e) { ShowAlert("Directory Export Failed", e)});
+        } else {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(b);
+            a.download = `databee_${+new Date()}.json`;
+            a.dispatchEvent(new MouseEvent("click"));
+        }
     });
     $("#btnImport").on("click", function() {
-        const input = document.createElement("input");
-        input.setAttribute("type", "file");
-        input.setAttribute("accept", ".databee");
-        input.setAttribute("onchange", "data.Import(this.files)");
-        input.dispatchEvent(new MouseEvent("click"));
+        if(typeof chooser !== "undefined") {
+            chooser.getFile().then(data.ImportChooser, function(e) { ShowAlert("Import Failed", e); });
+        } else {
+            const input = document.createElement("input");
+            input.setAttribute("type", "file");
+            input.setAttribute("accept", ".json");
+            input.setAttribute("onchange", "data.Import(this.files)");
+            input.dispatchEvent(new MouseEvent("click"));
+        }
     });
 
     // Sidebar

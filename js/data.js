@@ -272,7 +272,7 @@ const data = {
                 dbData._rev = res.rev;
                 if(callback !== undefined) { callback(); }
             }).catch(function(err) {
-                alert(JSON.stringify(err));
+                ShowAlert("Loading Error", JSON.stringify(err));
             });
         });
     },
@@ -284,32 +284,41 @@ const data = {
             if(callback !== undefined) { callback(); }
         }).catch(function(err) {
             $("#savingIcon").hide();
-            alert(JSON.stringify(err));
+            ShowAlert("Saving Error", JSON.stringify(err));
         });
     },
+    ImportChooser: function(file) {
+        const dObj = file.dataURI;
+        const prefix = "data:application/octet-stream;base64,";
+        if(dObj.indexOf(prefix) !== 0) {
+            ShowAlert("Import Failed", "Invalid databee format.");
+            return;
+        }
+        const decodedData = window.atob(dObj.replace(prefix, ""));
+        data.ProcessJSON(decodedData);
+    },
     Import: function(files) {
-        const file = files[0];
         const reader = new FileReader();
-        reader.onload = function(e) {
-            const str = e.target.result;
-            if(str.indexOf("databee") < 0) {
-                alert("Import Failed. Invalid databee format.");
-                return;
-            }
-            try {
-                const oldRev = dbData._rev;
-                dbData = JSON.parse(str);
-                dbData._rev = oldRev;
-                data.Save(function() {
-                    alert("Data Imported!");
-                    DrawSidebar();
-                });
-            } catch {
-                alert("Import Failed. Invalid databee json format.");
-            }
-        };
-        reader.onerror = function() { alert("Import Failed. Reading file as text was unsuccessful."); };
-        reader.readAsText(file);
+        reader.onload = function(e) { data.ProcessJSON(e.target.result); };
+        reader.onerror = function() { ShowAlert("Import Failed", "Reading file as text was unsuccessful."); };
+        reader.readAsText(files[0]);
+    },
+    ProcessJSON: function(str) {
+        if(str.indexOf("databee") < 0) {
+            ShowAlert("Import Failed", "Invalid databee format.");
+            return;
+        }
+        try {
+            const oldRev = dbData._rev;
+            dbData = JSON.parse(str);
+            dbData._rev = oldRev;
+            data.Save(function() {
+                ShowAlert("Import Succeeded!", "Your database is now up-to-date!");
+                DrawSidebar();
+            });
+        } catch {
+            ShowAlert("Import Failed", "Invalid databee json format.");
+        }
     },
     GetGUID: function() {
         let dt = new Date().getTime();

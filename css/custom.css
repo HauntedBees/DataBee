@@ -61,6 +61,7 @@
 .modalFooter { font-size: small; text-align: center }
 .modalFooter > * { margin: 0 0.5em }
 input.comeOn { border: 1px solid #FF0000 !important }
+#modalAlert .modalContent { word-break: break-word }
 
 /* Buttons */
 .btn, .addBtn, nav li { cursor: pointer }

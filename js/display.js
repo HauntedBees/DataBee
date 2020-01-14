@@ -24,6 +24,11 @@ function ShowInputModal(type, title, placeholder, buttonText, dataId) {
     ShowModal("modalInput", true);
     $("#txtModalInput").focus(); 
 }
+function ShowAlert(title, body) {
+    $("#modalAlert > div > .modalHeader").html(title);
+    $("#modalAlert > div > .modalContent").html(body);
+    ShowModal("modalAlert", true);
+}
 function ShowTagsModal() {
     const currentChecklist = dbData.dbList[dbData.currentScreen];
     $("#modalTags > div > .modalHeader > em").text(currentChecklist.name);
