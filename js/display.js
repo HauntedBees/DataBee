@@ -134,14 +134,14 @@ function ShowSettings() {
         $setting.attr("data-val", value).text(value ? "Enabled" : "Disabled");
         if(value) { $setting.addClass("button-primary"); }
     }
-    $("#bChecklist, #bMain, #menuBtn, #menuRight").hide();
+    $("#bChecklist, #bMain, #menuBtn, #menuRight, #bCredits").hide();
     $("#bSettings, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Settings");
     ctx.stateForBackButton = "secondary";
 }
 function ShowCredits() {
-    $("#bChecklist, #bMain, #menuBtn, #menuRight").hide();
+    $("#bChecklist, #bMain, #menuBtn, #menuRight, #bSettings").hide();
     $("#bCredits, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Credits");
