@@ -6,7 +6,7 @@ class DataObj {
         this.tags = {};
         this.sortType = "manual";
         this.sortDir = 1;
-        this.filterChecks = false;
+        this.filterChecks = true;
         this.date = +new Date();
     }
 }
