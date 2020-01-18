@@ -191,25 +191,21 @@ body { font-size: 2em }
     50% { opacity: 33% }
     100% { opacity: 99% }
 }
-#btnAddItemModal, #btnAddChecklist {
+#btnAddItemModal {
     position: fixed;
     bottom: 0.5em;
     right: 0.5em;
 }
-.lefty #btnAddItemModal, .lefty #btnAddChecklist {
+.lefty #btnAddItemModal {
     right: inherit;
     left: 0.5em;
-}
-#btnAddChecklist {
-    bottom: 1em;
-    position: absolute;
 }
 .cbitem, .settingsItem {
     padding: 0.3em 0.5em 0.15em;
     margin-bottom: 0;
 }
 .cbitem:last-child { margin-bottom: 3em }
-#checkListData > li:first-child { margin-top: 0.5em }
+#checkListData > li:first-child, #notesListData > li:first-child { margin-top: 0.5em }
 
 .cbitem > span {
     display: inline-block;
@@ -232,6 +228,11 @@ body { font-size: 2em }
     font-weight: bold;
     margin-left: 5px;
     margin-top: 0.5em;
+}
+
+.note .edit {
+    float: right;
+    font-size: 1.25em;
 }
 
 /* Checklist Settings */
@@ -351,7 +352,7 @@ header { background: var(--header-bg-color); color: var(--header-text-color) }
     color: var(--button-text-color);
 }
 nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-color) }
-.cbitem.important { background-color: var(--bg-color-important) }
+.cbitem.important, .note.important { background-color: var(--bg-color-important) }
 .cbitem, .settingsItem { background: var(--bg-color); border-bottom: 1px solid var(--header-bg-color) }
 #rightbar { border-left: 2px solid var(--secondary-bg-color) }
 .option { background-color: var(--bg-color); border: 1px solid var(--header-bg-color) }
@@ -424,3 +425,36 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
     margin-bottom: 0;
 }
 #sidebar ul { margin-bottom: 0 }
+
+.bottomElem {
+    width: 55%;
+    bottom: 0;
+    position: fixed;
+}
+
+#noteTitle {
+    background-color: var(--bg-color);
+    color: var(--header-text-color);
+    width: 100% !important;
+    margin-top: 0.5em;
+}
+#noteBody {
+    background-color: var(--bg-color);
+    color: var(--header-text-color);
+    width: 100% !important;
+    height: 75vh;
+}
+.noteBtns {
+    width: 100%;
+    text-align: center;
+}
+
+.note {
+    border-bottom: 1px solid var(--secondary-border-color);
+    padding: 0 0.75em;
+    margin-bottom: 0;
+}
+.note_body {
+    font-size: 0.75em;
+    overflow-wrap: break-word;
+}

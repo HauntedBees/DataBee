@@ -120,7 +120,7 @@ function DrawSidebar() { // TODO: make me prettier
     const html = dbData.dbList.map((e, i) => `<li data-id="${i}"${current === i ? ` class="active"` : ""}><i class="material-icons handle">unfold_more</i><span class="by-icon">${e.name}</span></li>`);
     $data.html(html.join(""));
 }
-function SelectChecklist() {
+function SelectDatalist() {
     const id = parseInt($(this).attr("data-id"));
     if(isNaN(id) || id >= dbData.dbList.length) { return; }
     HideSidebars();
@@ -142,14 +142,14 @@ function ShowSettings() {
         $setting.attr("data-val", value).text(value ? "Enabled" : "Disabled");
         if(value) { $setting.addClass("button-primary"); }
     }
-    $("#bChecklist, #bMain, #menuBtn, #menuRight, #bCredits, #bSearch").hide();
+    $(".body, #menuBtn, #menuRight").hide();
     $("#bSettings, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Settings");
     ctx.stateForBackButton = "secondary";
 }
 function ShowCredits() {
-    $("#bChecklist, #bMain, #menuBtn, #menuRight, #bSettings, #bSearch").hide();
+    $(".body, #menuBtn, #menuRight").hide();
     $("#bCredits, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Credits");
@@ -157,7 +157,7 @@ function ShowCredits() {
 }
 function ShowSearch() {
     $("#searchData").empty();
-    $("#bChecklist, #bMain, #menuBtn, #menuRight, #bSettings, #bCredits").hide();
+    $(".body, #menuBtn, #menuRight").hide();
     $("#bSearch, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Search");
@@ -178,6 +178,23 @@ function DoSearch(searchQuery) {
         const html = results.map(e => GetCheckboxItemHTML(e, e.myIdx, true));
         $("#searchData").html(html.join(""));
     }
+}
+function ShowNoteEditor(idx) {
+    const isNew = idx < 0;
+    const elem = isNew ? {} : dbData.dbList[dbData.currentScreen].data[idx];
+    const title = elem.title || "";
+    const body = elem.body || "";
+    $(".body, #menuBtn, #menuRight").hide();
+    $("#bNoteEditor, #backBtn").show();
+    $("#noteTitle").val(title);
+    $("#noteBody").val(body);
+    $("#bNoteEditor").attr("data-id", idx);
+    if(isNew) {
+        $("#title").text("Creating New Note");
+    } else {
+        $("#title").text(`Editing Note "${title}"`);
+    }
+    $("#noteBody").focus();
 }
 
 /* Main */
@@ -221,12 +238,20 @@ function DrawMain() {
     $(".body").hide();
     $("#bChecklist").show();
     $("#content").addClass("listView");
-    const checklist = dbData.dbList[dbData.currentScreen];
-    const $data = $("#checkListData");
-    $data.empty();
-    $("#title").text(`${checklist.name}`);
-    const html = checklist.data.map((e, i) => GetCheckboxItemHTML(e, i));
-    $data.html(html.join(""));
+    const datalist = dbData.dbList[dbData.currentScreen];
+    $("#checkListData, #notesListData").empty();
+    $("#title").text(`${datalist.name}`);
+    if(datalist.type === "checklist") {
+        $("#checkListData").show();
+        $("#notesListData").hide();
+        const html = datalist.data.map((e, i) => GetCheckboxItemHTML(e, i));
+        $("#checkListData").html(html.join(""));
+    } else if(datalist.type === "notes") {
+        $("#checkListData").hide();
+        $("#notesListData").show();
+        const html = datalist.data.map((e, i) => GetNoteHTML(e, i, datalist.displayType));
+        $("#notesListData").html(html.join(""));
+    }
     SetScroller("prevScroller", dbData.currentScreen - 1);
     SetScroller("nextScroller", dbData.currentScreen + 1);
 }
@@ -237,6 +262,26 @@ function SetScroller(elemId, idx) {
     const list = dbData.dbList[idx];
     $elem.attr("data-idx", idx);
     $(".scrollerBtn_text", $elem).text(list.name);
+}
+function GetNoteHTML(e, i, style, isSearchQuery) {
+    const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
+    const allTags = dbData.dbList[dbListIdx].tags;
+    //const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
+    const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
+    const body = e.body.length < 100 ? e.body : e.body.substring(0, 100) + "...";
+    if(style === "tiles") {
+        return `<li>fuk u bro team</li>`;
+    } else if(style === "list") {
+        return `<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
+        <div class="note_title">
+            ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
+            <div class="tagGroup">${tagsHTML}</div>
+            ${e.title}
+            <i class="edit material-icons">more_horiz</i>
+        </div>
+        <div class="note_body">${body}</div>
+        </li>`;
+    }
 }
 function GetCheckboxItemHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
@@ -259,7 +304,7 @@ function GetCheckboxItemHTML(e, i, isSearchQuery) {
 }
 function GetTagHTML(allTags, tagId) { return `<div class="tagBox ${allTags[tagId].color}" data-id="${tagId}"></div>`; }
 
-function ToggleCheckboxItemSettings($e, i) {
+function ToggleDataItemSettings($e, i, type) {
     const important = $e.hasClass("important");
     if($e.find(".settings").length) {
         $e.find(".settings").remove();
@@ -275,6 +320,10 @@ function ToggleCheckboxItemSettings($e, i) {
             `<div class="btn option ci-tags"><i class="material-icons">label</i><div>Tags</div></div>`,
             `<div class="btn option ci-important${important ? " active" : ""}"><i class="material-icons">error_outline</i><div>Important</div></div>`
         ];
+        if(type === "notes") {
+            settings.splice(3, 1); // remove NOTES
+            settings.splice(1, 1); // remove RENAME
+        }
         if(dbData.settings.leftHanded) { settings.reverse(); }
         $e.append(`<div class="settings" data-id="${i}">${settings.join("")}</div>`);
     }

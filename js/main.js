@@ -83,13 +83,13 @@ $(function() {
 
     $("#nextScroller, #prevScroller").on("click", function() {
         const listIdx = $(this).attr("data-idx");
-        SelectChecklist.call($(`#sidebarData > li[data-id='${listIdx}']`));
+        SelectDatalist.call($(`#sidebarData > li[data-id='${listIdx}']`));
     });
 
     // Sidebar
     $("#menuBtn").on("click", ShowSidebar);
     $("#cover").on("click", HideSidebars);
-    $("#sidebarData").on("click", "li", SelectChecklist);
+    $("#sidebarData").on("click", "li", SelectDatalist);
     $("#btnSettings").on("click", ShowSettings);
     $("#btnCredits").on("click", ShowCredits);
     $("#btnSearch").on("click", ShowSearch);
@@ -119,7 +119,7 @@ $(function() {
                 HideSidebars();
                 break;
             case "renameItem":
-                data.UpdateDataItem(dbData.currentScreen, idx, val);
+                data.UpdateChecklistItem(dbData.currentScreen, idx, val);
                 if(data.IsManualSorting()) {
                     $(`#cbitem${idx} > span.itemContainer > span.name`).text(val);
                 } else {
@@ -127,7 +127,7 @@ $(function() {
                 }
                 break;
             case "editNotes":
-                data.UpdateDataItem(dbData.currentScreen, idx, undefined, undefined, val);
+                data.UpdateChecklistItem(dbData.currentScreen, idx, undefined, undefined, val);
                 DrawMain();
                 break;
             case "newItem":
@@ -149,6 +149,18 @@ $(function() {
                 CloseModal("modalInput");
                 ctx.stateForBackButton = "sidebar";
                 return;
+            case "newNotes":
+                if(dbData.dbList.some(e => e.name === val)) {
+                    $txtBox.val(`${val} already exists!`);
+                    $txtBox.addClass("comeOn");
+                    $txtBox.select();
+                    return;
+                }
+                data.AddData(new NoteList(val));
+                DrawSidebar();
+                CloseModal("modalInput");
+                ctx.stateForBackButton = "sidebar";
+                return;
         }
         CloseModal("modalInput");
         ctx.stateForBackButton = "home";
@@ -159,7 +171,7 @@ $(function() {
     $("#btnConfirmModalInfo").on("click", function() {
         switch($("#modalInfo").attr("data-type")) {
             case "removeCompleted":
-                data.ClearCompletedDataItems(dbData.currentScreen);
+                data.ClearCompletedChecklistItems(dbData.currentScreen);
                 HideSidebars();
                 DrawMain();
                 break;
@@ -303,11 +315,34 @@ $(function() {
         if(e.keyCode === 13) { $("#btnConfirmModalInput").click(); }
     });
 
+    $("#btnAddItemModal").on("click", function() {
+        if(dbData.dbList[dbData.currentScreen].type === "checklist") {
+            ShowInputModal("newItem", "Add Item", "New Entry", "Add");
+        } else {
+            ShowNoteEditor(-1);
+        }
+    });
+
+    // Note List
+    $("#btnAddNotes").on("click", function() { ShowInputModal("newNotes", "Add Notes List", "New Notes List", "Create"); });
+    $("#btnCancelNote").on("click", DrawMain);
+    $("#btnSaveNote").on("click", function() {
+        const idx = parseInt($("#bNoteEditor").attr("data-id"));
+        const title = $("#noteTitle").val();
+        const body = $("#noteBody").val();
+        if(idx < 0) { // Add
+            data.AddDataItem(dbData.currentScreen, new NoteListItem(title, body));
+        } else { // Edit
+            data.UpdateNoteListItem(dbData.currentScreen, idx, title, body);
+        }
+        DrawMain();
+    });
+
     // Checklist
     $("#btnAddChecklist").on("click", function() { ShowInputModal("newChecklist", "Add Checklist", "New Checklist", "Create"); });
-    $("#btnAddItemModal").on("click", function() { ShowInputModal("newItem", "Add Item", "New Entry", "Add"); });
     $("#checkListData, #searchData").on("click", "li", function(e) { ChecklistItemClick(e, $(this)); });
-    $("#checkListData").on("click", ".ci-delete", function() {
+    $("#notesListData").on("click", "li", function(e) { NoteClick(e, $(this)); });
+    $("#checkListData, #notesListData").on("click", ".ci-delete", function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.DeleteDataItem(dbData.currentScreen, idx);
         $(this).closest("li").remove();
@@ -322,13 +357,13 @@ $(function() {
     });
     $("#checkListData").on("click", ".ci-notes", function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
-        const notes = data.GetDataItemNotes(dbData.currentScreen, idx);
+        const notes = data.GetChecklistItemNotes(dbData.currentScreen, idx);
         const name = $(this).closest("li").find(".name").text();
         $(this).closest(".settings").remove();
         ShowInputModal("editNotes", `Notes for <em>${name}</em>.`, "Notes", "Save", idx);
         $("#txtModalInput").val(notes).select();
     });
-    $("#checkListData").on("click", ".ci-important", function() {
+    $("#checkListData, #notesListData").on("click", ".ci-important", function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.ToggleDataItemImportance(dbData.currentScreen, idx);
         $(this).closest("li").replaceWith(GetCheckboxItemHTML(dbData.dbList[dbData.currentScreen].data[idx], idx));
@@ -373,6 +408,25 @@ $(function() {
     $(document).on("touchmove", TouchMove);
     $(document).on("touchend", TouchRelease);
 });
+function NoteClick(e, $t) {
+    const targType = e.target.tagName.toLowerCase();
+    const isSearch = $t.find(".goToResult").length > 0;
+    const idx = parseInt($t.attr("data-id"));
+    const $clicked = $(e.target);
+    if(targType === "i") { // button
+        if($clicked.closest(".settings").length) { return; } // settings
+        if($clicked.hasClass("goToResult")) { // Search
+            /*const listIdx = $clicked.attr("data-parent");
+            SelectDatalist.call($(`#sidebarData > li[data-id='${listIdx}']`));
+            $(`#cbitem${idx} .edit`).click();
+            document.documentElement.scrollTop = $(`#cbitem${idx}`).offset().top - 40;*/
+        } else { // Edit
+            ToggleDataItemSettings($t, idx, "notes");
+        }
+        return;
+    }
+    ShowNoteEditor(idx);
+}
 function ChecklistItemClick(e, $t) {
     const targType = e.target.tagName.toLowerCase();
     const isSearch = $t.find(".goToResult").length > 0;
@@ -385,17 +439,17 @@ function ChecklistItemClick(e, $t) {
         if($clicked.closest(".settings").length) { return; } // settings
         if($clicked.hasClass("goToResult")) { // Search
             const listIdx = $clicked.attr("data-parent");
-            SelectChecklist.call($(`#sidebarData > li[data-id='${listIdx}']`));
+            SelectDatalist.call($(`#sidebarData > li[data-id='${listIdx}']`));
             $(`#cbitem${idx} .edit`).click();
             document.documentElement.scrollTop = $(`#cbitem${idx}`).offset().top - 40;
         } else { // Edit
-            ToggleCheckboxItemSettings($t, idx);
+            ToggleDataItemSettings($t, idx, "checklist");
         }
         return;
     } else if(targType !== "input") { // settings
         return;
     } // otherwise it's the checkbox
-    data.UpdateDataItem(dbData.currentScreen, idx, undefined, $i.prop("checked"));
+    data.UpdateChecklistItem(dbData.currentScreen, idx, undefined, $i.prop("checked"));
     if(isSearch) {
         DoSearch($("#searchText").val().toLowerCase());
     } else {

@@ -30,29 +30,26 @@
                 <li class="sidebar_header">DataBee</li>
                 <li id="btnSearch" class="sidebar_setting"><i class="material-icons">search</i><span class="by-icon">Search</span></li>
             </ul>
-            <!--<ul> TODO: search, recent, overview
-                <li><i class="material-icons">home</i><span class="by-icon">Overview</span></li>
-                <li><i class="material-icons">settings_backup_restore</i><span class="by-icon">Recently Viewed</span></li>
-            </ul>-->
             <ul id="sidebarData"></ul>
             <ul>
                 <li id="btnSettings" class="sidebar_setting"><i class="material-icons">settings</i><span class="by-icon">Settings</span></li>
                 <li id="btnCredits" class="sidebar_setting"><i class="material-icons">copyright</i><span class="by-icon">Credits</span></li>
             </ul>
-            <div id="btnAddChecklist" class="addBtn">
-                <i class="material-icons">add</i>
-            </div>
+            <ul class="bottomElem">
+                <li id="btnAddChecklist" class="sidebar_setting"><i class="material-icons">add</i><span class="by-icon">New Checklist</span></li>
+                <li id="btnAddNotes" class="sidebar_setting"><i class="material-icons">add</i><span class="by-icon">New Notes List</span></li>
+            </ul>
         </nav>
         <nav id="rightbar">
-            <h4>Checklist Actions</h4>
+            <h4>List Actions</h4>
             <ul>
-                <li id="deleteChecklist"><i class="material-icons">delete</i><span class="by-icon">Delete Checklist</span></li>
-                <li id="renameChecklist"><i class="material-icons">edit</i><span class="by-icon">Rename Checklist</span></li>
+                <li id="deleteChecklist"><i class="material-icons">delete</i><span class="by-icon">Delete List</span></li>
+                <li id="renameChecklist"><i class="material-icons">edit</i><span class="by-icon">Rename List</span></li>
                 <li id="checkAll"><i class="material-icons">check_box</i><span class="by-icon">Check All</span></li>
                 <li id="uncheckAll"><i class="material-icons">check_box_outline_blank</i><span class="by-icon">Uncheck All</span></li>
                 <li id="removeCompleted"><i class="material-icons">cancel</i><span class="by-icon">Remove Completed</span></li>
             </ul>
-            <h4>Checklist Settings</h4>
+            <h4>List Settings</h4>
             <ul>
                 <li id="manageTags"><i class="material-icons">label</i><span class="by-icon">Tags</span><i class="sideMore material-icons">more_horiz</i></li>
                 <li>
@@ -121,6 +118,7 @@
                 </div>
                 <div id="bChecklist" class="body one-half column">
                     <ul id="checkListData"></ul>
+                    <ul id="notesListData"></ul>
                     <div id="savingIcon"><i class="material-icons">save</i></div>
                     <div id="checklistScroller">
                         <div id="prevScroller" class="scrollerBtn">
@@ -134,6 +132,14 @@
                     </div>
                     <div id="btnAddItemModal" class="addBtn">
                         <i class="material-icons">add</i>
+                    </div>
+                </div>
+                <div id="bNoteEditor" class="body one-half column">
+                    <input id="noteTitle" type="text" placeholder="Note Title (Optional)">
+                    <textarea id="noteBody" placeholder="Note Contents (Also Optional)"></textarea>
+                    <div class="bottomElem noteBtns">
+                        <button id="btnSaveNote" class="button-primary">Save</button>
+                        <button id="btnCancelNote">Cancel</button>
                     </div>
                 </div>
                 <div id="bSearch" class="body one-half column">

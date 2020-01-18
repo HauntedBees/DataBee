@@ -13,6 +13,12 @@ class DataObj {
 class Checklist extends DataObj {
     constructor(name) { super(name, "checklist"); }
 }
+class NoteList extends DataObj {
+    constructor(name) {
+        super(name, "notes");
+        this.displayType = "tiles";
+    }
+}
 class ChecklistItem {
     constructor(val) {
         this.val = val;
@@ -20,6 +26,16 @@ class ChecklistItem {
         this.important = false;
         this.tags = [];
         this.notes = "";
+        this.date = +new Date();
+    }
+}
+class NoteListItem {
+    constructor(title, body) {
+        this.title = title;
+        this.body = body;
+        this.tags = [];
+        this.important = false;
+        this.date = +new Date();
     }
 }
 class Tag {
@@ -249,7 +265,7 @@ const data = {
         if(dontSave !== true) { data.Save(); }
         return me.important;
     },
-    UpdateDataItem: function(dataIdx, elemIdx, name, checked, notes, dontSave) {
+    UpdateChecklistItem: function(dataIdx, elemIdx, name, checked, notes, dontSave) {
         const list = dbData.dbList[dataIdx].data;
         if(elemIdx < 0 || elemIdx >= list.length) { return; }
         const elem = list[elemIdx];
@@ -260,7 +276,18 @@ const data = {
         data.SortDataItems(dataIdx);
         if(dontSave !== true) { data.Save(); }
     },
-    ClearCompletedDataItems: function(dataIdx, dontSave) {
+    
+    UpdateNoteListItem: function(dataIdx, elemIdx, title, body, dontSave) {
+        const list = dbData.dbList[dataIdx].data;
+        if(elemIdx < 0 || elemIdx >= list.length) { return; }
+        const elem = list[elemIdx];
+        elem.date = +new Date();
+        if(title !== undefined) { elem.title = title; }
+        if(body !== undefined) { elem.body = body; }
+        data.SortDataItems(dataIdx);
+        if(dontSave !== true) { data.Save(); }
+    },
+    ClearCompletedChecklistItems: function(dataIdx, dontSave) {
         const list = dbData.dbList[dataIdx].data;
         dbData.dbList[dataIdx].data = list.filter(e => e.checked === false);
         if(dontSave !== true) { data.Save(); }
@@ -279,7 +306,7 @@ const data = {
         });
         return results;
     },
-    GetDataItemNotes: function(dataIdx, elemIdx) {
+    GetChecklistItemNotes: function(dataIdx, elemIdx) {
         const list = dbData.dbList[dataIdx].data;
         if(elemIdx < 0 || elemIdx >= list.length) { return; }
         const elem = list[elemIdx];
