@@ -34,8 +34,8 @@
 .by-icon {
     position: absolute;
     margin-left: 5px;
+    margin-top: -3px;
 }
-#sidebarData > li > i.material-icons { margin-top: 0.25em }
 
 /* Modals */
 .modal {
@@ -157,7 +157,6 @@ nav {
     display: flex;
     flex-flow: column;
     height: 100%;
-    padding: 0.25em 0;
 }
 nav > ul > li { padding: 0 0.25em }
 nav.active { left: 0; transition: 0.35s }
@@ -311,6 +310,7 @@ body { font-size: 2em }
 #sidebarData > li.active {
     background: var(--header-bg-color);
     color: var(--header-text-color);
+    padding-top: 0.3em;
 }
 input.checkbox {
     -webkit-appearance: none;
@@ -409,3 +409,18 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
     font-style: italic;
     margin-left: 3em;
 }
+
+.sidebar_header {
+    font-weight: bold;
+    background-color: var(--secondary-bg-color);
+    border-bottom: 1px solid var(--bg-color);
+    color: var(--button-text-color);
+    margin-bottom: 0;
+}
+.sidebar_setting {
+    background-color: var(--secondary-border-color);
+    color: var(--header-text-color);
+    border-bottom: 1px solid var(--bg-color);
+    margin-bottom: 0;
+}
+#sidebar ul { margin-bottom: 0 }
