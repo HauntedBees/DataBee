@@ -404,3 +404,8 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
     font-size: 0.75em;
     font-style: italic;
 }
+.citem_notes {
+    font-size: 0.75em;
+    font-style: italic;
+    margin-left: 3em;
+}

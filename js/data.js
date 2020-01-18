@@ -19,6 +19,7 @@ class ChecklistItem {
         this.checked = false;
         this.important = false;
         this.tags = [];
+        this.notes = "";
     }
 }
 class Tag {
@@ -70,6 +71,10 @@ const data = {
                 }
                 if(dItem.date === undefined) {              //0JAN05 to 0JAN12
                     dItem.date = +new Date();
+                    hasChanges = true;
+                }
+                if(dItem.notes === undefined) {             //0JAN13 to 0JAN17
+                    dItem.notes = "";
                     hasChanges = true;
                 }
             }
@@ -244,13 +249,14 @@ const data = {
         if(dontSave !== true) { data.Save(); }
         return me.important;
     },
-    UpdateDataItem: function(dataIdx, elemIdx, name, checked, dontSave) {
+    UpdateDataItem: function(dataIdx, elemIdx, name, checked, notes, dontSave) {
         const list = dbData.dbList[dataIdx].data;
         if(elemIdx < 0 || elemIdx >= list.length) { return; }
         const elem = list[elemIdx];
         elem.date = +new Date();
         if(name !== undefined) { elem.val = name; }
         if(checked !== undefined) { elem.checked = checked; }
+        if(notes !== undefined) { elem.notes = notes; }
         data.SortDataItems(dataIdx);
         if(dontSave !== true) { data.Save(); }
     },
@@ -272,6 +278,12 @@ const data = {
             });
         });
         return results;
+    },
+    GetDataItemNotes: function(dataIdx, elemIdx) {
+        const list = dbData.dbList[dataIdx].data;
+        if(elemIdx < 0 || elemIdx >= list.length) { return; }
+        const elem = list[elemIdx];
+        return elem.notes;
     },
     Load: function(callback) {
         db.get("databee").then(function(doc) {

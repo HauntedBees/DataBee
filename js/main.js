@@ -111,6 +111,7 @@ $(function() {
             return;
         }
         $txtBox.removeClass("comeOn");
+        const idx = parseInt($("#modalInput").attr("data-id"));
         switch($("#modalInput").attr("data-type")) {
             case "renameChecklist":
                 data.RenameData(dbData.currentScreen, val);
@@ -118,13 +119,16 @@ $(function() {
                 HideSidebars();
                 break;
             case "renameItem":
-                const idx = parseInt($("#modalInput").attr("data-id"));
                 data.UpdateDataItem(dbData.currentScreen, idx, val);
                 if(data.IsManualSorting()) {
                     $(`#cbitem${idx} > span.itemContainer > span.name`).text(val);
                 } else {
                     DrawMain();
                 }
+                break;
+            case "editNotes":
+                data.UpdateDataItem(dbData.currentScreen, idx, undefined, undefined, val);
+                DrawMain();
                 break;
             case "newItem":
                 const newItem = new ChecklistItem(val);
@@ -315,6 +319,14 @@ $(function() {
         $(this).closest(".settings").remove();
         ShowInputModal("renameItem", `Rename <em>${name}</em>.`, "Entry Name", "Rename", idx);
         $("#txtModalInput").val(name).select();
+    });
+    $("#checkListData").on("click", ".ci-notes", function() {
+        const idx = parseInt($(this).closest(".settings").attr("data-id"));
+        const notes = data.GetDataItemNotes(dbData.currentScreen, idx);
+        const name = $(this).closest("li").find(".name").text();
+        $(this).closest(".settings").remove();
+        ShowInputModal("editNotes", `Notes for <em>${name}</em>.`, "Notes", "Save", idx);
+        $("#txtModalInput").val(notes).select();
     });
     $("#checkListData").on("click", ".ci-important", function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));

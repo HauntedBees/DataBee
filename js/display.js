@@ -251,8 +251,10 @@ function GetCheckboxItemHTML(e, i, isSearchQuery) {
             <span class="name">${e.val}</span>
         </span>
         ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
+        ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i>` : ``}
         <i class="edit material-icons">more_horiz</i>
-        ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i><div class="citem_cname">${e.ownerName}</div>` : ``}
+        ${e.notes !== "" ? `<div class="citem_notes">${e.notes}</div>` : ``}
+        ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
         </li>`;
 }
 function GetTagHTML(allTags, tagId) { return `<div class="tagBox ${allTags[tagId].color}" data-id="${tagId}"></div>`; }
@@ -269,6 +271,7 @@ function ToggleCheckboxItemSettings($e, i) {
             `<div class="btn option ci-delete"><i class="material-icons">delete</i><div>Delete</div></div>`,
             `<div class="btn option ci-rename"><i class="material-icons">edit</i><div>Rename</div></div>`,
             `<div class="btn option ci-move"><i class="material-icons">arrow_forward</i><div>Move</div></div>`,
+            `<div class="btn option ci-notes"><i class="material-icons">question_answer</i><div>Notes</div></div>`,
             `<div class="btn option ci-tags"><i class="material-icons">label</i><div>Tags</div></div>`,
             `<div class="btn option ci-important${important ? " active" : ""}"><i class="material-icons">error_outline</i><div>Important</div></div>`
         ];
