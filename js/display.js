@@ -142,18 +142,42 @@ function ShowSettings() {
         $setting.attr("data-val", value).text(value ? "Enabled" : "Disabled");
         if(value) { $setting.addClass("button-primary"); }
     }
-    $("#bChecklist, #bMain, #menuBtn, #menuRight, #bCredits").hide();
+    $("#bChecklist, #bMain, #menuBtn, #menuRight, #bCredits, #bSearch").hide();
     $("#bSettings, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Settings");
     ctx.stateForBackButton = "secondary";
 }
 function ShowCredits() {
-    $("#bChecklist, #bMain, #menuBtn, #menuRight, #bSettings").hide();
+    $("#bChecklist, #bMain, #menuBtn, #menuRight, #bSettings, #bSearch").hide();
     $("#bCredits, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Credits");
     ctx.stateForBackButton = "secondary";
+}
+function ShowSearch() {
+    $("#searchData").empty();
+    $("#bChecklist, #bMain, #menuBtn, #menuRight, #bSettings, #bCredits").hide();
+    $("#bSearch, #backBtn").show();
+    HideSidebars();
+    $("#title").text("DataBee - Search");
+    $("#searchText").val("").focus();
+    ctx.stateForBackButton = "secondary";
+    DoSearch("");
+}
+function DoSearch(searchQuery) {
+    $("#searchData").empty();
+    if(searchQuery === "") {
+        $("#searchData").html(`<li class="citem-text">Enter a search query above to begin searching.</li>`);
+        return;
+    }
+    const results = data.SearchDataItems(searchQuery);
+    if(results.length === 0) {
+        $("#searchData").html(`<li class="citem-text">No results found.</li>`);
+    } else {
+        const html = results.map(e => GetCheckboxItemHTML(e, e.myIdx, true));
+        $("#searchData").html(html.join(""));
+    }
 }
 
 /* Main */
@@ -204,9 +228,10 @@ function DrawMain() {
     const html = checklist.data.map((e, i) => GetCheckboxItemHTML(e, i));
     $data.html(html.join(""));
 }
-function GetCheckboxItemHTML(e, i) {
-    const allTags = dbData.dbList[dbData.currentScreen].tags;
-    const showHandle = dbData.dbList[dbData.currentScreen].sortType === "manual";
+function GetCheckboxItemHTML(e, i, isSearchQuery) {
+    const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
+    const allTags = dbData.dbList[dbListIdx].tags;
+    const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
     return `<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
         <input class="checkbox" type="checkbox"${e.checked ? " checked" : ""}>
@@ -217,6 +242,7 @@ function GetCheckboxItemHTML(e, i) {
         </span>
         ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
         <i class="edit material-icons">more_horiz</i>
+        ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i><div class="citem_cname">${e.ownerName}</div>` : ``}
         </li>`;
 }
 function GetTagHTML(allTags, tagId) { return `<div class="tagBox ${allTags[tagId].color}" data-id="${tagId}"></div>`; }

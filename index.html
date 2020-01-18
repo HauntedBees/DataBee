@@ -26,9 +26,11 @@
             <i id="menuRight" class="btn material-icons">more_vert</i>
         </header>
         <nav id="sidebar">
+            <ul>
+                <li id="btnSearch"><i class="material-icons">search</i><span class="by-icon">Search</span></li>
+            </ul>
             <!--<ul> TODO: search, recent, overview
                 <li><i class="material-icons">home</i><span class="by-icon">Overview</span></li>
-                <li id="btnSearch"><i class="material-icons">search</i><span class="by-icon">Search</span></li>
                 <li><i class="material-icons">settings_backup_restore</i><span class="by-icon">Recently Viewed</span></li>
             </ul>-->
             <ul id="sidebarData"></ul>
@@ -122,6 +124,10 @@
                     <div id="btnAddItemModal" class="addBtn">
                         <i class="material-icons">add</i>
                     </div>
+                </div>
+                <div id="bSearch" class="body one-half column">
+                    <input id="searchText" class="input-full input-bg" type="text" placeholder="Search for...">
+                    <ul id="searchData"></ul>
                 </div>
                 <div id="bMain" class="body one-half column">
                     <h4>Hello, this is an app!</h4>

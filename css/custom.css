@@ -218,7 +218,7 @@ body { font-size: 2em }
     max-width: 75%;
     word-break: break-word;
 }
-.cbitem > .edit, .cbitem > .handle {
+.cbitem > .edit, .cbitem > .handle, .cbitem > .goToResult {
     float: right;
     font-size: 1.25em;
     padding: 0.25em;
@@ -363,3 +363,22 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
 }
 .modalContent > input { border-color: var(--header-bg-color) }
 .modalContent > input:focus { border-color: var(--secondary-bg-color) }
+
+
+/* NEW AND IMPROVED CSS */
+
+.input-full { width: 100% !important }
+.input-bg { 
+    background-color: var(--bg-color) !important;
+    border-color: var(--header-bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+.citem_cname {
+    text-align: right;
+    font-size: 0.75em;
+    font-style: italic;
+}
+.citem-text {
+    padding: 0 1em;
+}

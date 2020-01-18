@@ -22,7 +22,7 @@ $(function() {
     });
     $("#backBtn").on("click", function() {
         $("#bChecklist, #menuBtn, #menuRight").show();
-        $("#bSettings, #bCredits, #backBtn").hide();
+        $("#bSettings, #bCredits, #bSearch, #backBtn").hide();
         ctx.stateForBackButton = "home";
         DrawMain();
     });
@@ -87,6 +87,8 @@ $(function() {
     $("#sidebarData").on("click", "li", SelectChecklist);
     $("#btnSettings").on("click", ShowSettings);
     $("#btnCredits").on("click", ShowCredits);
+    $("#btnSearch").on("click", ShowSearch);
+    $("#searchText").on("keyup", function() { DoSearch($(this).val().toLowerCase()); });
 
     // Rightbar
     $("#menuRight").on("click", ShowRightbar);
@@ -113,7 +115,11 @@ $(function() {
             case "renameItem":
                 const idx = parseInt($("#modalInput").attr("data-id"));
                 data.UpdateDataItem(dbData.currentScreen, idx, val);
-                if(data.IsManualSorting()) { $(`#cbitem${idx} > span.itemContainer > span.name`).text(val); }
+                if(data.IsManualSorting()) {
+                    $(`#cbitem${idx} > span.itemContainer > span.name`).text(val);
+                } else {
+                    DrawMain();
+                }
                 break;
             case "newItem":
                 const newItem = new ChecklistItem(val);
@@ -260,8 +266,6 @@ $(function() {
         $tag.remove();
     });
     
-    // TODO: swap modal buttons for right/left hand?
-
     // Main
     document.addEventListener("backbutton", BackButtonPress, false);
     $("#checkListData").sortable({
@@ -293,7 +297,7 @@ $(function() {
     // Checklist
     $("#btnAddChecklist").on("click", function() { ShowInputModal("newChecklist", "Add Checklist", "New Checklist", "Create"); });
     $("#btnAddItemModal").on("click", function() { ShowInputModal("newItem", "Add Item", "New Entry", "Add"); });
-    $("#checkListData").on("click", "li", function(e) { ChecklistItemClick(e, $(this)); });
+    $("#checkListData, #searchData").on("click", "li", function(e) { ChecklistItemClick(e, $(this)); });
     $("#checkListData").on("click", ".ci-delete", function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.DeleteDataItem(dbData.currentScreen, idx);
@@ -354,20 +358,32 @@ $(function() {
 });
 function ChecklistItemClick(e, $t) {
     const targType = e.target.tagName.toLowerCase();
+    const isSearch = $t.find(".goToResult").length > 0;
     const $i = $t.find("input");
     const idx = parseInt($t.attr("data-id"));
+    const $clicked = $(e.target);
     if(targType === "span" || targType === "li") { // text or main area
         $i.prop("checked", !$i.prop("checked"));
     } else if(targType === "i") { // button
-        if($(e.target).closest(".settings").length) { return; } // settings
-        ToggleCheckboxItemSettings($t, idx);
+        if($clicked.closest(".settings").length) { return; } // settings
+        if($clicked.hasClass("goToResult")) { // Search
+            const listIdx = $clicked.attr("data-parent");
+            SelectChecklist.call($(`#sidebarData > li[data-id='${listIdx}']`));
+            $(`#cbitem${idx} .edit`).click();
+            document.documentElement.scrollTop = $(`#cbitem${idx}`).offset().top - 40;
+        } else { // Edit
+            ToggleCheckboxItemSettings($t, idx);
+        }
         return;
     } else if(targType !== "input") { // settings
         return;
     } // otherwise it's the checkbox
     data.UpdateDataItem(dbData.currentScreen, idx, undefined, $i.prop("checked"));
-    data.SortDataItems(dbData.currentScreen);
-    DrawMain();
+    if(isSearch) {
+        DoSearch($("#searchText").val().toLowerCase());
+    } else {
+        DrawMain();
+    }
 }
 function BackButtonPress() {
     if(ctx.stateForBackButton.indexOf("|") > 0) {

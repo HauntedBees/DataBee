@@ -252,13 +252,26 @@ const data = {
         if(name !== undefined) { elem.val = name; }
         if(checked !== undefined) { elem.checked = checked; }
         data.SortDataItems(dataIdx);
-        DrawMain();
         if(dontSave !== true) { data.Save(); }
     },
     ClearCompletedDataItems: function(dataIdx, dontSave) {
         const list = dbData.dbList[dataIdx].data;
         dbData.dbList[dataIdx].data = list.filter(e => e.checked === false);
         if(dontSave !== true) { data.Save(); }
+    },
+    SearchDataItems: function(query) {
+        const results = [];
+        dbData.dbList.forEach((arr, arrIdx) => {
+            arr.data.forEach((elem, elemIdx) => {
+                if(elem.val.toLowerCase().indexOf(query) >= 0) {
+                    elem.ownerName = arr.name;
+                    elem.ownerIdx = arrIdx;
+                    elem.myIdx = elemIdx;
+                    results.push(elem);
+                }
+            });
+        });
+        return results;
     },
     Load: function(callback) {
         db.get("databee").then(function(doc) {
