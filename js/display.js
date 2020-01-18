@@ -227,6 +227,16 @@ function DrawMain() {
     $("#title").text(`${checklist.name}`);
     const html = checklist.data.map((e, i) => GetCheckboxItemHTML(e, i));
     $data.html(html.join(""));
+    SetScroller("prevScroller", dbData.currentScreen - 1);
+    SetScroller("nextScroller", dbData.currentScreen + 1);
+}
+function SetScroller(elemId, idx) {
+    const $elem = $(`#${elemId}`);
+    if(idx < 0) { idx = dbData.dbList.length - 1; }
+    else if(idx >= dbData.dbList.length) { idx = 0; }
+    const list = dbData.dbList[idx];
+    $elem.attr("data-idx", idx);
+    $(".scrollerBtn_text", $elem).text(list.name);
 }
 function GetCheckboxItemHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;

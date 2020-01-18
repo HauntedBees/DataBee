@@ -367,6 +367,30 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
 
 /* NEW AND IMPROVED CSS */
 
+#checklistScroller {   
+    position: fixed;
+    bottom: 0em;
+    left: 0em;
+    background: var(--bg-color);
+    border-top: 1px solid var(--secondary-bg-color);
+    padding-top: 0.25em;
+    width: 100%;
+}
+.scrollerBtn {
+    display: inline-block;
+    text-align: center;
+    min-width: 5em;
+    max-width: 5em;
+    overflow-x: hidden;
+    white-space: nowrap;
+}
+#prevScroller { border-right: 1px solid var(--secondary-bg-color) }
+.scrollerBtn_text {
+    font-size: 0.5em;
+    margin-top: -0.5em;
+    padding: 0 0.5em;
+}
+
 .input-full { width: 100% !important }
 .input-bg { 
     background-color: var(--bg-color) !important;

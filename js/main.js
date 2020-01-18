@@ -81,6 +81,11 @@ $(function() {
         }
     });
 
+    $("#nextScroller, #prevScroller").on("click", function() {
+        const listIdx = $(this).attr("data-idx");
+        SelectChecklist.call($(`#sidebarData > li[data-id='${listIdx}']`));
+    });
+
     // Sidebar
     $("#menuBtn").on("click", ShowSidebar);
     $("#cover").on("click", HideSidebars);

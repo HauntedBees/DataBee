@@ -57,7 +57,7 @@ const data = {
                 dObj.sortDir = 1;
                 hasChanges = true;
             }
-            if(dObj.tags == undefined) {                    // 0JAN04 to 0JAN05
+            if(dObj.tags === undefined) {                   // 0JAN04 to 0JAN05
                 dObj.tags = {};
                 hasChanges = true;
             }
