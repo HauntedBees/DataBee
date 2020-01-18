@@ -374,11 +374,9 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
     color: var(--text-color) !important;
 }
 
+.citem-text { padding: 0 1em }
 .citem_cname {
     text-align: right;
     font-size: 0.75em;
     font-style: italic;
-}
-.citem-text {
-    padding: 0 1em;
 }

@@ -271,6 +271,10 @@ function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags
     if($tagButton.hasClass("active")) {
         $tagButton.removeClass("active");
         $settingsPanel.parent().find(".tagList").remove();
+        if(dbData.dbList[dbData.currentScreen].sortType === "tag") {
+            data.SortDataItems(dbData.currentScreen);
+            DrawMain();
+        }
     } else {
         $tagButton.addClass("active");
         if(allTags.length === 0) {
