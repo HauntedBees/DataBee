@@ -323,6 +323,7 @@ function ToggleDataItemSettings($e, i, type) {
         if(type === "notes") {
             settings.splice(3, 1); // remove NOTES
             settings.splice(1, 1); // remove RENAME
+            settings.push(`<div class="btn option ci-rename"><i class="material-icons">edit</i><div>Edit</div></div>`);
         }
         if(dbData.settings.leftHanded) { settings.reverse(); }
         $e.append(`<div class="settings" data-id="${i}">${settings.join("")}</div>`);

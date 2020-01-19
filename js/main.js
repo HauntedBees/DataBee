@@ -342,20 +342,23 @@ $(function() {
     $("#btnAddChecklist").on("click", function() { ShowInputModal("newChecklist", "Add Checklist", "New Checklist", "Create"); });
     $("#checkListData, #searchData").on("click", "li", function(e) { ChecklistItemClick(e, $(this)); });
     $("#notesListData").on("click", "li", function(e) { NoteClick(e, $(this)); });
-    $("#checkListData, #notesListData").on("click", ".ci-delete", function() {
+    $("#checkListData, #notesListData").on("click", ".ci-delete", function(e) {
+        e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.DeleteDataItem(dbData.currentScreen, idx);
         $(this).closest("li").remove();
         ctx.stateForBackButton = "home";
     });
-    $("#checkListData").on("click", ".ci-rename", function() {
+    $("#checkListData").on("click", ".ci-rename", function(e) {
+        e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         const name = $(this).closest("li").find(".name").text();
         $(this).closest(".settings").remove();
         ShowInputModal("renameItem", `Rename <em>${name}</em>.`, "Entry Name", "Rename", idx);
         $("#txtModalInput").val(name).select();
     });
-    $("#checkListData").on("click", ".ci-notes", function() {
+    $("#checkListData").on("click", ".ci-notes", function(e) {
+        e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         const notes = data.GetChecklistItemNotes(dbData.currentScreen, idx);
         const name = $(this).closest("li").find(".name").text();
@@ -363,13 +366,15 @@ $(function() {
         ShowInputModal("editNotes", `Notes for <em>${name}</em>.`, "Notes", "Save", idx);
         $("#txtModalInput").val(notes).select();
     });
-    $("#checkListData, #notesListData").on("click", ".ci-important", function() {
+    $("#checkListData, #notesListData").on("click", ".ci-important", function(e) {
+        e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.ToggleDataItemImportance(dbData.currentScreen, idx);
         $(this).closest("li").replaceWith(GetCheckboxItemHTML(dbData.dbList[dbData.currentScreen].data[idx], idx));
         ctx.stateForBackButton = "home";
     });
-    $("#checkListData").on("click", ".ci-tags", function() {
+    $("#checkListData").on("click", ".ci-tags", function(e) {
+        e.stopPropagation();
         const $parent = $(this).closest(".settings");
         const allTagsObj = dbData.dbList[dbData.currentScreen].tags;
         const allTags = Object.keys(allTagsObj).map(key => allTagsObj[key]);
@@ -410,7 +415,7 @@ $(function() {
 });
 function NoteClick(e, $t) {
     const targType = e.target.tagName.toLowerCase();
-    const isSearch = $t.find(".goToResult").length > 0;
+    //const isSearch = $t.find(".goToResult").length > 0;
     const idx = parseInt($t.attr("data-id"));
     const $clicked = $(e.target);
     if(targType === "i") { // button
