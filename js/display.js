@@ -163,7 +163,7 @@ function ShowCredits() {
     $(".body, #menuBtn, #menuRight").hide();
     $("#bCredits, #backBtn").show();
     HideSidebars();
-    $("#title").text("DataBee - Credits");
+    $("#title").text("DataBee v0JAN18");
     ctx.stateForBackButton = "secondary";
 }
 function ShowSearch() {
