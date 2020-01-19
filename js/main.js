@@ -6,11 +6,6 @@ const ctx = {
 };
 $(function() {
     data.Load(DrawAll);
-    window.oncontextmenu = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    };
 
     // Settings
     $(".box").on("click", function() {
