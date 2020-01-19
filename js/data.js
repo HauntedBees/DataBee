@@ -33,6 +33,7 @@ class NoteListItem {
     constructor(title, body) {
         this.title = title;
         this.body = body;
+        this.val = title + body;
         this.tags = [];
         this.important = false;
         this.date = +new Date();
@@ -177,13 +178,14 @@ const data = {
         if(dontSave !== true) { data.Save(); }
     },
     SortDataItems: function(dataIdx) {
-        const sortType = dbData.dbList[dataIdx].sortType;
-        const sortDir = dbData.dbList[dataIdx].sortDir;
-        const doFilter = dbData.dbList[dataIdx].filterChecks;
-        const list = dbData.dbList[dataIdx].data;
+        const dataList = dbData.dbList[dataIdx];
+        const sortType = dataList.sortType;
+        const sortDir = dataList.sortDir;
+        const doFilter = dataList.filterChecks || false;
+        const dataItems = dataList.data;
         switch(sortType) {
             case "manual":
-                list.sort((a, b) => {
+                dataItems.sort((a, b) => {
                     if(doFilter) {
                         if(a.checked && !b.checked) { return 1; }
                         if(!a.checked && b.checked) { return -1; }
@@ -192,7 +194,7 @@ const data = {
                 });
                 break;
             case "alphabetical": 
-                list.sort((a, b) => {
+                dataItems.sort((a, b) => {
                     if(doFilter) {
                         if(a.checked && !b.checked) { return 1; }
                         if(!a.checked && b.checked) { return -1; }
@@ -204,7 +206,7 @@ const data = {
                 });
                 break;
             case "importance": 
-                list.sort((a, b) => {
+                dataItems.sort((a, b) => {
                     if(doFilter) {
                         if(a.checked && !b.checked) { return 1; }
                         else if(!a.checked && b.checked) { return -1; }
@@ -218,7 +220,7 @@ const data = {
                 });
                 break;
             case "date": 
-                list.sort((a, b) => {
+                dataItems.sort((a, b) => {
                     if(doFilter) {
                         if(a.checked && !b.checked) { return 1; }
                         else if(!a.checked && b.checked) { return -1; }
@@ -233,7 +235,7 @@ const data = {
                 break;
             case "tag":
                 const allTags = dbData.dbList[dataIdx].tags;
-                list.sort((a, b) => {
+                dataItems.sort((a, b) => {
                     if(doFilter) {
                         if(a.checked && !b.checked) { return 1; }
                         else if(!a.checked && b.checked) { return -1; }
@@ -252,6 +254,7 @@ const data = {
     },
     MoveDataItem: function(oldDataIdx, newDataIdx, elemIdx, dontSave) {
         const elem = dbData.dbList[oldDataIdx].data.splice(elemIdx, 1)[0];
+        // TODO: handle tag changes
         data.AddDataItem(newDataIdx, elem, dontSave);
     },
     ToggleDataItemImportance: function(dataIdx, elemIdx, dontSave) {
@@ -275,8 +278,7 @@ const data = {
         if(notes !== undefined) { elem.notes = notes; }
         data.SortDataItems(dataIdx);
         if(dontSave !== true) { data.Save(); }
-    },
-    
+    },   
     UpdateNoteListItem: function(dataIdx, elemIdx, title, body, dontSave) {
         const list = dbData.dbList[dataIdx].data;
         if(elemIdx < 0 || elemIdx >= list.length) { return; }
@@ -284,6 +286,7 @@ const data = {
         elem.date = +new Date();
         if(title !== undefined) { elem.title = title; }
         if(body !== undefined) { elem.body = body; }
+        elem.val = elem.title + elem.body;
         data.SortDataItems(dataIdx);
         if(dontSave !== true) { data.Save(); }
     },

@@ -50,12 +50,15 @@ function GetTagModalHTML(e, i) {
     </li>`;
 }
 function ShowMoveModal(elemIdx) {
-    const currentChecklist = dbData.dbList[dbData.currentScreen];
-    const currentItem = currentChecklist.data[elemIdx];
+    const currentList = dbData.dbList[dbData.currentScreen];
+    const currentListType = currentList.type;
+    const currentItem = currentList.data[elemIdx];
     $("#modalMove > div > .modalHeader > em").text(currentItem.name);
     $("#modalMove").attr("data-id", elemIdx);
-    const html = dbData.dbList.map((e, i) => `<li data-id="${i}">${e.name}</li>`);
-    html.splice(dbData.currentScreen, 1);
+    const html = dbData.dbList
+                              .map((e, i) => [i, e.type, `<li data-id="${i}">${e.name}</li>`])
+                              .filter(e => e[1] === currentListType && e[0] !== dbData.currentScreen)
+                              .map(e => e[2]);
     $("#moveChecklists").html(html.join(""));
     ShowModal("modalMove");
 }
@@ -92,6 +95,16 @@ function ShowSidebar() {
 }
 function ShowRightbar() {
     if(dbData.currentScreen < 0) { return; }
+    switch(dbData.dbList[dbData.currentScreen].type) {
+        case "checklist":
+            $(".note-only").hide();
+            $(".checklist-only").show();
+            break;
+        case "notes":
+            $(".checklist-only").hide();
+            $(".note-only").show();
+            break;
+    }
     $("#rightbar").addClass("active");
     $("#sidebar").removeClass("active");
     $("#cover").show();
@@ -113,7 +126,7 @@ function BodyHideSidebars(e) {
         HideSidebars(e);
     }
 }
-function DrawSidebar() { // TODO: make me prettier
+function DrawSidebar() {
     const $data = $("#sidebarData");
     $data.empty();
     const current = dbData.currentScreen;
@@ -323,7 +336,7 @@ function ToggleDataItemSettings($e, i, type) {
         if(type === "notes") {
             settings.splice(3, 1); // remove NOTES
             settings.splice(1, 1); // remove RENAME
-            settings.push(`<div class="btn option ci-rename"><i class="material-icons">edit</i><div>Edit</div></div>`);
+            settings.push(`<div class="btn option ci-edit"><i class="material-icons">edit</i><div>Edit</div></div>`);
         }
         if(dbData.settings.leftHanded) { settings.reverse(); }
         $e.append(`<div class="settings" data-id="${i}">${settings.join("")}</div>`);
@@ -341,7 +354,7 @@ function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags
     } else {
         $tagButton.addClass("active");
         if(allTags.length === 0) {
-            $settingsPanel.after(`<div class="tagList noTags">This checklist does not have any tags for it. Go to the Checklist Settings and select "Manage Tags" to add some.</div>`);
+            $settingsPanel.after(`<div class="tagList noTags">This list does not have any tags for it. Go to the List Settings and select "Manage Tags" to add some.</div>`);
         } else {
             const tagHTML = allTags.map(e => `<div class="tag${myTags.indexOf(e.id) < 0 ? "" : " active"}" data-id="${e.id}">${e.tag}</div>`);
             $settingsPanel.after(`<div class="tagList">${tagHTML.join("")}</div>`);

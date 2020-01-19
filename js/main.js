@@ -325,7 +325,12 @@ $(function() {
 
     // Note List
     $("#btnAddNotes").on("click", function() { ShowInputModal("newNotes", "Add Notes List", "New Notes List", "Create"); });
-    $("#btnCancelNote").on("click", DrawMain);
+    $("#btnCancelNote").on("click", function() {
+        $("#bChecklist, #menuBtn, #menuRight").show();
+        $("#bSettings, #bCredits, #bSearch, #backBtn").hide();
+        ctx.stateForBackButton = "home";
+        DrawMain();
+    });
     $("#btnSaveNote").on("click", function() {
         const idx = parseInt($("#bNoteEditor").attr("data-id"));
         const title = $("#noteTitle").val();
@@ -373,7 +378,7 @@ $(function() {
         $(this).closest("li").replaceWith(GetCheckboxItemHTML(dbData.dbList[dbData.currentScreen].data[idx], idx));
         ctx.stateForBackButton = "home";
     });
-    $("#checkListData").on("click", ".ci-tags", function(e) {
+    $("#checkListData, #notesListData").on("click", ".ci-tags", function(e) {
         e.stopPropagation();
         const $parent = $(this).closest(".settings");
         const allTagsObj = dbData.dbList[dbData.currentScreen].tags;
@@ -382,7 +387,8 @@ $(function() {
         const myTags = dbData.dbList[dbData.currentScreen].data[idx].tags;
         SetSettingsTagSelectionHTML($(this), $parent, allTags, myTags);
     });
-    $(document).on("click", ".tagList > .tag", function() {
+    $(document).on("click", ".tagList > .tag", function(e) {
+        e.stopPropagation();
         const $parent = $(this).closest("li");
         const idx = parseInt($parent.attr("data-id"));
         const tagId = $(this).attr("data-id");
@@ -395,10 +401,15 @@ $(function() {
         }
         $(this).toggleClass("active");
     });
-    $("#checkListData").on("click", ".ci-move", function() {
+    $("#checkListData, #notesListData").on("click", ".ci-move", function(e) {
+        e.stopPropagation();
         const $parent = $(this).closest(".settings");
         const idx = parseInt($parent.attr("data-id"));
         ShowMoveModal(idx);
+    });
+    $("#notesListData").on("click", ".ci-edit", function(e) {
+        e.stopPropagation();
+        ShowNoteEditor(parseInt($(this).closest(".settings").attr("data-id")));
     });
     $(document).on("click", "#moveChecklists > li", function() {
         const listIdx = parseInt($(this).attr("data-id"));
@@ -418,6 +429,7 @@ function NoteClick(e, $t) {
     //const isSearch = $t.find(".goToResult").length > 0;
     const idx = parseInt($t.attr("data-id"));
     const $clicked = $(e.target);
+    if($clicked.hasClass("tag")) { return; }
     if(targType === "i") { // button
         if($clicked.closest(".settings").length) { return; } // settings
         if($clicked.hasClass("goToResult")) { // Search
