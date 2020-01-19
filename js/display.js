@@ -208,10 +208,12 @@ function ShowNoteEditor(idx, readView) {
     $("#noteTitleRead").text(title);
     $("#noteBodyRead").text(body);
     if(readView === true) {
+        ctx.stateForBackButton = "noteReader";
         $("#noteEdit").hide();
         $("#noteRead").show();
         $("#title").text(`Viewing Note "${title}"`);
     } else {
+        ctx.stateForBackButton = "noteEditor";
         $("#noteEdit").show();
         $("#noteRead").hide();
         if(isNew) {

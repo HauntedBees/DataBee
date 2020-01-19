@@ -538,6 +538,13 @@ function BackButtonPress() {
         return;
     }
     switch(ctx.stateForBackButton) {
+        case "noteEditor":
+            const idx = parseInt($("#bNoteEditor").attr("data-id"));
+            ShowNoteEditor(idx, true);
+            break;
+        case "noteReader":
+            $("#backBtn").click();
+            break;
         case "sidebar":
             HideSidebars();
             break;
