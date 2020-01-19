@@ -137,13 +137,11 @@ function SelectDatalist() {
     const id = parseInt($(this).attr("data-id"));
     if(isNaN(id) || id >= dbData.dbList.length) { return; }
     HideSidebars();
-    $("#menuBtn, #menuRight").show();
-    $("#backBtn").hide();
     dbData.currentScreen = id;
     ctx.stateForBackButton = "home";
     $("#sidebarData > li.active").removeClass("active");
     $(this).addClass("active");
-    DrawMain();
+    ReturnToMain();
     data.Save();
 }
 function ShowSettings() {
@@ -256,6 +254,12 @@ function SetTheme() {
     for(const varName in theme) {
         root.style.setProperty(varName, theme[varName]);
     }
+}
+function ReturnToMain() {
+    $(".body, #backBtn").hide();
+    $("#bChecklist, #menuBtn, #menuRight").show();
+    ctx.stateForBackButton = "home";
+    DrawMain();
 }
 function DrawMain() {
     if(dbData.currentScreen === -1) {

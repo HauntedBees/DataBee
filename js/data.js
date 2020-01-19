@@ -263,7 +263,6 @@ const data = {
         const oldVal = me.important;
         me.important = !oldVal;
         data.SortDataItems(dataIdx);
-        DrawMain()
         if(dontSave !== true) { data.Save(); }
         return me.important;
     },

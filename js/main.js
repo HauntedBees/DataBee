@@ -24,8 +24,7 @@ $(function() {
     $("#backBtn").on("click", function() {
         $("#bChecklist, #menuBtn, #menuRight").show();
         $("#bSettings, #bCredits, #bSearch, #backBtn").hide();
-        ctx.stateForBackButton = "home";
-        DrawMain();
+        ReturnToMain();
     });
     $(".settingsButton").on("click", function() { // TODO: maybe delete?
         const newVal = $(this).attr("data-val") !== "true";
@@ -381,8 +380,7 @@ $(function() {
         }
         $("#bChecklist, #menuBtn, #menuRight").show();
         $("#bSettings, #bCredits, #bSearch, #backBtn").hide();
-        ctx.stateForBackButton = "home";
-        DrawMain();
+        ReturnToMain();
     });
     $("#btnSaveNote").on("click", function() {
         const idx = parseInt($("#bNoteEditor").attr("data-id"));
@@ -393,7 +391,7 @@ $(function() {
         } else { // Edit
             data.UpdateNoteListItem(dbData.currentScreen, idx, title, body);
         }
-        DrawMain();
+        ReturnToMain();
     });
 
     // Checklist
@@ -435,6 +433,7 @@ $(function() {
         e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.ToggleDataItemImportance(dbData.currentScreen, idx);
+        DrawMain();
         $(this).closest("li").replaceWith(GetCheckboxItemHTML(dbData.dbList[dbData.currentScreen].data[idx], idx));
         ctx.stateForBackButton = "home";
     });
