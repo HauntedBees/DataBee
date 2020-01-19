@@ -458,3 +458,7 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
     font-size: 0.75em;
     overflow-wrap: break-word;
 }
+
+#noteTitleRead, #noteBodyRead { padding: 0 1em }
+#noteTitleRead { margin: 0.25em 0 }
+#noteBodyRead { overflow-wrap: break-word }

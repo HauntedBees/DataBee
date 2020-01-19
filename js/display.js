@@ -192,7 +192,7 @@ function DoSearch(searchQuery) {
         $("#searchData").html(html.join(""));
     }
 }
-function ShowNoteEditor(idx) {
+function ShowNoteEditor(idx, readView) {
     const isNew = idx < 0;
     const elem = isNew ? {} : dbData.dbList[dbData.currentScreen].data[idx];
     const title = elem.title || "";
@@ -201,13 +201,23 @@ function ShowNoteEditor(idx) {
     $("#bNoteEditor, #backBtn").show();
     $("#noteTitle").val(title);
     $("#noteBody").val(body);
-    $("#bNoteEditor").attr("data-id", idx);
-    if(isNew) {
-        $("#title").text("Creating New Note");
+    $("#noteTitleRead").text(title);
+    $("#noteBodyRead").text(body);
+    if(readView === true) {
+        $("#noteEdit").hide();
+        $("#noteRead").show();
+        $("#title").text(`Viewing Note "${title}"`);
     } else {
-        $("#title").text(`Editing Note "${title}"`);
+        $("#noteEdit").show();
+        $("#noteRead").hide();
+        if(isNew) {
+            $("#title").text("Creating New Note");
+        } else {
+            $("#title").text(`Editing Note "${title}"`);
+        }
+        $("#noteBody").focus();
     }
-    $("#noteBody").focus();
+    $("#bNoteEditor").attr("data-id", idx);
 }
 
 /* Main */

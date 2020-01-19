@@ -319,13 +319,22 @@ $(function() {
         if(dbData.dbList[dbData.currentScreen].type === "checklist") {
             ShowInputModal("newItem", "Add Item", "New Entry", "Add");
         } else {
-            ShowNoteEditor(-1);
+            ShowNoteEditor(-1, false);
         }
     });
 
     // Note List
     $("#btnAddNotes").on("click", function() { ShowInputModal("newNotes", "Add Notes List", "New Notes List", "Create"); });
-    $("#btnCancelNote").on("click", function() {
+    $("#btnEditNote").on("click", function() {
+        const idx = parseInt($("#bNoteEditor").attr("data-id"));
+        ShowNoteEditor(idx, false);
+    });
+    $(".btnCancelNote").on("click", function() {
+        const idx = parseInt($("#bNoteEditor").attr("data-id"));
+        if($(this).closest("#noteEdit").length > 0 && idx >= 0) {
+            ShowNoteEditor(idx, true);
+            return;
+        }
         $("#bChecklist, #menuBtn, #menuRight").show();
         $("#bSettings, #bCredits, #bSearch, #backBtn").hide();
         ctx.stateForBackButton = "home";
@@ -409,7 +418,7 @@ $(function() {
     });
     $("#notesListData").on("click", ".ci-edit", function(e) {
         e.stopPropagation();
-        ShowNoteEditor(parseInt($(this).closest(".settings").attr("data-id")));
+        ShowNoteEditor(parseInt($(this).closest(".settings").attr("data-id")), false);
     });
     $(document).on("click", "#moveChecklists > li", function() {
         const listIdx = parseInt($(this).attr("data-id"));
@@ -442,7 +451,7 @@ function NoteClick(e, $t) {
         }
         return;
     }
-    ShowNoteEditor(idx);
+    ShowNoteEditor(idx, true);
 }
 function ChecklistItemClick(e, $t) {
     const targType = e.target.tagName.toLowerCase();

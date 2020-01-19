@@ -135,11 +135,21 @@
                     </div>
                 </div>
                 <div id="bNoteEditor" class="body one-half column">
-                    <input id="noteTitle" type="text" placeholder="Note Title (Optional)">
-                    <textarea id="noteBody" placeholder="Note Contents (Also Optional)"></textarea>
-                    <div class="bottomElem noteBtns">
-                        <button id="btnSaveNote" class="button-primary">Save</button>
-                        <button id="btnCancelNote">Cancel</button>
+                    <div id="noteRead">
+                        <h3 id="noteTitleRead"></h3>
+                        <p id="noteBodyRead"></p>
+                        <div class="bottomElem noteBtns">
+                            <button id="btnEditNote" class="button-primary">Edit</button>
+                            <button class="btnCancelNote">Cancel</button>
+                        </div>
+                    </div>
+                    <div id="noteEdit">
+                        <input id="noteTitle" type="text" placeholder="Note Title (Optional)">
+                        <textarea id="noteBody" placeholder="Note Contents (Also Optional)"></textarea>
+                        <div class="bottomElem noteBtns">
+                            <button id="btnSaveNote" class="button-primary">Save</button>
+                            <button class="btnCancelNote">Cancel</button>
+                        </div>
                     </div>
                 </div>
                 <div id="bSearch" class="body one-half column">
