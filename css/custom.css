@@ -230,7 +230,7 @@ body { font-size: 2em }
     margin-top: 0.5em;
 }
 
-.note .edit {
+.note .edit, .note .handle, .note .goToResult {
     float: right;
     font-size: 1.25em;
 }

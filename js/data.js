@@ -303,6 +303,7 @@ const data = {
                     elem.ownerName = arr.name;
                     elem.ownerIdx = arrIdx;
                     elem.myIdx = elemIdx;
+                    elem.listType = arr.type;
                     results.push(elem);
                 }
             });

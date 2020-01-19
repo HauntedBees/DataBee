@@ -354,8 +354,15 @@ $(function() {
 
     // Checklist
     $("#btnAddChecklist").on("click", function() { ShowInputModal("newChecklist", "Add Checklist", "New Checklist", "Create"); });
-    $("#checkListData, #searchData").on("click", "li", function(e) { ChecklistItemClick(e, $(this)); });
+    $("#checkListData").on("click", "li", function(e) { ChecklistItemClick(e, $(this)); });
     $("#notesListData").on("click", "li", function(e) { NoteClick(e, $(this)); });
+    $("#searchData").on("click", "li", function(e) {
+        if($(this).hasClass("note")) {
+            NoteClick(e, $(this));
+        } else if($(this).hasClass("cbitem")) {
+            ChecklistItemClick(e, $(this));
+        }
+    });
     $("#checkListData, #notesListData").on("click", ".ci-delete", function(e) {
         e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
@@ -435,17 +442,17 @@ $(function() {
 });
 function NoteClick(e, $t) {
     const targType = e.target.tagName.toLowerCase();
-    //const isSearch = $t.find(".goToResult").length > 0;
+    const isSearch = $t.find(".goToResult").length > 0;
     const idx = parseInt($t.attr("data-id"));
     const $clicked = $(e.target);
     if($clicked.hasClass("tag")) { return; }
     if(targType === "i") { // button
         if($clicked.closest(".settings").length) { return; } // settings
         if($clicked.hasClass("goToResult")) { // Search
-            /*const listIdx = $clicked.attr("data-parent");
+            const listIdx = $clicked.attr("data-parent");
             SelectDatalist.call($(`#sidebarData > li[data-id='${listIdx}']`));
-            $(`#cbitem${idx} .edit`).click();
-            document.documentElement.scrollTop = $(`#cbitem${idx}`).offset().top - 40;*/
+            $(`#note${idx} .edit`).click();
+            document.documentElement.scrollTop = $(`#cbitem${idx}`).offset().top - 40;
         } else { // Edit
             ToggleDataItemSettings($t, idx, "notes");
         }

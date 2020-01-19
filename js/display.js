@@ -188,7 +188,13 @@ function DoSearch(searchQuery) {
     if(results.length === 0) {
         $("#searchData").html(`<li class="citem-text">No results found.</li>`);
     } else {
-        const html = results.map(e => GetCheckboxItemHTML(e, e.myIdx, true));
+        const html = results.map(e => {
+            if(e.listType === "checklist") {
+                return GetCheckboxItemHTML(e, e.myIdx, true);
+            } else if(e.listType === "notes") {
+                return GetNoteHTML(e, e.myIdx, "list", true);
+            } else { return ""; }
+        });
         $("#searchData").html(html.join(""));
     }
 }
@@ -300,9 +306,11 @@ function GetNoteHTML(e, i, style, isSearchQuery) {
             ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
             <div class="tagGroup">${tagsHTML}</div>
             ${e.title}
+            ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i>` : ``}
             <i class="edit material-icons">more_horiz</i>
         </div>
         <div class="note_body">${body}</div>
+        ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
         </li>`;
     }
 }
