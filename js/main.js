@@ -291,7 +291,32 @@ $(function() {
     });
 
     // Tags
-    $("#manageTags").on("click", ShowTagsModal);
+    $("#manageTags").on("click", ShowTagEditor);
+    $("#btnAddTagModal").on("click", ShowEditTagModal);
+    $("#tagColorList > .tagColorSelector").on("click", function() {
+        const id = $(this).attr("data-id");
+        $("#tagColorList > .tagColorSelector").removeClass("active");
+        $(this).addClass("active");
+        $("#tagColorList").attr("data-selectedColor", id);
+        document.documentElement.style.setProperty("--current-tag-color", $(this).attr("data-color"));
+    });
+    $("#tagIconList > .tagImgSelector").on("click", function() {
+        const id = $(this).attr("data-id");
+        $("#tagIconList > .tagImgSelector").removeClass("active");
+        $(this).addClass("active");
+        $("#tagColorList").attr("data-selectedImg", id);
+    });
+    $("#btnConfirmModalTagEdit").on("click", function() {
+        const tagText = $("#txtModalTagInput").val() || "Unnamed Tag";
+        const colorIdx = parseInt($("#tagColorList").attr("data-selectedColor"));
+        const imgIdx = parseInt($("#tagColorList").attr("data-selectedImg"));
+        const imgText = imgIdx < 0 ? "" : $(`.tagImgSelector[data-id="${imgIdx}"]`).text();
+        const tag = new Tag(tagText, colorIdx, imgText);
+        data.SaveTag(dbData.currentScreen, tag);
+        CloseModal("modalTagEdit");
+        ShowTagEditor();
+    });
+
     $("#btnAddNewTag").on("click", function() {
         const max = $("#modalTagList > li").length;
         const newTag = new Tag("", `tagColor${max % 10}`);

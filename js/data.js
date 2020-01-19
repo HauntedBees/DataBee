@@ -40,10 +40,12 @@ class NoteListItem {
     }
 }
 class Tag {
-    constructor(tag, color, id) {
+    constructor(tag, color, imgVal, id) {
         this.id = id || data.GetGUID();
         this.tag = tag;
         this.color = color;
+        this.imgVal = imgVal;
+        this.sortOrder = 0;
     }
 }
 let dbData = {
@@ -79,6 +81,19 @@ const data = {
                 dObj.tags = {};
                 hasChanges = true;
             }
+            const dTags = Object.keys(dObj.tags).map(key => dObj.tags[key]);
+            for(let j = 0; j < dTags.length; j++) {
+                const dTag = dTags[j];
+                if(dTag.imgVal === undefined) {             // 0JAN18 to 0JAN19
+                    dTag.imgVal = "";
+                    dTag.sortOrder = j;
+                    hasChanges = true;
+                }
+                if(typeof dTag.color === "string") {   // 0JAN18 to 0JAN19
+                    dTag.color = parseInt(dTag.color.replace("tagColor", ""));
+                    hasChanges = true;
+                }
+            }
             const dData = dObj.data;
             for(let j = 0; j < dData.length; j++) {
                 const dItem = dData[j];
@@ -86,11 +101,11 @@ const data = {
                     dItem.tags = [];
                     hasChanges = true;
                 }
-                if(dItem.date === undefined) {              //0JAN05 to 0JAN12
+                if(dItem.date === undefined) {              // 0JAN05 to 0JAN12
                     dItem.date = +new Date();
                     hasChanges = true;
                 }
-                if(dItem.notes === undefined) {             //0JAN13 to 0JAN17
+                if(dItem.notes === undefined) {             // 0JAN13 to 0JAN17
                     dItem.notes = "";
                     hasChanges = true;
                 }
@@ -101,7 +116,33 @@ const data = {
             data.Save();
         }
     },
-    SaveNewTags: function(dataIdx, tags, toDelete, dontSave) {
+    SaveTag: function(dataIdx, tag, dontSave) {
+        const clist = dbData.dbList[dataIdx];
+        clist.tags[tag.id] = tag;
+        if(dontSave !== true) { data.Save(); }
+    },
+    DeleteTag: function(dataIdx, tagId, dontSave) {
+        const clist = dbData.dbList[dataIdx];
+        delete clist.tags[tagId];
+        if(dontSave !== true) { data.Save(); }
+    },
+    ReorderTags: function(dataIdx, tagId, oldPos, newPos, dontSave) {
+        if(oldPos === newPos) { return; }
+        const clist = dbData.dbList[dataIdx];
+        const dir = (newPos > oldPos) ? 1 : -1;
+        for(const id in clist.tags) { // TWEAK SLIGHTLY PROBABLY
+            const e = clist.tags[id];
+            if(id === tagId) {
+                e.sortOrder = newPos;
+            } else if(dir > 0 && e.sortOrder < newPos && e.sortOrder > oldPos) {
+                e.sortOrder -= 1;
+            } else if(dir < 0 && e.sortOrder > newPos && e.sortOrder < oldPos) {
+                e.sortOrder += 1;
+            }
+        }
+        if(dontSave !== true) { data.Save(); }
+    },
+    SaveNewTags: function(dataIdx, tags, toDelete, dontSave) { // TODO: probably delete
         const clist = dbData.dbList[dataIdx];
         clist.tags = tags;
         for(let i = 0; i < toDelete.length; i++) {

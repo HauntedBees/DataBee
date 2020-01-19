@@ -29,18 +29,52 @@ function ShowAlert(title, body) {
     $("#modalAlert > div > .modalContent").html(body);
     ShowModal("modalAlert", true);
 }
-function ShowTagsModal() {
-    const currentChecklist = dbData.dbList[dbData.currentScreen];
-    $("#modalTags > div > .modalHeader > em").text(currentChecklist.name);
-    const tagHTMLs = [];
-    let i = 0;
-    for(const id in currentChecklist.tags) {
-        const e = currentChecklist.tags[id];
-        tagHTMLs.push(GetTagModalHTML(e, i++));
+function ShowEditTagModal(tagId) {
+    $("#tagColorList > .tagColorSelector").removeClass("active");
+    $("#tagIconList > .tagImgSelector").removeClass("active");
+    if(typeof tagId !== "number" || tagId < 0) { // new Tag
+        $("#modalTagEdit").attr("data-id", -1);
+        $("#modalTagEdit > div > .modalHeader").text("New Tag");
+        $(".tc0").addClass("active");
+        $(".editorTagBox").addClass("active");
+        $("#tagColorList").attr("data-selectedColor", 0);
+        $("#tagColorList").attr("data-selectedImg", -1);
+        document.documentElement.style.setProperty("--current-tag-color", "#FF0000");
     }
-    $("#modalTagList").html(tagHTMLs.join(""));
-    ctx.tagsToDelete = [];
-    ShowModal("modalTags");
+    ShowModal("modalTagEdit", true);
+}
+function ShowTagEditor() {
+    $(".body, #menuBtn, #menuRight").hide();
+    $("#bTagEditor, #backBtn").show();
+    HideSidebars();
+    const currentList = dbData.dbList[dbData.currentScreen];
+    $("#title").html(`Editing Tags for <em>${currentList.name}</em>`);
+    ctx.stateForBackButton = "secondary";
+    const tagHTMLs = [];
+    for(const id in currentList.tags) {
+        const e = currentList.tags[id];
+        tagHTMLs.push(GetTagEditHTML(e));
+    }
+    if(tagHTMLs.length === 0) {
+        tagHTMLs.push(`<li class="no-items">This list does not have any tags yet. Tap the + icon in the bottom corner of the screen to add one.</li>`);
+    } else {
+
+    }
+    $("#tagData").html(tagHTMLs.join(""));
+}
+function GetTagEditHTML(e) {
+    let tagImg = "";
+    if(e.imgVal === "") {
+        tagImg = `<div class='modalTagColor tc${e.color}' data-color="${e.color}"></div>`;
+    } else {
+        tagImg = `<i class="material-icons tc${e.color}">${e.imgVal}</i>`;
+    }
+    return `<li data-id="${e.id}">
+        <div class="tagImg">${tagImg}</div>
+        <span>${e.tag.replace(/"/g, '\\"')}</span>
+        <i class='editTag material-icons'>more_horiz</i>
+        <i class="material-icons handle">unfold_more</i>
+    </li>`;
 }
 function GetTagModalHTML(e, i) {
     return `<li data-id="${e.id}">
@@ -343,13 +377,12 @@ function GetCheckboxItemHTML(e, i, isSearchQuery) {
         ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
         </li>`;
 }
-function GetTagHTML(allTags, tagId) { return `<div class="tagBox ${allTags[tagId].color}" data-id="${tagId}"></div>`; }
+function GetTagHTML(allTags, tagId) { return `<div class="tagBox ${allTags[tagId].color}" data-id="${tagId}"></div>`; } // TODO
 function BasicMarkdown(s) {
-    return s.replace(/\*\*(.*?)\*\*/g, `<span class="bold">$1</span>`)
-            .replace(/__(.*?)__/g, `<span class="bold">$1</span>`)
-            .replace(/\*(.*?)\*/g, `<span class="italic">$1</span>`)
-            .replace(/_(.*?)_/g, `<span class="italic">$1</span>`)
-            .replace(/\*(.*?)\*/g, `<span class="italic">$1</span>`)
+    return s.replace(/\*\*(.*?)\*\*/g, `<strong>$1</strong>`)
+            .replace(/__(.*?)__/g, `<strong>$1</strong>`)
+            .replace(/\*(.*?)\*/g, `<em>$1</em>`)
+            .replace(/_(.*?)_/g, `<em>$1</em>`)
             .replace(/~~(.*?)~~/g, `<span class="strikethru">$1</span>`)
             .replace(/((http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?)/g, `<a href="$1">$1</a>`);
 }

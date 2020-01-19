@@ -15,7 +15,7 @@
         <div id="front">
             <div>
                 <h1>DataBee</h1>
-                <h6>Version 0JAN18</h6>
+                <h6>Version 0JAN19</h6>
                 <h3>Now Lording</h3>
             </div>
         </div>
@@ -143,6 +143,12 @@
                         <i class="material-icons">add</i>
                     </div>
                 </div>
+                <div id="bTagEditor" class="body one-half column">
+                    <ul id="tagData"></ul>
+                    <div id="btnAddTagModal" class="addBtn">
+                        <i class="material-icons">add</i>
+                    </div>
+                </div>
                 <div id="bNoteEditor" class="body one-half column">
                     <div id="noteRead">
                         <h3 id="noteTitleRead"></h3>
@@ -201,6 +207,103 @@
                 <div class="modalContent"><input id="txtModalInput" type="text" placeholder="Entry"></div>
                 <div class="modalFooter">
                     <button id="btnConfirmModalInput" class="button-primary">OK</button>
+                    <button class="btnCancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div id="modalTagEdit" class="modal">
+            <div>
+                <div class="modalHeader"></div>
+                <div class="modalContent">
+                    <input id="txtModalTagInput" type="text" placeholder="Tag Name">
+                    <div>
+                        <label for="tagColorList">Color: </label>
+                        <div id="tagColorList" class="horiz-scroll">
+                            <div data-color="#FF0000" data-id="0" class="tagColorSelector tc0"></div>
+                            <div data-color="#00FF00" data-id="1" class="tagColorSelector tc1"></div>
+                            <div data-color="#0000FF" data-id="2" class="tagColorSelector tc2"></div>
+                            <div data-color="#FFFF00" data-id="3" class="tagColorSelector tc3"></div>
+                            <div data-color="#FF00FF" data-id="4" class="tagColorSelector tc4"></div>
+                            <div data-color="#00FFFF" data-id="5" class="tagColorSelector tc5"></div>
+                            <div data-color="#999999" data-id="6" class="tagColorSelector tc6"></div>
+                            <div data-color="#333333" data-id="7" class="tagColorSelector tc7"></div>
+                            <div data-color="#FFAA33" data-id="8" class="tagColorSelector tc8"></div>
+                            <div data-color="#33AAFF" data-id="9" class="tagColorSelector tc9"></div>
+                            <div data-color="#000000" data-id="10" class="tagColorSelector tc10"></div>
+                            <div data-color="#FFFFFF" data-id="11" class="tagColorSelector tc11"></div>
+                            <div data-color="#990099" data-id="12" class="tagColorSelector tc12"></div>
+                            <div data-color="#009999" data-id="13" class="tagColorSelector tc13"></div>
+                            <div data-color="#999900" data-id="14" class="tagColorSelector tc14"></div>
+                            <div data-color="#990000" data-id="15" class="tagColorSelector tc15"></div>
+                            <div data-color="#009900" data-id="16" class="tagColorSelector tc16"></div>
+                            <div data-color="#000099" data-id="17" class="tagColorSelector tc17"></div>
+                            <div data-color="#FF9900" data-id="18" class="tagColorSelector tc18"></div>
+                            <div data-color="#FF0099" data-id="19" class="tagColorSelector tc19"></div>
+                            <div data-color="#99FF00" data-id="20" class="tagColorSelector tc20"></div>
+                            <div data-color="#00FF99" data-id="21" class="tagColorSelector tc21"></div>
+                            <div data-color="#9900FF" data-id="22" class="tagColorSelector tc22"></div>
+                            <div data-color="#0099FF" data-id="23" class="tagColorSelector tc23"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="tagIconList">Display: </label>
+                        <div id="tagIconList" class="horiz-scroll">
+                            <div data-id="-1" class="editorTagBox tagImgSelector"></div>
+                            <i data-id="0" class="tagImgSelector material-icons">star</i>
+                            <i data-id="1" class="tagImgSelector material-icons">star_half</i>
+                            <i data-id="2" class="tagImgSelector material-icons">star_border</i>
+                            <i data-id="3" class="tagImgSelector material-icons">whatshot</i>
+                            <i data-id="4" class="tagImgSelector material-icons">sentiment_very_satisfied</i>
+                            <i data-id="5" class="tagImgSelector material-icons">sentiment_satisfied</i>
+                            <i data-id="6" class="tagImgSelector material-icons">sentiment_dissatisfied</i>
+                            <i data-id="7" class="tagImgSelector material-icons">sentiment_very_dissatisfied</i>
+                            <i data-id="8" class="tagImgSelector material-icons">people</i>
+                            <i data-id="9" class="tagImgSelector material-icons">outdoor_grill</i>
+                            <i data-id="10" class="tagImgSelector material-icons">notifications</i>
+                            <i data-id="11" class="tagImgSelector material-icons">cake</i>
+                            <i data-id="12" class="tagImgSelector material-icons">emoji_events</i>
+                            <i data-id="13" class="tagImgSelector material-icons">emoji_nature</i>
+                            <i data-id="14" class="tagImgSelector material-icons">poll</i>
+                            <i data-id="15" class="tagImgSelector material-icons">public</i>
+                            <i data-id="16" class="tagImgSelector material-icons">sports_esports</i>
+                            <i data-id="17" class="tagImgSelector material-icons">sports_tennis</i>
+                            <i data-id="18" class="tagImgSelector material-icons">emoji_food_beverage</i>
+                            <i data-id="19" class="tagImgSelector material-icons">child_friendly</i>
+                            <i data-id="20" class="tagImgSelector material-icons">house</i>
+                            <i data-id="21" class="tagImgSelector material-icons">event_available</i>
+                            <i data-id="22" class="tagImgSelector material-icons">event_busy</i>
+                            <i data-id="23" class="tagImgSelector material-icons">layers</i>
+                            <i data-id="24" class="tagImgSelector material-icons">timer</i>
+                            <i data-id="25" class="tagImgSelector material-icons">music_note</i>
+                            <i data-id="26" class="tagImgSelector material-icons">brightness_5</i>
+                            <i data-id="27" class="tagImgSelector material-icons">camera_alt</i>
+                            <i data-id="28" class="tagImgSelector material-icons">security</i>
+                            <i data-id="29" class="tagImgSelector material-icons">smartphone</i>
+                            <i data-id="30" class="tagImgSelector material-icons">laptop_chromebook</i>
+                            <i data-id="31" class="tagImgSelector material-icons">attachment</i>
+                            <i data-id="32" class="tagImgSelector material-icons">folder</i>
+                            <i data-id="33" class="tagImgSelector material-icons">monetization_on</i>
+                            <i data-id="34" class="tagImgSelector material-icons">waves</i>
+                            <i data-id="35" class="tagImgSelector material-icons">vpn_key</i>
+                            <i data-id="36" class="tagImgSelector material-icons">forum</i>
+                            <i data-id="37" class="tagImgSelector material-icons">fiber_new</i>
+                            <i data-id="38" class="tagImgSelector material-icons">visibility</i>
+                            <i data-id="39" class="tagImgSelector material-icons">shopping_cart</i>
+                            <i data-id="40" class="tagImgSelector material-icons">pets</i>
+                            <i data-id="41" class="tagImgSelector material-icons">extension</i>
+                            <i data-id="42" class="tagImgSelector material-icons">lock</i>
+                            <i data-id="43" class="tagImgSelector material-icons">favorite</i>
+                            <i data-id="44" class="tagImgSelector material-icons">eco</i>
+                            <i data-id="45" class="tagImgSelector material-icons">bug_report</i>
+                            <i data-id="46" class="tagImgSelector material-icons">build</i>
+                            <i data-id="47" class="tagImgSelector material-icons">accessible_forward</i>
+                            <i data-id="48" class="tagImgSelector material-icons">explore</i>
+                            <i data-id="49" class="tagImgSelector material-icons">pan_tool</i>
+                        </div>
+                    </div>
+                </div>
+                <div class="modalFooter">
+                    <button id="btnConfirmModalTagEdit" class="button-primary">Save</button>
                     <button class="btnCancel">Cancel</button>
                 </div>
             </div>
