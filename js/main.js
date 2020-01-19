@@ -1,6 +1,7 @@
 const db = new PouchDB("databee");
 const ctx = {
     stateForBackButton: "home",
+    isSorting: false, 
     tagsToDelete: []
 };
 $(function() {
@@ -41,6 +42,7 @@ $(function() {
     $("#sidebarData").sortable({
         delay: 100,
         handle: ".handle",
+        start: StartSort, stop: EndSort,
         update: function(e) {
             if(e === undefined || e.originalEvent === undefined || e.originalEvent.target === undefined) { return; }
             const $me = $(e.originalEvent.target).closest("li");
@@ -248,6 +250,33 @@ $(function() {
         DrawMain();
         data.Save();
     });
+    $("#viewType").on("click", function() {
+        const $subList = $("#viewTypes");
+        if($subList.hasClass("active")) {
+            $subList.hide().removeClass("active");
+        } else {
+            const viewType = dbData.dbList[dbData.currentScreen].displayType;
+            $("li", $subList).removeClass("active");
+            if(viewType === "tiles") {
+                $("#viewTile").addClass("active");
+            } else {
+                $("#viewList").addClass("active");
+            }
+            $subList.show().addClass("active");
+        }
+    });
+    $("#viewTypes > li").on("click", function() {
+        const newViewType = $(this).attr("data-val");
+        $("#filterTypes > li").removeClass("active");
+        if(viewType === "tiles") {
+            $("#viewTile").addClass("active");
+        } else {
+            $("#viewList").addClass("active");
+        }
+        dbData.dbList[dbData.currentScreen].displayType = newViewType;
+        DrawMain();
+        data.Save();
+    });
     $("#checkAll").on("click", function() {
         dbData.dbList[dbData.currentScreen].data.forEach(e => { e.checked = true });
         data.SortDataItems(dbData.currentScreen);
@@ -292,6 +321,7 @@ $(function() {
     $("#checkListData").sortable({
         delay: 100,
         handle: ".handle",
+        start: StartSort, stop: EndSort,
         update: function(e) {
             if(e === undefined || e.originalEvent === undefined || e.originalEvent.target === undefined) { return; }
             const $me = $(e.originalEvent.target).closest("li");
@@ -305,6 +335,7 @@ $(function() {
     $("#notesListData").sortable({
         delay: 100,
         handle: ".handle",
+        start: StartSort, stop: EndSort,
         update: function(e) {
             if(e === undefined || e.originalEvent === undefined || e.originalEvent.target === undefined) { return; }
             const $me = $(e.originalEvent.target).closest("li");
@@ -526,6 +557,12 @@ function BackButtonPress() {
 
 // Swiping
 let potentialSwitch = false, potentialX = 0;
+function StartSort() {
+    ctx.isSorting = true;
+}
+function EndSort() {
+    ctx.isSorting = false;
+}
 function TouchPress(e) {
     if(ctx.stateForBackButton.indexOf("|") >= 0) { return; }
     const touch = e.originalEvent.touches[0];
@@ -533,7 +570,7 @@ function TouchPress(e) {
     potentialX = touch.clientX;
 }
 function TouchMove(e) {
-    if(!potentialSwitch) { return; }
+    if(ctx.isSorting || !potentialSwitch) { return; }
     const touch = e.originalEvent.touches[0];
     const max = window.screen.width;
     const current = touch.clientX;

@@ -268,8 +268,8 @@ body { font-size: 2em }
     font-size: 0.66em;
     padding: 0.33em;
 }
-#sortTypes, #filterTypes { display: none }
-#sortTypes > li.active, #filterTypes > li.active {
+#sortTypes, #filterTypes, #viewTypes { display: none }
+#sortTypes > li.active, #filterTypes > li.active, #viewTypes > li.active {
     background-color: var(--bg-color-important);
     border: 1px solid var(--text-color);
     border-radius: 0.5em;
@@ -469,3 +469,20 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
 #noteTitleRead, #noteBodyRead { padding: 0 1em }
 #noteTitleRead { margin: 0.25em 0 }
 #noteBodyRead { overflow-wrap: break-word }
+
+.tileView {
+    align-items: start;
+    display: grid;
+    grid-auto-rows: minmax(min-content, max-content);
+    grid-template-columns: 50% 50%;
+    width: 100%;
+}
+.tileView > .note {
+    border: 1px solid var(--secondary-border-color);
+    border-radius: 1em;
+    margin: 0.15em;
+}
+.tileView .option {
+    min-width: 1.75em;
+    font-size: 0.75em;
+}

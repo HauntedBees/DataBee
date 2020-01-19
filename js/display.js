@@ -192,7 +192,7 @@ function DoSearch(searchQuery) {
             if(e.listType === "checklist") {
                 return GetCheckboxItemHTML(e, e.myIdx, true);
             } else if(e.listType === "notes") {
-                return GetNoteHTML(e, e.myIdx, "list", true);
+                return GetNoteHTML(e, e.myIdx, true);
             } else { return ""; }
         });
         $("#searchData").html(html.join(""));
@@ -278,7 +278,12 @@ function DrawMain() {
     } else if(datalist.type === "notes") {
         $("#checkListData").hide();
         $("#notesListData").show();
-        const html = datalist.data.map((e, i) => GetNoteHTML(e, i, datalist.displayType));
+        if(datalist.displayType === "tiles") {
+            $("#notesListData").addClass("tileView");
+        } else {
+            $("#notesListData").removeClass("tileView");
+        }
+        const html = datalist.data.map((e, i) => GetNoteHTML(e, i));
         $("#notesListData").html(html.join(""));
     }
     SetScroller("prevScroller", dbData.currentScreen - 1);
@@ -292,16 +297,13 @@ function SetScroller(elemId, idx) {
     $elem.attr("data-idx", idx);
     $(".scrollerBtn_text", $elem).text(list.name);
 }
-function GetNoteHTML(e, i, style, isSearchQuery) {
+function GetNoteHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
     const body = e.body.length < 100 ? e.body : e.body.substring(0, 100) + "...";
-    if(style === "tiles") {
-        return `<li>fuk u bro team</li>`;
-    } else if(style === "list") {
-        return `<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
+    return `<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
         <div class="note_title">
             ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
             <div class="tagGroup">${tagsHTML}</div>
@@ -313,8 +315,7 @@ function GetNoteHTML(e, i, style, isSearchQuery) {
         <div class="note_body">${body}</div>
         <div class="citem_cname">${FormatDate(e.date)}</div>
         ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
-        </li>`;
-    }
+    </li>`;
 }
 function GetCheckboxItemHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
