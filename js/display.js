@@ -311,6 +311,7 @@ function GetNoteHTML(e, i, style, isSearchQuery) {
             <i class="edit material-icons">more_horiz</i>
         </div>
         <div class="note_body">${body}</div>
+        <div class="citem_cname">${FormatDate(e.date)}</div>
         ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
         </li>`;
     }
@@ -384,4 +385,8 @@ function AddSortOrderImg($li, sortOrder) {
     $("#sortDirIcon").remove();
     if(sortOrder === "manual") { return; }
     $li.append(`<i id="sortDirIcon" class="material-icons">keyboard_arrow_${dbData.dbList[dbData.currentScreen].sortDir > 0 ? "up" : "down"}</i>`);
+}
+function FormatDate(dateNumber) {
+    const d = new Date(dateNumber);
+    return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric", hour12: false }).format(d);
 }
