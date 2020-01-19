@@ -472,7 +472,7 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
 
 #noteTitleRead, #noteBodyRead { padding: 0 1em }
 #noteTitleRead { margin: 0.25em 0 }
-#noteBodyRead { overflow-wrap: break-word }
+#noteBodyRead { overflow-wrap: break-word; white-space: pre-wrap; }
 
 .tileView {
     align-items: start;
