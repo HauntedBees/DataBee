@@ -102,7 +102,6 @@ const data = {
         }
     },
     SaveNewTags: function(dataIdx, tags, toDelete, dontSave) {
-        console.log(toDelete);
         const clist = dbData.dbList[dataIdx];
         clist.tags = tags;
         for(let i = 0; i < toDelete.length; i++) {

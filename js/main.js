@@ -291,7 +291,7 @@ $(function() {
     document.addEventListener("backbutton", BackButtonPress, false);
     $("#checkListData").sortable({
         delay: 100,
-        handle: ".handle", // TODO: VIBRATION?
+        handle: ".handle",
         update: function(e) {
             if(e === undefined || e.originalEvent === undefined || e.originalEvent.target === undefined) { return; }
             const $me = $(e.originalEvent.target).closest("li");
@@ -302,6 +302,19 @@ $(function() {
         }
     });
     $("#checkListData").disableSelection();
+    $("#notesListData").sortable({
+        delay: 100,
+        handle: ".handle",
+        update: function(e) {
+            if(e === undefined || e.originalEvent === undefined || e.originalEvent.target === undefined) { return; }
+            const $me = $(e.originalEvent.target).closest("li");
+            const oldIdx = parseInt($me.attr("data-id"));
+            const newIdx = $("#notesListData > li").index($me[0]);
+            data.SwapDataItems(dbData.currentScreen, oldIdx, newIdx);
+            DrawMain();
+        }
+    });
+    $("#notesListData").disableSelection();
 
     // Modals
     $(".btnCancel").on("click", function() { CloseModal($(this).closest(".modal").attr("id")); });
@@ -442,7 +455,6 @@ $(function() {
 });
 function NoteClick(e, $t) {
     const targType = e.target.tagName.toLowerCase();
-    const isSearch = $t.find(".goToResult").length > 0;
     const idx = parseInt($t.attr("data-id"));
     const $clicked = $(e.target);
     if($clicked.hasClass("tag")) { return; }
@@ -452,7 +464,7 @@ function NoteClick(e, $t) {
             const listIdx = $clicked.attr("data-parent");
             SelectDatalist.call($(`#sidebarData > li[data-id='${listIdx}']`));
             $(`#note${idx} .edit`).click();
-            document.documentElement.scrollTop = $(`#cbitem${idx}`).offset().top - 40;
+            document.documentElement.scrollTop = $(`#note${idx}`).offset().top - 40;
         } else { // Edit
             ToggleDataItemSettings($t, idx, "notes");
         }

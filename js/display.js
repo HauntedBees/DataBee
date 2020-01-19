@@ -295,7 +295,7 @@ function SetScroller(elemId, idx) {
 function GetNoteHTML(e, i, style, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
-    //const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
+    const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
     const body = e.body.length < 100 ? e.body : e.body.substring(0, 100) + "...";
     if(style === "tiles") {
@@ -306,6 +306,7 @@ function GetNoteHTML(e, i, style, isSearchQuery) {
             ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
             <div class="tagGroup">${tagsHTML}</div>
             ${e.title}
+            ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
             ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i>` : ``}
             <i class="edit material-icons">more_horiz</i>
         </div>

@@ -205,6 +205,7 @@ body { font-size: 2em }
     margin-bottom: 0;
 }
 .cbitem:last-child { margin-bottom: 3em }
+.note:last-child { margin-bottom: 5em }
 #checkListData > li:first-child, #notesListData > li:first-child { margin-top: 0.5em }
 
 .cbitem > span {
