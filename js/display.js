@@ -306,12 +306,13 @@ function GetNoteHTML(e, i, isSearchQuery) {
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
-    const body = e.body.length < 100 ? e.body : e.body.substring(0, 100) + "...";
+    const title = e.title === "" ? e.body.substring(0, 30) + (e.body.length > 30 ? "..." : "") : e.title;
+    const body = e.title === "" ? "" : (e.body.length < 100 ? e.body : e.body.substring(0, 100) + "...");
     return `<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
         <div class="note_title">
             ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
             <div class="tagGroup">${tagsHTML}</div>
-            ${e.title}
+            ${title}
             ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
             ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i>` : ``}
             <i class="edit material-icons">more_horiz</i>
