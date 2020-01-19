@@ -497,3 +497,7 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
     display: grid;
     grid-template-columns: 10% 80% 10%;
 }
+
+.bold { font-weight: bold }
+.italic { font-style: italic }
+.strikethru { text-decoration: line-through }

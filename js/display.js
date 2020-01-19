@@ -205,8 +205,8 @@ function ShowNoteEditor(idx, readView) {
     $("#bNoteEditor, #backBtn").show();
     $("#noteTitle").val(title);
     $("#noteBody").val(body);
-    $("#noteTitleRead").text(title);
-    $("#noteBodyRead").text(body);
+    $("#noteTitleRead").html(BasicMarkdown(title));
+    $("#noteBodyRead").html(BasicMarkdown(body));
     if(readView === true) {
         ctx.stateForBackButton = "noteReader";
         $("#noteEdit").hide();
@@ -314,12 +314,12 @@ function GetNoteHTML(e, i, isSearchQuery) {
         <div class="note_title">
             ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
             <div class="tagGroup">${tagsHTML}</div>
-            ${title}
+            ${BasicMarkdown(title)}
             ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
             ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i>` : ``}
             <i class="edit material-icons">more_horiz</i>
         </div>
-        <div class="note_body">${body}</div>
+        <div class="note_body">${BasicMarkdown(body)}</div>
         <div class="citem_cname">${FormatDate(e.date)}</div>
         ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
     </li>`;
@@ -344,6 +344,15 @@ function GetCheckboxItemHTML(e, i, isSearchQuery) {
         </li>`;
 }
 function GetTagHTML(allTags, tagId) { return `<div class="tagBox ${allTags[tagId].color}" data-id="${tagId}"></div>`; }
+function BasicMarkdown(s) {
+    return s.replace(/\*\*(.*?)\*\*/g, `<span class="bold">$1</span>`)
+            .replace(/__(.*?)__/g, `<span class="bold">$1</span>`)
+            .replace(/\*(.*?)\*/g, `<span class="italic">$1</span>`)
+            .replace(/_(.*?)_/g, `<span class="italic">$1</span>`)
+            .replace(/\*(.*?)\*/g, `<span class="italic">$1</span>`)
+            .replace(/~~(.*?)~~/g, `<span class="strikethru">$1</span>`)
+            .replace(/((http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?)/g, `<a href="$1">$1</a>`);
+}
 
 function ToggleDataItemSettings($e, i, type) {
     const important = $e.hasClass("important");

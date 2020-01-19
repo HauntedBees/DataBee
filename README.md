@@ -1,10 +1,12 @@
 # DataBee
 
 ## wut
-It's basically just a checklist app.
+It's basically just a checklist and very basic notes app.
 
 ## why
-There's a checklist app I use that I really like, but it keeps asking me to create an account and put my checklists in *the cloud* and I can't stop it from begging me to do that, so I made my own checklist app that's essentially that app, but minus the cloud garbage, minus 90% of the features since I don't use them, and plus a few tweaks for my own convenience. 
+There's a checklist app I use that I really like, but it keeps asking me to create an account and put my checklists in *the cloud* and I can't stop it from begging me to do that, so I made my own checklist app that's essentially that app, but minus the cloud garbage, minus 90% of the features since I don't use them, and plus a few tweaks for my own convenience.
+
+Then I thought "hey, I also use the Samsung Notes app a lot, can I rip that off a bit, too?" The answer was yes. But I didn't want to make a WYSIWYG because I love myself, so it only has very basic formatting support with a tiny subset of Markdown. Still, two apps I use a lot in one, so, that's pretty chill.
 
 ## license
 DataBee's source code is licensed with the [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html). All media assets are licensed with the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) license.
