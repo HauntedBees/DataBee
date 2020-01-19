@@ -115,6 +115,12 @@ $(function() {
         const idx = parseInt($("#modalInput").attr("data-id"));
         switch($("#modalInput").attr("data-type")) {
             case "renameChecklist":
+                if(dbData.dbList.some((e, i) => e.name === val && i !== dbData.currentScreen)) {
+                    $txtBox.val(`${val} already exists!`);
+                    $txtBox.addClass("comeOn");
+                    $txtBox.select();
+                    return;
+                }
                 data.RenameData(dbData.currentScreen, val);
                 $("#title").text(val);
                 HideSidebars();
