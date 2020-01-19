@@ -98,10 +98,10 @@ $(function() {
     // Rightbar
     $("#menuRight").on("click", ShowRightbar);
     $("#renameChecklist").on("click", function() {
-        ShowInputModal("renameChecklist", `Rename <em>${dbData.dbList[dbData.currentScreen].name}</em>.`, "New Checklist Name", "Rename");
+        ShowInputModal("renameChecklist", `Rename <em>${dbData.dbList[dbData.currentScreen].name}</em>.`, "New List Name", "Rename");
     });
     $("#deleteChecklist").on("click", function() {
-        ShowInfoModal("deleteChecklist", `Delete <em>${dbData.dbList[dbData.currentScreen].name}</em>.`, `Are you sure you want to delete the <em>${dbData.dbList[dbData.currentScreen].name}</em> checklist and all of its items? This cannot be undone.`, "Delete");
+        ShowInfoModal("deleteChecklist", `Delete <em>${dbData.dbList[dbData.currentScreen].name}</em>.`, `Are you sure you want to delete the <em>${dbData.dbList[dbData.currentScreen].name}</em> list and all of its items? This cannot be undone.`, "Delete");
     });
     $("#btnConfirmModalInput").on("click", function() {
         const $txtBox = $("#txtModalInput");
