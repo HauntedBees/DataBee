@@ -468,6 +468,9 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
 .note_body {
     font-size: 0.75em;
     overflow-wrap: break-word;
+    white-space: pre-wrap;
+    max-height: 8em;
+    overflow-y: hidden;
 }
 
 #noteTitleRead, #noteBodyRead { padding: 0 1em }
