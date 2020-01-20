@@ -490,14 +490,14 @@ $(function() {
     $(document).on("click", ".tagList > .tag", function(e) {
         e.stopPropagation();
         const $parent = $(this).closest("li");
-        const idx = parseInt($parent.attr("data-id"));
+        const elemIdx = parseInt($parent.attr("data-id"));
         const tagId = $(this).attr("data-id");
-        data.ToggleTag(dbData.currentScreen, idx, tagId);
+        data.ToggleTag(dbData.currentScreen, elemIdx, tagId);
         if($(this).hasClass("active")) {
             $(`[data-id="${tagId}"`, $parent.find(".tagGroup")).remove();
         } else {
             const allTags = dbData.dbList[dbData.currentScreen].tags;
-            $parent.find(".tagGroup").append(GetTagHTML(allTags[tagId]));
+            $parent.find(".tagGroup").html(GetTagsHTML(allTags, dbData.dbList[dbData.currentScreen].data[elemIdx].tags));
         }
         $(this).toggleClass("active");
     });

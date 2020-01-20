@@ -355,7 +355,7 @@ function GetNoteHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
-    const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags[tagId])).join("");
+    const tagsHTML = GetTagsHTML(allTags, e.tags);
     const title = e.title === "" ? e.body.substring(0, 30) + (e.body.length > 30 ? "..." : "") : e.title;
     const body = e.title === "" ? "" : (e.body.length < 100 ? e.body : e.body.substring(0, 100) + "...");
     return `<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
@@ -376,7 +376,7 @@ function GetCheckboxItemHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
-    const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags[tagId])).join("");
+    const tagsHTML = GetTagsHTML(allTags, e.tags);
     return `<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
         <input class="checkbox" type="checkbox"${e.checked ? " checked" : ""}>
         <span class="itemContainer">
@@ -391,7 +391,16 @@ function GetCheckboxItemHTML(e, i, isSearchQuery) {
         ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
         </li>`;
 }
-function GetTagHTML(tag) { // TODO
+function GetTagsHTML(allTags, myTags) {
+    const tags = myTags.map(t => allTags[t]).sort((a, b) => {
+        if(a.sortOrder < b.sortOrder) { return -1; }
+        if(a.sortOrder > b.sortOrder) { return 1; }
+        return 0;
+    });
+    console.log(tags);
+    return tags.map(t => GetTagHTML(t)).join("");
+}
+function GetTagHTML(tag) {
     if(tag.imgVal === "") {
         return `<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
     } else {

@@ -89,7 +89,7 @@ const data = {
                     dTag.sortOrder = j;
                     hasChanges = true;
                 }
-                if(typeof dTag.color === "string") {   // 0JAN18 to 0JAN19
+                if(typeof dTag.color === "string") {        // 0JAN18 to 0JAN19
                     dTag.color = parseInt(dTag.color.replace("tagColor", ""));
                     hasChanges = true;
                 }
