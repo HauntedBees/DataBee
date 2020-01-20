@@ -124,7 +124,10 @@ const data = {
     DeleteTag: function(dataIdx, tagId, dontSave) {
         const clist = dbData.dbList[dataIdx];
         delete clist.tags[tagId];
-        // TODO: clear anything that has this tag
+        for(let j = 0; j < clist.data.length; j++) {
+            const obj = clist.data[j];
+            obj.tags = obj.tags.filter(e => e !== tagId);
+        }
         if(dontSave !== true) { data.Save(); }
     },
     ReorderTags: function(dataIdx, tagId, newPos, dontSave) {

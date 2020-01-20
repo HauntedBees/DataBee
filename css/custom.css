@@ -83,33 +83,21 @@ header {
 #menuRight { float: right; padding: 0.25em }
 
 /* Tags */
-#modalTags > div { margin: 40% auto }
 .modalTagColor {
     width: 1em;
     height: 1em;
     display: inline-block;
     border: 1px solid var(--text-color);
 }
-#modalTagList > li > input { width: 80% }
-#modalTags > div > .modalContent > div { text-align: center }
-.tagColor0 { background-color: #FF0000 }
-.tagColor1 { background-color: #00FF00 }
-.tagColor2 { background-color: #0000FF }
-.tagColor3 { background-color: #FFFF00 }
-.tagColor4 { background-color: #FF00FF }
-.tagColor5 { background-color: #00FFFF }
-.tagColor6 { background-color: #999999 }
-.tagColor7 { background-color: #333333 }
-.tagColor8 { background-color: #FFAA33 }
-.tagColor9 { background-color: #33AAFF }
 .tagBox {
-    width: 0.5em;
+    width: 0.75em;
     height: 0.5em;
     margin-right: 0.25em;
     display: inline-block;
     border: 1px solid var(--text-color);
 }
 .tagGroup { display: inline-block }
+.tagGroup > * { vertical-align: sub }
 .tagBox + .name {
     margin-left: 0;
 }
@@ -365,8 +353,9 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
 .modalContent > input { border-color: var(--header-bg-color) }
 .modalContent > input:focus { border-color: var(--secondary-bg-color) }
 
-
 /* NEW AND IMPROVED CSS */
+
+i.important { vertical-align: sub }
 
 #checklistScroller {   
     position: fixed;
@@ -409,6 +398,7 @@ nav { background: var(--bg-color); border-right: 2px solid var(--secondary-bg-co
     font-size: 0.75em;
     font-style: italic;
     margin-left: 3em;
+    margin-top: -0.75em;
 }
 
 .sidebar_header {
@@ -553,7 +543,7 @@ i.tc23 { color: #0099FF }
     overflow-x: scroll;
     white-space: nowrap;
 }
-#tagIconList > i {
+#tagIconList > i, .dispTag {
     color: var(--current-tag-color);
     text-shadow: -1px -1px 1px var(--text-color), 
                   1px -1px 1px var(--text-color),
@@ -571,6 +561,10 @@ i.tc23 { color: #0099FF }
     display: inline-block;
     border: 1px solid var(--text-color);
     background-color: var(--current-tag-color);
+}
+.editorTagBoxSm {
+    font-size: 22px;
+    margin-bottom: 0.1em;
 }
 #tagIconList > .active {
     border: 5px solid var(--header-text-color);

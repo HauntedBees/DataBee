@@ -97,13 +97,6 @@ function GetTagEditHTML(e) {
         <i class="material-icons handle">unfold_more</i>
     </li>`;
 }
-function GetTagModalHTML(e, i) {
-    return `<li data-id="${e.id}">
-        <div class='modalTagColor ${e.color}' data-color="${e.color}"></div>
-        <input type="text" placeholder="Tag ${i}" value="${e.tag.replace(/"/g, '\\"')}">
-        <i class='deleteTag material-icons'>delete</i>
-    </li>`;
-}
 function ShowMoveModal(elemIdx) {
     const currentList = dbData.dbList[dbData.currentScreen];
     const currentListType = currentList.type;
@@ -218,7 +211,7 @@ function ShowCredits() {
     $(".body, #menuBtn, #menuRight").hide();
     $("#bCredits, #backBtn").show();
     HideSidebars();
-    $("#title").text("DataBee v0JAN18");
+    $("#title").text("DataBee v0JAN20");
     ctx.stateForBackButton = "secondary";
 }
 function ShowSearch() {
@@ -362,7 +355,7 @@ function GetNoteHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
-    const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
+    const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags[tagId])).join("");
     const title = e.title === "" ? e.body.substring(0, 30) + (e.body.length > 30 ? "..." : "") : e.title;
     const body = e.title === "" ? "" : (e.body.length < 100 ? e.body : e.body.substring(0, 100) + "...");
     return `<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
@@ -383,7 +376,7 @@ function GetCheckboxItemHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
-    const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags, tagId)).join("");
+    const tagsHTML = e.tags.map(tagId =>GetTagHTML(allTags[tagId])).join("");
     return `<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
         <input class="checkbox" type="checkbox"${e.checked ? " checked" : ""}>
         <span class="itemContainer">
@@ -398,7 +391,13 @@ function GetCheckboxItemHTML(e, i, isSearchQuery) {
         ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
         </li>`;
 }
-function GetTagHTML(allTags, tagId) { return `<div class="tagBox ${allTags[tagId].color}" data-id="${tagId}"></div>`; } // TODO
+function GetTagHTML(tag) { // TODO
+    if(tag.imgVal === "") {
+        return `<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
+    } else {
+        return `<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
+    }
+}
 function BasicMarkdown(s) {
     return s.replace(/\*\*(.*?)\*\*/g, `<strong>$1</strong>`)
             .replace(/__(.*?)__/g, `<strong>$1</strong>`)
@@ -434,7 +433,7 @@ function ToggleDataItemSettings($e, i, type) {
     }
 }
 
-function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags) {
+function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags) { // TODO
     if($tagButton.hasClass("active")) {
         $tagButton.removeClass("active");
         $settingsPanel.parent().find(".tagList").remove();

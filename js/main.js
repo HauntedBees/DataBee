@@ -355,31 +355,6 @@ $(function() {
         data.DeleteTag(dbData.currentScreen, id);
         ShowTagEditor();
     });
-
-    // OLD tag shit
-    $("#btnAddNewTag").on("click", function() {
-        const max = $("#modalTagList > li").length;
-        const newTag = new Tag("", `tagColor${max % 10}`);
-        $("#modalTagList").append(GetTagModalHTML(newTag, max));
-    });
-    $("#btnSaveTags").on("click", function() {
-        const newTags = {};
-        $("#modalTagList > li").each(function() {
-            const text = $("input", this);
-            const color = $("div.modalTagColor", this);
-            const myId = $(this).attr("data-id");
-            newTags[myId] = new Tag((text.val() === "" ? text.attr("placeholder") : text.val()), color.attr("data-color"), myId);
-        });
-        if(ctx.tagsToDelete.length > 0) { DrawMain(); }
-        data.SaveNewTags(dbData.currentScreen, newTags, ctx.tagsToDelete);
-        CloseModal("modalTags");
-    });
-    $(document).on("click", ".deleteTag", function() {
-        const $tag = $(this).closest("li");
-        const myId = $tag.attr("data-id");
-        ctx.tagsToDelete.push(myId);
-        $tag.remove();
-    });
     
     // Main
     document.addEventListener("backbutton", BackButtonPress, false);
@@ -522,7 +497,7 @@ $(function() {
             $(`[data-id="${tagId}"`, $parent.find(".tagGroup")).remove();
         } else {
             const allTags = dbData.dbList[dbData.currentScreen].tags;
-            $parent.find(".tagGroup").append(GetTagHTML(allTags, tagId));
+            $parent.find(".tagGroup").append(GetTagHTML(allTags[tagId]));
         }
         $(this).toggleClass("active");
     });
