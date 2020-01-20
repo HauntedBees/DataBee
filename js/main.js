@@ -648,14 +648,14 @@ function TouchMove(e) {
     const current = touch.clientX;
     const dx = current - potentialX;
     const dP = dx / max;
-    if(dP > 0.1) {
+    if(dP > 0.2) {
         if(ctx.stateForBackButton === "sidebar") {
             HideSidebars();
         } else {
             ShowSidebar();
         }
         potentialSwitch = false;
-    } else if(dP < -0.1) {
+    } else if(dP < -0.2) {
         if(ctx.stateForBackButton === "sidebar") {
             HideSidebars();
         } else if(ctx.stateForBackButton !== "secondary") {
