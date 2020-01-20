@@ -32,16 +32,29 @@ function ShowAlert(title, body) {
 function ShowEditTagModal(tagId) {
     $("#tagColorList > .tagColorSelector").removeClass("active");
     $("#tagIconList > .tagImgSelector").removeClass("active");
-    if(typeof tagId !== "number" || tagId < 0) { // new Tag
-        $("#modalTagEdit").attr("data-id", -1);
-        $("#modalTagEdit > div > .modalHeader").text("New Tag");
-        $(".tc0").addClass("active");
-        $(".editorTagBox").addClass("active");
+    if(typeof tagId !== "string") { // New Tag
+        $("#modalTagEdit").attr("data-id", "");
+        $("#modalTagEdit > div > .modalHeader").html("New Tag");
+        $("#txtModalTagInput").val("");
+        $(".tagColorSelector.tc0").addClass("active");
+        $(".tagImgSelector.editorTagBox").addClass("active");
         $("#tagColorList").attr("data-selectedColor", 0);
-        $("#tagColorList").attr("data-selectedImg", -1);
+        $("#tagColorList").attr("data-selectedImg", "");
         document.documentElement.style.setProperty("--current-tag-color", "#FF0000");
+    } else { // Existing Tag
+        $("#modalTagEdit").attr("data-id", tagId);
+        const tag = dbData.dbList[dbData.currentScreen].tags[tagId];
+        $("#modalTagEdit > div > .modalHeader").html(`Editing <em>${tag.tag}</em>`);
+        $("#txtModalTagInput").val(tag.tag);
+        const $colorTag = $(`.tagColorSelector.tc${tag.color}`);
+        $colorTag.addClass("active");
+        $(`.tagImgSelector[data-id="${tag.imgVal}"]`).addClass("active");
+        $("#tagColorList").attr("data-selectedColor", tag.color);
+        $("#tagColorList").attr("data-selectedImg", tag.imgVal);
+        document.documentElement.style.setProperty("--current-tag-color", $colorTag.attr("data-color"));
     }
-    ShowModal("modalTagEdit", true);
+    ShowModal("modalTagEdit", false);
+    $("#txtModalTagInput").focus();
 }
 function ShowTagEditor() {
     $(".body, #menuBtn, #menuRight").hide();
@@ -51,10 +64,18 @@ function ShowTagEditor() {
     $("#title").html(`Editing Tags for <em>${currentList.name}</em>`);
     ctx.stateForBackButton = "secondary";
     const tagHTMLs = [];
-    for(const id in currentList.tags) {
+    const tagsSorted = Object.keys(currentList.tags).map(e => currentList.tags[e]).sort((a, b) => {
+        if(a.sortOrder < b.sortOrder) { return -1; }
+		if(a.sortOrder > b.sortOrder) { return 1; }
+		return 0;
+    });
+    for(let i = 0; i < tagsSorted.length; i++) {
+        tagHTMLs.push(GetTagEditHTML(tagsSorted[i]));
+    }
+    /*for(const id in currentList.tags) {
         const e = currentList.tags[id];
         tagHTMLs.push(GetTagEditHTML(e));
-    }
+    }*/
     if(tagHTMLs.length === 0) {
         tagHTMLs.push(`<li class="no-items">This list does not have any tags yet. Tap the + icon in the bottom corner of the screen to add one.</li>`);
     } else {
@@ -69,7 +90,7 @@ function GetTagEditHTML(e) {
     } else {
         tagImg = `<i class="material-icons tc${e.color}">${e.imgVal}</i>`;
     }
-    return `<li data-id="${e.id}">
+    return `<li class="tagEdit" data-id="${e.id}">
         <div class="tagImg">${tagImg}</div>
         <span>${e.tag.replace(/"/g, '\\"')}</span>
         <i class='editTag material-icons'>more_horiz</i>

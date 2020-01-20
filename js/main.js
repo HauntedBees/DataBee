@@ -309,14 +309,54 @@ $(function() {
     $("#btnConfirmModalTagEdit").on("click", function() {
         const tagText = $("#txtModalTagInput").val() || "Unnamed Tag";
         const colorIdx = parseInt($("#tagColorList").attr("data-selectedColor"));
-        const imgIdx = parseInt($("#tagColorList").attr("data-selectedImg"));
-        const imgText = imgIdx < 0 ? "" : $(`.tagImgSelector[data-id="${imgIdx}"]`).text();
-        const tag = new Tag(tagText, colorIdx, imgText);
-        data.SaveTag(dbData.currentScreen, tag);
+        const imgText = $("#tagColorList").attr("data-selectedImg");
+        const tagId = $("#modalTagEdit").attr("data-id");
+        if(tagId === "") {
+            const tag = new Tag(tagText, colorIdx, imgText, Object.keys(dbData.dbList[dbData.currentScreen].tags).length);
+            data.SaveTag(dbData.currentScreen, tag);
+        } else {
+            const tag = dbData.dbList[dbData.currentScreen].tags[tagId];
+            tag.tag = tagText;
+            tag.color = colorIdx;
+            tag.imgVal = imgText;
+            data.SaveTag(dbData.currentScreen, tag);
+        }
         CloseModal("modalTagEdit");
         ShowTagEditor();
     });
+    $("#tagData").sortable({
+        delay: 100,
+        handle: ".handle",
+        start: StartSort, stop: EndSort,
+        update: function(e) {
+            if(e === undefined || e.originalEvent === undefined || e.originalEvent.target === undefined) { return; }
+            const $me = $(e.originalEvent.target).closest("li");
+            const newIdx = $("#tagData > li").index($me[0]);
+            data.ReorderTags(dbData.currentScreen, $me.attr("data-id"), newIdx);
+        }
+    });
+    $("#tagData").on("click", ".editTag", function() {
+        const $settings = $(this).parent().find(".tagSettings");
+        if($settings.length === 0) {
+            $(this).parent().append(`
+            <div class="tagSettings"></div>
+            <div class="tagSettings spaced-out"><button class="button-primary tagSettingsEdit">Edit</button><button class="button tagSettingsDelete">Delete</button></div>
+            <div class="tagSettings"></div><div class="tagSettings"></div>`);
+        } else {
+            $settings.remove();
+        }
+    });
+    $("#tagData").on("click", ".tagSettingsEdit", function() {
+        const id = $(this).closest("li").attr("data-id");
+        ShowEditTagModal(id);
+    });
+    $("#tagData").on("click", ".tagSettingsDelete", function() {
+        const id = $(this).closest("li").attr("data-id");
+        data.DeleteTag(dbData.currentScreen, id);
+        ShowTagEditor();
+    });
 
+    // OLD tag shit
     $("#btnAddNewTag").on("click", function() {
         const max = $("#modalTagList > li").length;
         const newTag = new Tag("", `tagColor${max % 10}`);

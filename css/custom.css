@@ -576,9 +576,11 @@ i.tc23 { color: #0099FF }
     border: 5px solid var(--header-text-color);
 }
 
-#tagData > li {
+.tagEdit {
     display: grid;
     grid-template-columns: 10% 74% 8% 8%;
     border-bottom: 1px solid var(--header-bg-color);
 }
 .tagImg, #tagData > li > i { margin: 0.25em }
+.spaced-out { text-align: center }
+.spaced-out > button { margin: 0 1em 1em }

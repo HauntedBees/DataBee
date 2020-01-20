@@ -40,12 +40,12 @@ class NoteListItem {
     }
 }
 class Tag {
-    constructor(tag, color, imgVal, id) {
+    constructor(tag, color, imgVal, sortOrder, id) {
         this.id = id || data.GetGUID();
         this.tag = tag;
         this.color = color;
         this.imgVal = imgVal;
-        this.sortOrder = 0;
+        this.sortOrder = sortOrder;
     }
 }
 let dbData = {
@@ -124,19 +124,21 @@ const data = {
     DeleteTag: function(dataIdx, tagId, dontSave) {
         const clist = dbData.dbList[dataIdx];
         delete clist.tags[tagId];
+        // TODO: clear anything that has this tag
         if(dontSave !== true) { data.Save(); }
     },
-    ReorderTags: function(dataIdx, tagId, oldPos, newPos, dontSave) {
-        if(oldPos === newPos) { return; }
+    ReorderTags: function(dataIdx, tagId, newPos, dontSave) {
         const clist = dbData.dbList[dataIdx];
+        const oldPos = clist.tags[tagId].sortOrder;
+        if(oldPos === newPos) { return; }
         const dir = (newPos > oldPos) ? 1 : -1;
-        for(const id in clist.tags) { // TWEAK SLIGHTLY PROBABLY
+        for(const id in clist.tags) {
             const e = clist.tags[id];
             if(id === tagId) {
                 e.sortOrder = newPos;
-            } else if(dir > 0 && e.sortOrder < newPos && e.sortOrder > oldPos) {
+            } else if(dir > 0 && e.sortOrder < newPos && e.sortOrder >= oldPos) {
                 e.sortOrder -= 1;
-            } else if(dir < 0 && e.sortOrder > newPos && e.sortOrder < oldPos) {
+            } else if(dir < 0 && e.sortOrder >= newPos && e.sortOrder < oldPos) {
                 e.sortOrder += 1;
             }
         }
