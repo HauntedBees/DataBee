@@ -435,7 +435,7 @@ function ToggleDataItemSettings($e, i, type) {
     }
 }
 
-function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags) { // TODO
+function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags) {
     if($tagButton.hasClass("active")) {
         $tagButton.removeClass("active");
         $settingsPanel.parent().find(".tagList").remove();

@@ -268,13 +268,13 @@ const data = {
                 break;
             case "tag":
                 const allTags = dbData.dbList[dataIdx].tags;
-                dataItems.sort((a, b) => { // TODO: make me good
+                dataItems.sort((a, b) => {
                     if(doFilter) {
                         if(a.checked && !b.checked) { return 1; }
                         else if(!a.checked && b.checked) { return -1; }
                     }
-                    const atags = a.tags.map(tagId => allTags[tagId].tag).join("") || "zzzzz";
-                    const btags = b.tags.map(tagId => allTags[tagId].tag).join("") || "zzzzz";
+                    const atags = a.tags.map(tagId => `${allTags[tagId].sortOrder}`.padStart(4, "0")).join("") || "zzzzz";
+                    const btags = b.tags.map(tagId => `${allTags[tagId].sortOrder}`.padStart(4, "0")).join("") || "zzzzz";
                     if(atags < btags) { return -sortDir; }
                     if(atags > btags) { return sortDir; }
                     const aL = a.val.toLowerCase(), bL = b.val.toLowerCase();
