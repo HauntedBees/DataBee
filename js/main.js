@@ -408,7 +408,7 @@ $(function() {
             if(currentList.advancedView) {
                 ShowAdvancedAddModal();
             } else {
-                ShowInputModal("newItem", "Add Item", "New Entry", "Add");
+                ShowInputModal("newItem", "New Item", "New Entry", "Add");
             }
         } else {
             ShowNoteEditor(-1, false);
@@ -416,7 +416,7 @@ $(function() {
     });
 
     // Note List
-    $("#btnAddNotes").on("click", function() { ShowInputModal("newNotes", "Add Notes List", "New Notes List", "Create"); });
+    $("#btnAddNotes").on("click", function() { ShowInputModal("newNotes", "New Notes List", "New Notes List", "Create"); });
     $("#btnEditNote").on("click", function() {
         const idx = parseInt($("#bNoteEditor").attr("data-id"));
         ShowNoteEditor(idx, false);
@@ -444,7 +444,7 @@ $(function() {
     });
 
     // Checklist
-    $("#btnAddChecklist").on("click", function() { ShowInputModal("newChecklist", "Add Checklist", "New Checklist", "Create"); });
+    $("#btnAddChecklist").on("click", function() { ShowInputModal("newChecklist", "New Checklist", "New Checklist", "Create"); });
     $("#listData").on("click", "li", function(e) {
         switch($("#listData").attr("data-type")) {
             case "checklist":
