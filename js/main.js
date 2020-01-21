@@ -251,33 +251,6 @@ $(function() {
         DrawMain();
         data.Save();
     });
-    $("#viewType").on("click", function() {
-        const $subList = $("#viewTypes");
-        if($subList.hasClass("active")) {
-            $subList.hide().removeClass("active");
-        } else {
-            const viewType = dbData.dbList[dbData.currentScreen].displayType;
-            $("li", $subList).removeClass("active");
-            if(viewType === "tiles") {
-                $("#viewTile").addClass("active");
-            } else {
-                $("#viewList").addClass("active");
-            }
-            $subList.show().addClass("active");
-        }
-    });
-    $("#viewTypes > li").on("click", function() {
-        const newViewType = $(this).attr("data-val");
-        $("#filterTypes > li").removeClass("active");
-        if(viewType === "tiles") {
-            $("#viewTile").addClass("active");
-        } else {
-            $("#viewList").addClass("active");
-        }
-        dbData.dbList[dbData.currentScreen].displayType = newViewType;
-        DrawMain();
-        data.Save();
-    });
     $("#checkAll").on("click", function() {
         dbData.dbList[dbData.currentScreen].data.forEach(e => { e.checked = true });
         data.SortDataItems(dbData.currentScreen);
@@ -289,6 +262,27 @@ $(function() {
         data.SortDataItems(dbData.currentScreen);
         data.Save(DrawMain);
         HideSidebars();
+    });
+    $(".settingToggle").on("click", function() {
+        const $subList = $(`#${$(this).attr("data-target")}`);
+        if($subList.hasClass("active")) {
+            $subList.hide().removeClass("active");
+        } else {
+            const valueToCheck = dbData.dbList[dbData.currentScreen][$(this).attr("data-val")];
+            $("li", $subList).removeClass("active");
+            $(`li[data-val="${valueToCheck}"]`).addClass("active");
+            $subList.show().addClass("active");
+        }
+    });
+    $(".settingToggled > li").on("click", function() {
+        const $toggler = $(this).parent();
+        const newVal = $toggler.attr("data-boolean") === "true" ? $(this).attr("data-val") === "true" : $(this).attr("data-val");
+        $toggler.find("li").removeClass("active");
+        $toggler.find(`li[data-val="${newVal}"]`).addClass("active");
+        const key = $toggler.attr("data-val");
+        dbData.dbList[dbData.currentScreen][key] = newVal;
+        DrawMain();
+        data.Save();
     });
 
     // Tags

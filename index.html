@@ -72,10 +72,17 @@
                     </ul>
                 </li>
                 <li class="note-only">
-                    <span id="viewType"><i class="material-icons">view_list</i><span class="by-icon">View Type</span><i class="sideMore material-icons">more_horiz</i></span>
-                    <ul id="viewTypes">
+                    <span class="settingToggle" data-target="viewTypes" data-val="displayType"><i class="material-icons">view_list</i><span class="by-icon">View Type</span><i class="sideMore material-icons">more_horiz</i></span>
+                    <ul id="viewTypes" class="settingToggled" data-val="displayType">
                         <li id="viewTile" data-val="tiles"><i class="material-icons">view_module</i><span class="by-icon">Tiles</span></li>
                         <li id="viewList" data-val="list"><i class="material-icons">view_headline</i><span class="by-icon">List</span></li i>
+                    </ul>
+                </li>
+                <li>
+                    <span class="settingToggle" data-target="showBottoms" data-val="carousel"><i class="material-icons">view_carousel</i><span class="by-icon">Show in Carousel</span><i class="sideMore material-icons">more_horiz</i></span>
+                    <ul id="showBottoms" class="settingToggled" data-val="carousel" data-boolean="true">
+                        <li id="viewTile" data-val="true"><i class="material-icons">toggle_on</i><span class="by-icon">Show</span></li>
+                        <li id="viewList" data-val="false"><i class="material-icons">toggle_off</i><span class="by-icon">Hide</span></li>
                     </ul>
                 </li>
             </ul>

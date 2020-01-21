@@ -8,6 +8,7 @@ class DataObj {
         this.sortDir = 1;
         this.filterChecks = true;
         this.date = +new Date();
+        this.carousel = true;
     }
 }
 class Checklist extends DataObj {
@@ -79,6 +80,10 @@ const data = {
             }
             if(dObj.tags === undefined) {                   // 0JAN04 to 0JAN05
                 dObj.tags = {};
+                hasChanges = true;
+            }
+            if(dObj.carousel === undefined) {               // 0JAN19 to 0JAN20
+                dObj.carousel = true;
                 hasChanges = true;
             }
             const dTags = Object.keys(dObj.tags).map(key => dObj.tags[key]);

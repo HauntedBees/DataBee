@@ -147,6 +147,7 @@ function ShowRightbar() {
             $(".note-only").show();
             break;
     }
+    $(".settingToggled").hide();
     $("#rightbar").addClass("active");
     $("#sidebar").removeClass("active");
     $("#cover").show();
@@ -334,16 +335,28 @@ function DrawMain() {
         const html = datalist.data.map((e, i) => GetNoteHTML(e, i));
         $("#notesListData").html(html.join(""));
     }
-    SetScroller("prevScroller", dbData.currentScreen - 1);
-    SetScroller("nextScroller", dbData.currentScreen + 1);
+    SetScroller("prevScroller", dbData.currentScreen, -1);
+    SetScroller("nextScroller", dbData.currentScreen, 1);
 }
-function SetScroller(elemId, idx) {
-    const $elem = $(`#${elemId}`);
+function SetScroller(elemId, currIdx, dir, origIdx) {
+    origIdx = origIdx === undefined ? currIdx : origIdx;
+    let idx = currIdx + dir;
     if(idx < 0) { idx = dbData.dbList.length - 1; }
     else if(idx >= dbData.dbList.length) { idx = 0; }
+    const $elem = $(`#${elemId}`);
     const list = dbData.dbList[idx];
-    $elem.attr("data-idx", idx);
-    $(".scrollerBtn_text", $elem).text(list.name);
+    if(origIdx === idx) { // did a full loop; there are no scrollable lists!
+        $(".scrollerBtn_text", $elem).text(list.name);
+        $elem.attr("data-idx", idx);
+        $("#checklistScroller").hide();
+        return;
+    } else if(!list.carousel) {
+        SetScroller(elemId, idx, dir, origIdx);
+    } else {
+        $elem.attr("data-idx", idx);
+        $(".scrollerBtn_text", $elem).text(list.name);
+        $("#checklistScroller").show();
+    }
 }
 function GetNoteHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
