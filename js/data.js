@@ -139,7 +139,7 @@ const data = {
             const e = clist.tags[id];
             if(id === tagId) {
                 e.sortOrder = newPos;
-            } else if(dir > 0 && e.sortOrder < newPos && e.sortOrder >= oldPos) {
+            } else if(dir > 0 && e.sortOrder <= newPos && e.sortOrder > oldPos) {
                 e.sortOrder -= 1;
             } else if(dir < 0 && e.sortOrder >= newPos && e.sortOrder < oldPos) {
                 e.sortOrder += 1;
@@ -268,7 +268,7 @@ const data = {
                 break;
             case "tag":
                 const allTags = dbData.dbList[dataIdx].tags;
-                dataItems.sort((a, b) => {
+                dataItems.sort((a, b) => { // TODO: make me good
                     if(doFilter) {
                         if(a.checked && !b.checked) { return 1; }
                         else if(!a.checked && b.checked) { return -1; }
