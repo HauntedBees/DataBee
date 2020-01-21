@@ -130,7 +130,6 @@ function CloseModal(id) {
         ctx.stateForBackButton = ctx.stateForBackButton.split("|")[0];
     }
 }
-
 function DrawAll() {
     if(dbData.settings.leftHanded) { $("body").addClass("lefty"); }
     else { $("body").removeClass("lefty"); }
@@ -330,23 +329,17 @@ function DrawMain() {
     $("#bChecklist").show();
     $("#content").addClass("listView");
     const datalist = dbData.dbList[dbData.currentScreen];
-    $("#checkListData, #notesListData").empty();
+    $("#listData").empty().attr("data-type", datalist.type).removeClass("tileView");
     $("#title").text(`${datalist.name}`);
     if(datalist.type === "checklist") {
-        $("#checkListData").show();
-        $("#notesListData").hide();
         const html = datalist.data.map((e, i) => GetCheckboxItemHTML(e, i));
-        $("#checkListData").html(html.join(""));
+        $("#listData").html(html.join(""));
     } else if(datalist.type === "notes") {
-        $("#checkListData").hide();
-        $("#notesListData").show();
         if(datalist.displayType === "tiles") {
-            $("#notesListData").addClass("tileView");
-        } else {
-            $("#notesListData").removeClass("tileView");
+            $("#listData").addClass("tileView");
         }
         const html = datalist.data.map((e, i) => GetNoteHTML(e, i));
-        $("#notesListData").html(html.join(""));
+        $("#listData").html(html.join(""));
     }
     SetScroller("prevScroller", dbData.currentScreen, -1);
     SetScroller("nextScroller", dbData.currentScreen, 1);

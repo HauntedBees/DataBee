@@ -376,7 +376,7 @@ $(function() {
     
     // Main
     document.addEventListener("backbutton", BackButtonPress, false);
-    $("#checkListData").sortable({
+    $("#listData").sortable({
         delay: 100,
         handle: ".handle",
         start: StartSort, stop: EndSort,
@@ -384,26 +384,12 @@ $(function() {
             if(e === undefined || e.originalEvent === undefined || e.originalEvent.target === undefined) { return; }
             const $me = $(e.originalEvent.target).closest("li");
             const oldIdx = parseInt($me.attr("data-id"));
-            const newIdx = $("#checkListData > li").index($me[0]);
+            const newIdx = $("#listData > li").index($me[0]);
             data.SwapDataItems(dbData.currentScreen, oldIdx, newIdx);
             DrawMain();
         }
     });
-    $("#checkListData").disableSelection();
-    $("#notesListData").sortable({
-        delay: 100,
-        handle: ".handle",
-        start: StartSort, stop: EndSort,
-        update: function(e) {
-            if(e === undefined || e.originalEvent === undefined || e.originalEvent.target === undefined) { return; }
-            const $me = $(e.originalEvent.target).closest("li");
-            const oldIdx = parseInt($me.attr("data-id"));
-            const newIdx = $("#notesListData > li").index($me[0]);
-            data.SwapDataItems(dbData.currentScreen, oldIdx, newIdx);
-            DrawMain();
-        }
-    });
-    $("#notesListData").disableSelection();
+    $("#listData").disableSelection();
 
     // Modals
     $(".btnCancel").on("click", function() { CloseModal($(this).closest(".modal").attr("id")); });
@@ -416,7 +402,6 @@ $(function() {
         e.preventDefault();
         if(e.keyCode === 13) { $("#btnConfirmModalInput").click(); }
     });
-
     $("#btnAddItemModal").on("click", function() {
         const currentList = dbData.dbList[dbData.currentScreen];
         if(currentList.type === "checklist") {
@@ -460,8 +445,19 @@ $(function() {
 
     // Checklist
     $("#btnAddChecklist").on("click", function() { ShowInputModal("newChecklist", "Add Checklist", "New Checklist", "Create"); });
-    $("#checkListData").on("click", "li", function(e) { ChecklistItemClick(e, $(this)); });
-    $("#notesListData").on("click", "li", function(e) { NoteClick(e, $(this)); });
+    $("#listData").on("click", "li", function(e) {
+        switch($("#listData").attr("data-type")) {
+            case "checklist":
+                ChecklistItemClick(e, $(this));
+                break;
+            case "notes":
+                NoteClick(e, $(this));
+                break;
+            case "recipe":
+                RecipeClick(e, $(this));
+                break;
+        }
+    });
     $("#searchData").on("click", "li", function(e) {
         if($(this).hasClass("note")) {
             NoteClick(e, $(this));
@@ -469,14 +465,14 @@ $(function() {
             ChecklistItemClick(e, $(this));
         }
     });
-    $("#checkListData, #notesListData").on("click", ".ci-delete", function(e) {
+    $("#listData").on("click", ".ci-delete", function(e) {
         e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.DeleteDataItem(dbData.currentScreen, idx);
         $(this).closest("li").remove();
         ctx.stateForBackButton = "home";
     });
-    $("#checkListData").on("click", ".ci-rename", function(e) {
+    $("#listData").on("click", ".ci-rename", function(e) {
         e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         const name = $(this).closest("li").find(".name").text();
@@ -484,7 +480,7 @@ $(function() {
         ShowInputModal("renameItem", `Rename <em>${name}</em>.`, "Entry Name", "Rename", idx);
         $("#txtModalInput").val(name).select();
     });
-    $("#checkListData").on("click", ".ci-notes", function(e) {
+    $("#listData").on("click", ".ci-notes", function(e) {
         e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         const notes = data.GetChecklistItemNotes(dbData.currentScreen, idx);
@@ -493,7 +489,7 @@ $(function() {
         ShowInputModal("editNotes", `Notes for <em>${name}</em>.`, "Notes", "Save", idx);
         $("#txtModalInput").val(notes).select();
     });
-    $("#checkListData, #notesListData").on("click", ".ci-important", function(e) {
+    $("#listData").on("click", ".ci-important", function(e) {
         e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.ToggleDataItemImportance(dbData.currentScreen, idx);
@@ -501,7 +497,7 @@ $(function() {
         $(this).closest("li").replaceWith(GetCheckboxItemHTML(dbData.dbList[dbData.currentScreen].data[idx], idx));
         ctx.stateForBackButton = "home";
     });
-    $("#checkListData, #notesListData").on("click", ".ci-tags", function(e) {
+    $("#listData").on("click", ".ci-tags", function(e) {
         e.stopPropagation();
         const $parent = $(this).closest(".settings");
         const allTagsObj = dbData.dbList[dbData.currentScreen].tags;
@@ -528,7 +524,7 @@ $(function() {
         e.stopPropagation();
         $(this).toggleClass("active");
     });
-    $("#checkListData, #notesListData").on("click", ".ci-move", function(e) {
+    $("#listData").on("click", ".ci-move", function(e) {
         e.stopPropagation();
         const $parent = $(this).closest(".settings");
         const idx = parseInt($parent.attr("data-id"));
