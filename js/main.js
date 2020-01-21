@@ -168,6 +168,24 @@ $(function() {
         CloseModal("modalInput");
         ctx.stateForBackButton = "home";
     });
+    $("#btnConfirmModalAdv").on("click", function() {
+        const $txtBox = $("#txtAdvName");
+        const val = $txtBox.val();
+        if(val === "") {
+            $txtBox.addClass("comeOn");
+            return;
+        }
+        const newItem = new ChecklistItem(val);
+        newItem.notes = $("#txtAdvNote").val();
+        newItem.tags = $("#advTags > .tag.active").toArray().map(e => $(e).attr("data-id"));
+        data.AddDataItem(dbData.currentScreen, newItem);
+        DrawMain();
+        $txtBox.val("");
+        $("#txtAdvNote").val("");
+        $("#advTags > .tag.active").removeClass("active");
+        $txtBox.focus();
+        return;
+    });
     $("#removeCompleted").on("click", function() {
         ShowInfoModal("removeCompleted", "Remove Completed Items", "Are you sure you want to remove all completed items? This cannot be undone.", "Clear");
     });
@@ -400,8 +418,13 @@ $(function() {
     });
 
     $("#btnAddItemModal").on("click", function() {
-        if(dbData.dbList[dbData.currentScreen].type === "checklist") {
-            ShowInputModal("newItem", "Add Item", "New Entry", "Add");
+        const currentList = dbData.dbList[dbData.currentScreen];
+        if(currentList.type === "checklist") {
+            if(currentList.advancedView) {
+                ShowAdvancedAddModal();
+            } else {
+                ShowInputModal("newItem", "Add Item", "New Entry", "Add");
+            }
         } else {
             ShowNoteEditor(-1, false);
         }
@@ -499,6 +522,10 @@ $(function() {
             const allTags = dbData.dbList[dbData.currentScreen].tags;
             $parent.find(".tagGroup").html(GetTagsHTML(allTags, dbData.dbList[dbData.currentScreen].data[elemIdx].tags));
         }
+        $(this).toggleClass("active");
+    });
+    $(document).on("click", "#advTags > .tag", function(e) {
+        e.stopPropagation();
         $(this).toggleClass("active");
     });
     $("#checkListData, #notesListData").on("click", ".ci-move", function(e) {

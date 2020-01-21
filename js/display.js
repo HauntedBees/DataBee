@@ -56,6 +56,19 @@ function ShowEditTagModal(tagId) {
     ShowModal("modalTagEdit", false);
     $("#txtModalTagInput").focus();
 }
+function ShowAdvancedAddModal() {
+    $("#txtAdvName, #txtAdvNote").val("");
+    const currlist = dbData.dbList[dbData.currentScreen];
+    if(Object.keys(currlist.tags).length === 0) {
+        $("#advTagsLabel").hide();
+        $("#advTags").empty();
+    } else {
+        $("#advTagsLabel").show();
+        $("#advTags").html(GetTogglingTagListHTML(currlist.tags, []));
+    }
+    ShowModal("modalAdvancedAdd");
+    $("#txtAdvName").focus();
+}
 function ShowTagEditor() {
     $(".body, #menuBtn, #menuRight").hide();
     $("#bTagEditor, #backBtn").show();
@@ -421,7 +434,6 @@ function BasicMarkdown(s) {
             .replace(/~~(.*?)~~/g, `<span class="strikethru">$1</span>`)
             .replace(/((http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?)/g, `<a href="$1">$1</a>`);
 }
-
 function ToggleDataItemSettings($e, i, type) {
     const important = $e.hasClass("important");
     if($e.find(".settings").length) {
@@ -447,7 +459,6 @@ function ToggleDataItemSettings($e, i, type) {
         $e.append(`<div class="settings" data-id="${i}">${settings.join("")}</div>`);
     }
 }
-
 function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags) {
     if($tagButton.hasClass("active")) {
         $tagButton.removeClass("active");
@@ -459,25 +470,28 @@ function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags
     } else {
         $tagButton.addClass("active");
         if(allTags.length === 0) {
-            $settingsPanel.after(`<div class="tagList noTags">This list does not have any tags for it. Go to the List Settings and select "Manage Tags" to add some.</div>`);
+            $settingsPanel.after(`<div class="tagList tagDisp noTags">This list does not have any tags for it. Go to the List Settings and select "Manage Tags" to add some.</div>`);
         } else {
-            const tags = Object.keys(allTags).map(t => allTags[t]).sort((a, b) => {
-                if(a.sortOrder < b.sortOrder) { return -1; }
-                if(a.sortOrder > b.sortOrder) { return 1; }
-                return 0;
-            });
-            const tagHTML = tags.map(tag => {
-                let innerHTML = "";
-                if(tag.imgVal === "") {
-                    innerHTML = `<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
-                } else {
-                    innerHTML = `<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
-                }
-                return `<div class="tag${myTags.indexOf(tag.id) < 0 ? "" : " active"}" data-id="${tag.id}">${innerHTML} ${tag.tag}</div>`
-            });
-            $settingsPanel.after(`<div class="tagList">${tagHTML.join("")}</div>`);
+            $settingsPanel.after(`<div class="tagList tagDisp">${GetTogglingTagListHTML(allTags, myTags)}</div>`);
         }
     }
+}
+function GetTogglingTagListHTML(allTags, myTags) {
+    const tags = Object.keys(allTags).map(t => allTags[t]).sort((a, b) => {
+        if(a.sortOrder < b.sortOrder) { return -1; }
+        if(a.sortOrder > b.sortOrder) { return 1; }
+        return 0;
+    });
+    const tagHTML = tags.map(tag => {
+        let innerHTML = "";
+        if(tag.imgVal === "") {
+            innerHTML = `<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
+        } else {
+            innerHTML = `<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
+        }
+        return `<div class="tag${myTags.indexOf(tag.id) < 0 ? "" : " active"}" data-id="${tag.id}">${innerHTML} ${tag.tag}</div>`
+    });
+    return `${tagHTML.join("")}`;
 }
 function AddSortOrderImg($li, sortOrder) {
     $("#sortDirIcon").remove();
