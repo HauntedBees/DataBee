@@ -140,6 +140,29 @@ function DrawAll() {
     $(`#themes .box.theme${dbData.settings.theme}`).html(`<i class="material-icons">check</i>`);
 }
 
+/* Cookbook */
+function EditRecipe(idx) {
+    const recipe = dbData.dbList[dbData.currentScreen].data[idx];
+    $(".body, #menuBtn, #menuRight, #recipeRead").hide();
+    $("#bRecipeEditor, #backBtn, #recipeEdit").show();
+    $("#title").text(recipe.name);
+    ctx.stateForBackButton = "recipeeditor";
+    $("#bRecipeEditor").attr("data-id", idx);
+    $("#recipeServingSize").val(recipe.servings);
+    $("#ingredientEditList").html(recipe.ingredience.map((e, i) => `
+    <li data-id="${i}" class="editIngredient">
+        <span>${e.amount}${e.unit === "" ? "" : ` ${e.unit}`} ${e.ingredient}</span>
+        <i class="material-icons recipeEditBtn recipeEdit">edit</i>
+        <i class="material-icons recipeEditBtn recipeDel">delete</i>
+    </li>`).join(""));
+    $("#stepEditList").html(recipe.steps.map((e, i) => `
+    <li data-id="${i}" class="editStep">
+        <span>${i + 1}. ${e.step}</span>
+        <i class="material-icons recipeEditBtn recipeEdit">edit</i>
+        <i class="material-icons recipeEditBtn recipeDel">delete</i>
+    </li>`).join(""));
+}
+
 /* Sidebar */
 function ShowSidebar() {
     $("#sidebar").addClass("active");
@@ -157,6 +180,9 @@ function ShowRightbar() {
         case "notes":
             $(".checklist-only").hide();
             $(".note-only").show();
+            break;
+        case "recipe":
+            $(".checklist-only, .note-only").hide();
             break;
     }
     $(".settingToggled").hide();
@@ -246,6 +272,8 @@ function DoSearch(searchQuery) {
                 return GetCheckboxItemHTML(e, e.myIdx, true);
             } else if(e.listType === "notes") {
                 return GetNoteHTML(e, e.myIdx, true);
+            } else if(e.listType === "recipe") {
+                return GetRecipeHTML(e, e.myIdx, true);
             } else { return ""; }
         });
         $("#searchData").html(html.join(""));
@@ -340,6 +368,9 @@ function DrawMain() {
         }
         const html = datalist.data.map((e, i) => GetNoteHTML(e, i));
         $("#listData").html(html.join(""));
+    } else if(datalist.type === "recipe") {
+        const html = datalist.data.map((e, i) => GetRecipeHTML(e, i));
+        $("#listData").html(html.join(""));
     }
     SetScroller("prevScroller", dbData.currentScreen, -1);
     SetScroller("nextScroller", dbData.currentScreen, 1);
@@ -363,6 +394,23 @@ function SetScroller(elemId, currIdx, dir, origIdx) {
         $(".scrollerBtn_text", $elem).text(list.name);
         $("#checklistScroller").show();
     }
+}
+function GetRecipeHTML(e, i, isSearchQuery) {
+    const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
+    const allTags = dbData.dbList[dbListIdx].tags;
+    const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
+    const tagsHTML = GetTagsHTML(allTags, e.tags);
+    return `<li id="recipeitem${i}" data-id="${i}" class="cbitem ritem ui-sortable-handle${e.important ? " important" : ""}">
+        <span class="itemContainer">
+            ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
+            <div class="tagGroup">${tagsHTML}</div>
+            <span class="name">${e.name}</span>
+        </span>
+        ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
+        ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i>` : ``}
+        <i class="edit material-icons">more_horiz</i>
+        ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
+        </li>`;
 }
 function GetNoteHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;

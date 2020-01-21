@@ -55,7 +55,7 @@ input.comeOn { border: 1px solid #FF0000 !important }
 
 /* Buttons */
 .btn, .addBtn, nav li { cursor: pointer }
-.addBtn {
+.addBtn, .recipeBtn {
     border-radius: 50%;
     height: 30px;
     width: 35px;
@@ -336,7 +336,7 @@ button { color: var(--text-color) !important }
     color: var(--button-text-color) !important;
 }
 header { background: var(--header-bg-color); color: var(--header-text-color) }
-.addBtn {
+.addBtn, .recipeBtn {
     background-color: var(--secondary-bg-color);
     border: 1px solid var(--secondary-border-color);
     color: var(--button-text-color);
@@ -586,3 +586,41 @@ i.tc23 { color: #0099FF }
 .tagImg, #tagData > li > i { margin: 0.25em }
 .spaced-out { text-align: center }
 .spaced-out > button { margin: 0 1em 1em }
+
+input, option, select, textarea { color: #000000 }
+
+/* Cookbook */
+.recipeDetails > h4 { margin: 0.25em 0.5em }
+#recipeServingSize {
+    display: inline-block;
+    width: 3em;
+}
+.recipeSection { overflow-y: scroll }
+.recipeSection-small { height: 25vh }
+.recipeSection-big { height: 35vh }
+.recipeBtn {
+    height: 25px;
+    width: 30px;
+}
+#ddlModalUnit {
+    margin-bottom: 1em;
+    width: 100%;
+}
+#modalAddIngredient > div { margin: 40% auto }
+.editIngredient, .editStep {
+    display: grid;
+    grid-template-columns: 76% 12% 12%;
+    margin: 0 0.5em 0.5em 1em;
+}
+.recipeEditBtn {
+    background-color: var(--secondary-bg-color);
+    border: 1px solid var(--secondary-border-color);
+    color: var(--button-text-color);
+    border-radius: 0.5em;
+    padding-top: 0.1em;
+    text-align: center;
+    width: 80%;
+}
+
+#txtStep { width: 100%; height: 8em; }
+#modalAddStep > div { margin: 50% auto }

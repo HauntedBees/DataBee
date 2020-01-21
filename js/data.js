@@ -21,24 +21,53 @@ class NoteList extends DataObj {
         this.displayType = "tiles";
     }
 }
-class ChecklistItem {
-    constructor(val) {
-        this.val = val;
-        this.checked = false;
-        this.important = false;
+class Cookbook extends DataObj {
+    constructor(name) { super(name, "recipe"); }
+}
+class DataItem {
+    constructor() {
         this.tags = [];
-        this.notes = "";
+        this.important = false;
         this.date = +new Date();
     }
 }
-class NoteListItem {
+class ChecklistItem extends DataItem {
+    constructor(val) {
+        super();
+        this.val = val;
+        this.checked = false;
+        this.notes = "";
+    }
+}
+class NoteListItem extends DataItem {
     constructor(title, body) {
+        super();
         this.title = title;
         this.body = body;
         this.val = title + body;
-        this.tags = [];
-        this.important = false;
-        this.date = +new Date();
+    }
+}
+class Recipe extends DataItem {
+    constructor(name) {
+        super();
+        this.name = name;
+        this.servings = 1;
+        this.ingredience = [];
+        this.steps = [];
+    }
+}
+class Ingredient {
+    constructor(item, amt, unit) {
+        this.ingredient = item;
+        this.amount = amt;
+        this.unit = unit;
+        this.checked = false;
+    }
+}
+class Step {
+    constructor(text) {
+        this.step = text;
+        this.checked = false;
     }
 }
 class Tag {
@@ -337,10 +366,47 @@ const data = {
         dbData.dbList[dataIdx].data = list.filter(e => e.checked === false);
         if(dontSave !== true) { data.Save(); }
     },
+    AddRecipeIngredient: function(dataIdx, recipeIdx, ingredient, dontSave) {
+        const list = dbData.dbList[dataIdx];
+        const recipe = list.data[recipeIdx];
+        recipe.ingredience.push(ingredient);
+        if(dontSave !== true) { data.Save(); }
+    },
+    ReplaceRecipeIngredient: function(dataIdx, recipeIdx, ingredientIdx, ingredient, dontSave) {
+        const list = dbData.dbList[dataIdx];
+        const recipe = list.data[recipeIdx];
+        recipe.ingredience[ingredientIdx] = ingredient;
+        if(dontSave !== true) { data.Save(); }
+    },
+    RemoveRecipeIngredient: function(dataIdx, recipeIdx, ingredientIdx, dontSave) {
+        const list = dbData.dbList[dataIdx];
+        const recipe = list.data[recipeIdx];
+        recipe.ingredience.splice(ingredientIdx, 1);
+        if(dontSave !== true) { data.Save(); }
+    },
+    AddRecipeStep: function(dataIdx, recipeIdx, step, dontSave) {
+        const list = dbData.dbList[dataIdx];
+        const recipe = list.data[recipeIdx];
+        recipe.steps.push(step);
+        if(dontSave !== true) { data.Save(); }
+    },
+    ReplaceRecipeStep: function(dataIdx, recipeIdx, stepIdx, step, dontSave) {
+        const list = dbData.dbList[dataIdx];
+        const recipe = list.data[recipeIdx];
+        recipe.steps[stepIdx] = step;
+        if(dontSave !== true) { data.Save(); }
+    },
+    RemoveRecipeStep: function(dataIdx, recipeIdx, stepIdx, dontSave) {
+        const list = dbData.dbList[dataIdx];
+        const recipe = list.data[recipeIdx];
+        recipe.steps.splice(stepIdx, 1);
+        if(dontSave !== true) { data.Save(); }
+    },
     SearchDataItems: function(query) {
         const results = [];
         dbData.dbList.forEach((arr, arrIdx) => {
             arr.data.forEach((elem, elemIdx) => {
+                if(elem.val === undefined) { elem.val = elem.name; } // lazy hack for recipes
                 if(elem.val.toLowerCase().indexOf(query) >= 0) {
                     elem.ownerName = arr.name;
                     elem.ownerIdx = arrIdx;

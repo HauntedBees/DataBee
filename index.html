@@ -40,6 +40,7 @@
             <ul class="bottomElem">
                 <li id="btnAddChecklist" class="sidebar_setting"><i class="material-icons">add</i><span class="by-icon">New Checklist</span></li>
                 <li id="btnAddNotes" class="sidebar_setting"><i class="material-icons">add</i><span class="by-icon">New Notes List</span></li>
+                <li id="btnAddRecipe" class="sidebar_setting"><i class="material-icons">add</i><span class="by-icon">New Cookbook</span></li>
             </ul>
         </nav>
         <nav id="rightbar">
@@ -178,6 +179,28 @@
                             <button id="btnSaveNote" class="button-primary">Save</button>
                             <button class="btnCancelNote">Cancel</button>
                         </div>
+                    </div>
+                </div>
+                <div id="bRecipeEditor" class="body one-half column">
+                    <div id="recipeRead" class="recipeDetails">
+                        
+                    </div>
+                    <div id="recipeEdit" class="recipeDetails">
+                        <h4>Servings: <input id="recipeServingSize" type="text" placeholder="1"></h4>
+                        <h4>
+                            Ingredience
+                            <div id="btnAddIngredient" class="recipeBtn">
+                                <i class="material-icons">add</i>
+                            </div>
+                        </h4>
+                        <ul id="ingredientEditList" class="recipeSection recipeSection-small"></ul>
+                        <h4>
+                            Steps
+                            <div id="btnAddStep" class="recipeBtn">
+                                <i class="material-icons">add</i>
+                            </div>
+                        </h4>
+                        <ul id="stepEditList" class="recipeSection recipeSection-big"></ul>
                     </div>
                 </div>
                 <div id="bSearch" class="body one-half column">
@@ -346,6 +369,59 @@
                 <div class="modalHeader">Move <em>Item</em> to...</div>
                 <div class="modalContent"><ul id="moveChecklists"></ul></div>
                 <div class="modalFooter">
+                    <button class="btnCancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div id="modalAddIngredient" class="modal">
+            <div>
+                <div class="modalHeader">Add Ingredient</div>
+                <div class="modalContent">
+                    <label for="txtModalIngredient">Ingredient</label>
+                    <input id="txtModalIngredient" type="text" placeholder="Ingredient">
+                    <label for="txtModalAmount">Quantity</label>
+                    <input id="txtModalAmount" type="text" placeholder="2, 1.5, 3/4, 10,5, etc.">
+                    <label for="ddlModalUnit">Unit</label>
+                    <select id="ddlModalUnit">
+                        <option value="">Unit</option>
+                        <optgroup label="Volume">
+                            <option value="tsp">Teaspoon (tsp)</option>
+                            <option value="tbsp">Tablespoon (tbsp)</option>
+                            <option value="fl oz">Fluid Ounce (fl oz)</option>
+                            <option value="cup">Cup</option>
+                            <option value="qt">Quart (qt)</option>
+                            <option value="gal">Gallon (gal)</option>
+                            <option value="mL">Milliliter (mL)</option>
+                            <option value="L">Liter (L)</option>
+                            <option value="dL">Deciliter (dL)</option>
+                        </optgroup>
+                        <optgroup label="Weight/Mass">
+                            <option value="lb">Pound (lb)</option>
+                            <option value="oz">Ounce (oz)</option>
+                            <option value="mg">Milligram (mg)</option>
+                            <option value="g">Gram (g)</option>
+                            <option value="kg">Kilogram (kg)</option>
+                        </optgroup>
+                        <optgroup label="Length">
+                            <option value="mm">Millimeter (mm)</option>
+                            <option value="cm">Centimeter (cm)</option>
+                            <option value="m">Meter (m)</option>
+                            <option value="in">Inch (")</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="modalFooter">
+                    <button id="btnConfirmIngredient" class="button-primary">Add</button>
+                    <button class="btnCancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div id="modalAddStep" class="modal">
+            <div>
+                <div class="modalHeader">Add Step</div>
+                <div class="modalContent"><textarea id="txtStep" placeholder="Recipe Step" rows="6"></textarea></div>
+                <div class="modalFooter">
+                    <button id="btnConfirmStep" class="button-primary">Add</button>
                     <button class="btnCancel">Cancel</button>
                 </div>
             </div>

@@ -164,6 +164,24 @@ $(function() {
                 CloseModal("modalInput");
                 ctx.stateForBackButton = "sidebar";
                 return;
+            case "newCookbook":
+                if(dbData.dbList.some(e => e.name === val)) {
+                    $txtBox.val(`${val} already exists!`);
+                    $txtBox.addClass("comeOn");
+                    $txtBox.select();
+                    return;
+                }
+                data.AddData(new Cookbook(val));
+                DrawSidebar();
+                CloseModal("modalInput");
+                ctx.stateForBackButton = "sidebar";
+                return;
+            case "newRecipe":
+                const newRecipe = new Recipe(val);
+                data.AddDataItem(dbData.currentScreen, newRecipe);
+                CloseModal("modalInput");
+                EditRecipe(dbData.dbList[dbData.currentScreen].data.length - 1);
+                return;
         }
         CloseModal("modalInput");
         ctx.stateForBackButton = "home";
@@ -410,8 +428,122 @@ $(function() {
             } else {
                 ShowInputModal("newItem", "New Item", "New Entry", "Add");
             }
-        } else {
+        } else if(currentList.type === "notes") {
             ShowNoteEditor(-1, false);
+        } else if(currentList.type === "recipe") {
+            ShowInputModal("newRecipe", "New Recipe", "Recipe Name", "Create");
+        }
+    });
+
+    // Cookbook
+    $("#btnAddRecipe").on("click", function() { ShowInputModal("newCookbook", "New Cookbook", "New Cookbook", "Create"); });
+    $("#btnAddIngredient").on("click", function() {
+        ShowModal("modalAddIngredient", true);
+        $("#btnConfirmIngredient").text("Add");
+        $("#modalAddIngredient > div > .modalHeader").text("Add Ingredient");
+        $("#modalAddIngredient").attr("data-id", "");
+        $("#ddlModalUnit").val("");
+        $("#txtModalIngredient").focus();
+    });
+    $("#btnConfirmIngredient").on("click", function() {
+        $("#modalAddIngredient .comeOn").removeClass("comeOn");
+        const ing = $("#txtModalIngredient").val();
+        if(ing === "") {
+            $("#txtModalIngredient").addClass("comeOn");
+            return;
+        }
+        const amt = $("#txtModalAmount").val();
+        if(amt === "") {
+            $("#txtModalAmount").addClass("comeOn");
+            return;
+        } else if(!IsValidNumberString(amt)) {
+            $("#txtModalAmount").addClass("comeOn").val("Integer, decimal, or fraction.").focus().select();
+            return;
+        }
+        const unit = $("#ddlModalUnit").val();
+        const ingredient = new Ingredient(ing, amt, unit);
+
+        const ingId = $("#modalAddIngredient").attr("data-id");
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        if(ingId === "") { // new
+            data.AddRecipeIngredient(dbData.currentScreen, recipeIdx, ingredient);
+        } else { // edit
+            data.ReplaceRecipeIngredient(dbData.currentScreen, recipeIdx, parseInt(ingId), ingredient);
+        }
+        EditRecipe(recipeIdx);
+        CloseModal("modalAddIngredient");
+    });
+    $("#ingredientEditList").on("click", ".recipeDel", function() {
+        const ingId = parseInt($(this).parent().attr("data-id"));
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        data.RemoveRecipeIngredient(dbData.currentScreen, recipeIdx, ingId);
+        EditRecipe(recipeIdx);
+    });
+    $("#ingredientEditList").on("click", ".recipeEdit", function() {
+        $("#modalAddIngredient > div > .modalHeader").text("Edit Ingredient");
+        $("#btnConfirmIngredient").text("Save");
+        const ingId = parseInt($(this).parent().attr("data-id"));
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        const ingredient = dbData.dbList[dbData.currentScreen].data[recipeIdx].ingredience[ingId];
+        ShowModal("modalAddIngredient", true);
+        $("#modalAddIngredient").attr("data-id", ingId);
+        $("#txtModalIngredient").val(ingredient.ingredient);
+        $("#txtModalAmount").val(ingredient.amount);
+        $("#ddlModalUnit").val(ingredient.unit);
+    });
+    // TODO: click event, settings, view mode
+
+    $("#btnAddStep").on("click", function() {
+        ShowModal("modalAddStep", true);
+        $("#btnConfirmStep").text("Add");
+        $("#modalAddStep > div > .modalHeader").text("Add Step");
+        $("#modalAddStep").attr("data-id", "");
+        $("#txtStep").val("").focus();
+    });
+    $("#btnConfirmStep").on("click", function() {
+        $("#txtStep").removeClass("comeOn");
+        const stepText = $("#txtStep").val();
+        if(stepText === "") {
+            $("#txtStep").addClass("comeOn");
+            return;
+        }
+        const step = new Step(stepText);
+        const stepId = $("#modalAddStep").attr("data-id");
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        if(stepId === "") { // new
+            data.AddRecipeStep(dbData.currentScreen, recipeIdx, step);
+        } else { // edit
+            data.ReplaceRecipeStep(dbData.currentScreen, recipeIdx, parseInt(stepId), step);
+        }
+        EditRecipe(recipeIdx);
+        CloseModal("modalAddStep");
+    });
+    $("#stepEditList").on("click", ".recipeDel", function() {
+        const stepId = parseInt($(this).parent().attr("data-id"));
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        data.RemoveRecipeStep(dbData.currentScreen, recipeIdx, stepId);
+        EditRecipe(recipeIdx);
+    });
+    $("#stepEditList").on("click", ".recipeEdit", function() {
+        $("#modalAddStep > div > .modalHeader").text("Edit Step");
+        $("#btnConfirmStep").text("Save");
+        const stepId = parseInt($(this).parent().attr("data-id"));
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        const step = dbData.dbList[dbData.currentScreen].data[recipeIdx].steps[stepId];
+        ShowModal("modalAddStep", true);
+        $("#modalAddStep").attr("data-id", stepId);
+        $("#txtStep").val(step.step);
+    });
+
+    $("#recipeServingSize").on("blur", function() {
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        const recipe = dbData.dbList[dbData.currentScreen].data[recipeIdx];
+        const newServings = $(this).val();
+        if(IsValidNumberString(newServings)) {
+            recipe.servings = newServings;
+            data.Save();
+        } else {
+            $(this).val(recipe.servings);
         }
     });
 
@@ -461,6 +593,8 @@ $(function() {
     $("#searchData").on("click", "li", function(e) {
         if($(this).hasClass("note")) {
             NoteClick(e, $(this));
+        } else if($(this).hasClass("ritem")) {
+            RecipeClick(e, $(this));
         } else if($(this).hasClass("cbitem")) {
             ChecklistItemClick(e, $(this));
         }
@@ -547,6 +681,10 @@ $(function() {
     $(document).on("touchmove", TouchMove);
     $(document).on("touchend", TouchRelease);
 });
+function RecipeClick(e, $t) {
+    // TODO: recipe click
+    console.log(e);
+}
 function NoteClick(e, $t) {
     const targType = e.target.tagName.toLowerCase();
     const idx = parseInt($t.attr("data-id"));
@@ -625,6 +763,8 @@ function BackButtonPress() {
             break;
     }
 }
+
+function IsValidNumberString(i) { return i.match(/^([0-9]+)((\.|\/|,)[0-9]+)?$/g) !== null; }
 
 // Swiping
 let potentialSwitch = false, potentialX = 0;
