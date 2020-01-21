@@ -21,7 +21,7 @@ $(function() {
         $("#bSettings, #bCredits, #bSearch, #backBtn").hide();
         ReturnToMain();
     });
-    $(".settingsButton").on("click", function() { // TODO: maybe delete?
+    $(".settingsButton").on("click", function() {
         const newVal = $(this).attr("data-val") !== "true";
         data.ChangeSetting($(this).attr("data-setting"), newVal);
         if(newVal) {
@@ -101,14 +101,15 @@ $(function() {
     });
     $("#btnConfirmModalInput").on("click", function() {
         const $txtBox = $("#txtModalInput");
+        const changeType = $("#modalInput").attr("data-type");
         const val = $txtBox.val();
-        if(val === "") {
+        if(val === "" && changeType !== "editNotes") {
             $txtBox.addClass("comeOn");
             return;
         }
         $txtBox.removeClass("comeOn");
         const idx = parseInt($("#modalInput").attr("data-id"));
-        switch($("#modalInput").attr("data-type")) {
+        switch(changeType) {
             case "renameChecklist":
                 if(dbData.dbList.some((e, i) => e.name === val && i !== dbData.currentScreen)) {
                     $txtBox.val(`${val} already exists!`);

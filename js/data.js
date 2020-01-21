@@ -147,18 +147,6 @@ const data = {
         }
         if(dontSave !== true) { data.Save(); }
     },
-    SaveNewTags: function(dataIdx, tags, toDelete, dontSave) { // TODO: probably delete
-        const clist = dbData.dbList[dataIdx];
-        clist.tags = tags;
-        for(let i = 0; i < toDelete.length; i++) {
-            const deleteId = toDelete[i];
-            for(let j = 0; j < clist.data.length; j++) {
-                const obj = clist.data[j];
-                obj.tags = obj.tags.filter(e => e !== deleteId);
-            }
-        }
-        if(dontSave !== true) { data.Save(); }
-    },
     ToggleTag: function(dataIdx, elemIdx, tagId, dontSave) {
         const clist = dbData.dbList[dataIdx];
         const elem = clist.data[elemIdx];
