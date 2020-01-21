@@ -337,10 +337,15 @@ $(function() {
     });
     $("#tagData").on("click", ".editTag", function() {
         const $settings = $(this).parent().find(".tagSettings");
+        const buttons = [
+            `<button class="button tagSettingsDelete">Delete</button>`,
+            `<button class="button-primary tagSettingsEdit">Edit</button>`
+        ];
+        if(dbData.settings.leftHanded) { buttons.reverse(); }
         if($settings.length === 0) {
             $(this).parent().append(`
             <div class="tagSettings"></div>
-            <div class="tagSettings spaced-out"><button class="button-primary tagSettingsEdit">Edit</button><button class="button tagSettingsDelete">Delete</button></div>
+            <div class="tagSettings spaced-out">${buttons.join("")}</div>
             <div class="tagSettings"></div><div class="tagSettings"></div>`);
         } else {
             $settings.remove();
