@@ -374,6 +374,9 @@ i.important { vertical-align: sub }
     overflow-x: hidden;
     white-space: nowrap;
 }
+.lefty .scrollerBtn { float: right }
+.lefty #prevScroller { border-right: none }
+.lefty #nextScroller { border-right: 1px solid var(--secondary-bg-color) }
 #prevScroller { border-right: 1px solid var(--secondary-bg-color) }
 .scrollerBtn_text {
     font-size: 0.5em;
