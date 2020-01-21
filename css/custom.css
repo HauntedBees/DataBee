@@ -438,6 +438,10 @@ i.important { vertical-align: sub }
     width: 100% !important;
     height: 75vh;
 }
+#noteBodyRead {
+    height: 76vh;
+    overflow-y: scroll;
+}
 .noteBtns {
     width: 100%;
     text-align: center;
