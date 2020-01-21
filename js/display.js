@@ -72,14 +72,8 @@ function ShowTagEditor() {
     for(let i = 0; i < tagsSorted.length; i++) {
         tagHTMLs.push(GetTagEditHTML(tagsSorted[i]));
     }
-    /*for(const id in currentList.tags) {
-        const e = currentList.tags[id];
-        tagHTMLs.push(GetTagEditHTML(e));
-    }*/
     if(tagHTMLs.length === 0) {
         tagHTMLs.push(`<li class="no-items">This list does not have any tags yet. Tap the + icon in the bottom corner of the screen to add one.</li>`);
-    } else {
-
     }
     $("#tagData").html(tagHTMLs.join(""));
 }
@@ -397,7 +391,6 @@ function GetTagsHTML(allTags, myTags) {
         if(a.sortOrder > b.sortOrder) { return 1; }
         return 0;
     });
-    console.log(tags);
     return tags.map(t => GetTagHTML(t)).join("");
 }
 function GetTagHTML(tag) {
@@ -455,7 +448,20 @@ function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags
         if(allTags.length === 0) {
             $settingsPanel.after(`<div class="tagList noTags">This list does not have any tags for it. Go to the List Settings and select "Manage Tags" to add some.</div>`);
         } else {
-            const tagHTML = allTags.map(e => `<div class="tag${myTags.indexOf(e.id) < 0 ? "" : " active"}" data-id="${e.id}">${e.tag}</div>`);
+            const tags = Object.keys(allTags).map(t => allTags[t]).sort((a, b) => {
+                if(a.sortOrder < b.sortOrder) { return -1; }
+                if(a.sortOrder > b.sortOrder) { return 1; }
+                return 0;
+            });
+            const tagHTML = tags.map(tag => {
+                let innerHTML = "";
+                if(tag.imgVal === "") {
+                    innerHTML = `<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
+                } else {
+                    innerHTML = `<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
+                }
+                return `<div class="tag${myTags.indexOf(tag.id) < 0 ? "" : " active"}" data-id="${tag.id}">${innerHTML} ${tag.tag}</div>`
+            });
             $settingsPanel.after(`<div class="tagList">${tagHTML.join("")}</div>`);
         }
     }

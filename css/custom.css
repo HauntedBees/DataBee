@@ -241,6 +241,7 @@ body { font-size: 2em }
     padding: 0.25em 0.5em;
     margin-right: 0.25em;
 }
+.tagList > .tag > .editorTagBox { margin-top: 0.15em }
 .tagList > .tag.active { background-color: var(--secondary-bg-color); color: var(--bg-color) }
 .tagList.noTags {
     border: 1px solid var(--text-color);

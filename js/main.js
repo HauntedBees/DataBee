@@ -565,6 +565,7 @@ function ChecklistItemClick(e, $t) {
             $(`#cbitem${idx} .edit`).click();
             document.documentElement.scrollTop = $(`#cbitem${idx}`).offset().top - 40;
         } else { // Edit
+            if($clicked.hasClass("dispTag")) { return; }
             ToggleDataItemSettings($t, idx, "checklist");
         }
         return;
