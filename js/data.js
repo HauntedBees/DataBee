@@ -287,7 +287,7 @@ const data = {
     },
     MoveDataItem: function(oldDataIdx, newDataIdx, elemIdx, dontSave) {
         const elem = dbData.dbList[oldDataIdx].data.splice(elemIdx, 1)[0];
-        // TODO: handle tag changes
+        elem.tags = [];
         data.AddDataItem(newDataIdx, elem, dontSave);
     },
     ToggleDataItemImportance: function(dataIdx, elemIdx, dontSave) {
