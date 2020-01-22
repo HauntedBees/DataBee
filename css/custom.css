@@ -482,7 +482,7 @@ i.important { vertical-align: sub }
 }
 #head {
     display: grid;
-    grid-template-columns: 10% 80% 10%;
+    grid-template-columns: 10% 75% 15%;
 }
 
 .strikethru { text-decoration: line-through }
@@ -591,12 +591,14 @@ input, option, select, textarea { color: #000000 }
 
 /* Cookbook */
 .recipeDetails > h4 { margin: 0.25em 0.5em }
-#recipeServingSize {
+.servingSize {
     display: inline-block;
     width: 3em;
 }
 .recipeSection { overflow-y: scroll }
+.recipeSection-tiny { max-height: 15vh }
 .recipeSection-small { height: 25vh }
+.recipeSection-smallMaybe { max-height: 25vh }
 .recipeSection-big { height: 35vh }
 .recipeBtn {
     height: 25px;
@@ -624,3 +626,16 @@ input, option, select, textarea { color: #000000 }
 
 #txtStep { width: 100%; height: 8em; }
 #modalAddStep > div { margin: 50% auto }
+.btn-small {
+    font-weight: bold;
+    padding: 0.25em;
+}
+.btn-small > i { vertical-align: sub }
+#recipeTopBtns { display: none }
+#ingredientViewList {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-auto-rows: min-content;
+}
+.viewIngredient { padding: 0 0.5em }
+#stepViewList { padding: 0 0.75em }

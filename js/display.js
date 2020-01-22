@@ -70,7 +70,7 @@ function ShowAdvancedAddModal() {
     $("#txtAdvName").focus();
 }
 function ShowTagEditor() {
-    $(".body, #menuBtn, #menuRight").hide();
+    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
     $("#bTagEditor, #backBtn").show();
     HideSidebars();
     const currentList = dbData.dbList[dbData.currentScreen];
@@ -140,29 +140,6 @@ function DrawAll() {
     $(`#themes .box.theme${dbData.settings.theme}`).html(`<i class="material-icons">check</i>`);
 }
 
-/* Cookbook */
-function EditRecipe(idx) {
-    const recipe = dbData.dbList[dbData.currentScreen].data[idx];
-    $(".body, #menuBtn, #menuRight, #recipeRead").hide();
-    $("#bRecipeEditor, #backBtn, #recipeEdit").show();
-    $("#title").text(recipe.name);
-    ctx.stateForBackButton = "recipeeditor";
-    $("#bRecipeEditor").attr("data-id", idx);
-    $("#recipeServingSize").val(recipe.servings);
-    $("#ingredientEditList").html(recipe.ingredience.map((e, i) => `
-    <li data-id="${i}" class="editIngredient">
-        <span>${e.amount}${e.unit === "" ? "" : ` ${e.unit}`} ${e.ingredient}</span>
-        <i class="material-icons recipeEditBtn recipeEdit">edit</i>
-        <i class="material-icons recipeEditBtn recipeDel">delete</i>
-    </li>`).join(""));
-    $("#stepEditList").html(recipe.steps.map((e, i) => `
-    <li data-id="${i}" class="editStep">
-        <span>${i + 1}. ${e.step}</span>
-        <i class="material-icons recipeEditBtn recipeEdit">edit</i>
-        <i class="material-icons recipeEditBtn recipeDel">delete</i>
-    </li>`).join(""));
-}
-
 /* Sidebar */
 function ShowSidebar() {
     $("#sidebar").addClass("active");
@@ -174,15 +151,16 @@ function ShowRightbar() {
     if(dbData.currentScreen < 0) { return; }
     switch(dbData.dbList[dbData.currentScreen].type) {
         case "checklist":
-            $(".note-only").hide();
+            $(".note-only, .recipe-only").hide();
             $(".checklist-only").show();
             break;
         case "notes":
-            $(".checklist-only").hide();
+            $(".checklist-only, .recipe-only").hide();
             $(".note-only").show();
             break;
         case "recipe":
             $(".checklist-only, .note-only").hide();
+            $(".recipe-only").show();
             break;
     }
     $(".settingToggled").hide();
@@ -234,14 +212,14 @@ function ShowSettings() {
         $setting.attr("data-val", value).text(value ? "Enabled" : "Disabled");
         if(value) { $setting.addClass("button-primary"); }
     }
-    $(".body, #menuBtn, #menuRight").hide();
+    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
     $("#bSettings, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Settings");
     ctx.stateForBackButton = "secondary";
 }
 function ShowCredits() {
-    $(".body, #menuBtn, #menuRight").hide();
+    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
     $("#bCredits, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee v0JAN20");
@@ -249,7 +227,7 @@ function ShowCredits() {
 }
 function ShowSearch() {
     $("#searchData").empty();
-    $(".body, #menuBtn, #menuRight").hide();
+    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
     $("#bSearch, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Search");
@@ -284,7 +262,7 @@ function ShowNoteEditor(idx, readView) {
     const elem = isNew ? {} : dbData.dbList[dbData.currentScreen].data[idx];
     const title = elem.title || "";
     const body = elem.body || "";
-    $(".body, #menuBtn, #menuRight").hide();
+    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
     $("#bNoteEditor, #backBtn").show();
     $("#noteTitle").val(title);
     $("#noteBody").val(body);
@@ -341,7 +319,7 @@ function SetTheme() {
     }
 }
 function ReturnToMain() {
-    $(".body, #backBtn").hide();
+    $(".body, #backBtn, #recipeTopBtns").hide();
     $("#bChecklist, #menuBtn, #menuRight").show();
     ctx.stateForBackButton = "home";
     DrawMain();

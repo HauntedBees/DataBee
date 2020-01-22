@@ -25,7 +25,13 @@
                 <i id="backBtn" class="btn material-icons">chevron_left</i>
             </div>
             <div id="title">DataBee - Welcome!</div>
-            <div><i id="menuRight" class="btn material-icons">more_vert</i></div>
+            <div>
+                <i id="menuRight" class="btn material-icons">more_vert</i>
+                <div id="recipeTopBtns">
+                    <i id="recipeViewEdit" class="recipeTopBtn btn material-icons">edit</i>
+                    <i id="recipeViewClear" class="recipeTopBtn btn material-icons">indeterminate_check_box</i>
+                </div>
+            </div>
         </header>
         <nav id="sidebar">
             <ul>
@@ -183,10 +189,21 @@
                 </div>
                 <div id="bRecipeEditor" class="body one-half column">
                     <div id="recipeRead" class="recipeDetails">
-                        
+                        <div class="recipeSection recipeSection-tiny">
+                            <div>Serves: 
+                                <button data-dir="-1" class="servingSizeAdjustment btn-small"><i class="material-icons">remove</i></button class="btn-small">
+                                <input type="text" id="currentServingSize" class="servingSize">
+                                <button data-dir="1" class="servingSizeAdjustment btn-small"><i class="material-icons">add</i></button>
+                            </div>
+                            <div id="recipeBy"></div>
+                            <div id="recipeURL"></div>
+                            <div id="recipeNotes"></div>
+                        </div>
+                        <ul id="ingredientViewList" class="recipeSection recipeSection-smallMaybe"></ul>
+                        <ul id="stepViewList" class="recipeSection recipeSection-big"></ul>
                     </div>
                     <div id="recipeEdit" class="recipeDetails">
-                        <h4>Servings: <input id="recipeServingSize" type="text" placeholder="1"></h4>
+                        <h4>Servings: <input id="recipeServingSize" class="servingSize" type="text" placeholder="1"></h4>
                         <h4>
                             Ingredience
                             <div id="btnAddIngredient" class="recipeBtn">
@@ -385,6 +402,8 @@
                     <select id="ddlModalUnit">
                         <option value="">Unit</option>
                         <optgroup label="Volume">
+                            <option value="pinch">Pinch</option>
+                            <option value="dash">Dash</option>
                             <option value="tsp">Teaspoon (tsp)</option>
                             <option value="tbsp">Tablespoon (tbsp)</option>
                             <option value="fl oz">Fluid Ounce (fl oz)</option>
@@ -407,6 +426,7 @@
                             <option value="cm">Centimeter (cm)</option>
                             <option value="m">Meter (m)</option>
                             <option value="in">Inch (")</option>
+                            <option value="ft">Foot (ft)</option>
                         </optgroup>
                     </select>
                 </div>
@@ -434,5 +454,6 @@
         <script type="text/javascript" src="js/data.js"></script>
         <script type="text/javascript" src="js/display.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript" src="js/cookbook.js"></script>
     </body>
 </html>
