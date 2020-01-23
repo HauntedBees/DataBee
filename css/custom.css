@@ -639,3 +639,9 @@ input, option, select, textarea { color: #000000 }
 }
 .viewIngredient { padding: 0 0.5em }
 #stepViewList { padding: 0 0.75em }
+#matterType { text-align: center }
+.step-unit {
+    border: 1px dashed var(--bg-color-important);
+    border-radius: 0.35em;
+    padding: 0.15em;
+}

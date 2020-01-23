@@ -143,6 +143,7 @@
                         <li><a target="_blank" href="https://cordova.apache.org/">Cordova</a>, under the <a target="_blank" href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.</li>
                         <li><a target="_blank" href="https://github.com/apache/cordova-plugin-file/releases">Cordova File Plugin</a>, under the <a target="_blank" href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.</li>
                         <li><a target="_blank" href="https://github.com/cyph/cordova-plugin-chooser">Cordova Chooser Plugin</a>, under the <a target="_blank" href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.</li>
+                        <li><a target="_blank" href="https://github.com/infusion/Fraction.js/">Fraction.js</a>, under the <a target="_blank" href="https://opensource.org/licenses/MIT">MIT License</a>.</li>
                     </ul>
                     <p>There's no Privacy Policy because we don't do anything with your data. We don't even collect it! Everything is kept locally on your device.</p>
                 </div>
@@ -398,30 +399,35 @@
                     <input id="txtModalIngredient" type="text" placeholder="Ingredient">
                     <label for="txtModalAmount">Quantity</label>
                     <input id="txtModalAmount" type="text" placeholder="2, 1.5, 3/4, 10,5, etc.">
+                    <label for="matterType">Type</label>
+                    <div id="matterType">
+                        <button data-type="solid" class="button">Solid</button>
+                        <button data-type="liquid" class="button">Liquid</button>
+                    </div>
                     <label for="ddlModalUnit">Unit</label>
                     <select id="ddlModalUnit">
                         <option value="">Unit</option>
                         <optgroup label="Volume">
-                            <option value="pinch">Pinch</option>
-                            <option value="dash">Dash</option>
+                            <option class="solid" value="pinch">Pinch</option class="solid">
+                            <option class="liquid" value="dash">Dash</option class="solid">
                             <option value="tsp">Teaspoon (tsp)</option>
                             <option value="tbsp">Tablespoon (tbsp)</option>
-                            <option value="fl oz">Fluid Ounce (fl oz)</option>
+                            <option class="liquid" value="fl oz">Fluid Ounce (fl oz)</option>
                             <option value="cup">Cup</option>
-                            <option value="qt">Quart (qt)</option>
-                            <option value="gal">Gallon (gal)</option>
-                            <option value="mL">Milliliter (mL)</option>
-                            <option value="L">Liter (L)</option>
-                            <option value="dL">Deciliter (dL)</option>
+                            <option class="liquid" value="qt">Quart (qt)</option class="liquid">
+                            <option class="liquid" value="gal">Gallon (gal)</option class="liquid">
+                            <option class="liquid" value="mL">Milliliter (mL)</option class="liquid">
+                            <option class="liquid" value="L">Liter (L)</option class="liquid">
+                            <option class="liquid" value="dL">Deciliter (dL)</option class="liquid">
                         </optgroup>
-                        <optgroup label="Weight/Mass">
+                        <optgroup label="Weight/Mass" class="solid">
                             <option value="lb">Pound (lb)</option>
                             <option value="oz">Ounce (oz)</option>
                             <option value="mg">Milligram (mg)</option>
                             <option value="g">Gram (g)</option>
                             <option value="kg">Kilogram (kg)</option>
                         </optgroup>
-                        <optgroup label="Length">
+                        <optgroup label="Length" class="solid">
                             <option value="mm">Millimeter (mm)</option>
                             <option value="cm">Centimeter (cm)</option>
                             <option value="m">Meter (m)</option>
@@ -448,6 +454,7 @@
         </div>
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/pouchdb.js"></script>
+        <script type="text/javascript" src="js/fraction.js"></script>
         <script type="text/javascript" src="js/jquery.js"></script>
         <script type="text/javascript" src="js/jquery-ui.js"></script>
         <script type="text/javascript" src="js/jquery.ui.touch-punch.js"></script>

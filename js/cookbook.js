@@ -6,7 +6,17 @@ function SetUpCookbook() {
         $("#modalAddIngredient > div > .modalHeader").text("Add Ingredient");
         $("#modalAddIngredient").attr("data-id", "");
         $("#ddlModalUnit").val("");
+        $("#matterType > button").removeClass("button-primary");
+        $("#matterType > button:first").addClass("button-primary");
+        $("#ddlModalUnit .liquid").hide();
+        $("#ddlModalUnit .solid").show();
         $("#txtModalIngredient").focus();
+    });
+    $("#matterType > button").on("click", function() {
+        $("#matterType > button").removeClass("button-primary");
+        $(this).addClass("button-primary");
+        $("#ddlModalUnit .liquid, #ddlModalUnit .solid").hide();
+        $(`#ddlModalUnit .${$(this).attr("data-type")}`).show();
     });
     $("#btnConfirmIngredient").on("click", function() {
         $("#modalAddIngredient .comeOn").removeClass("comeOn");
@@ -24,7 +34,8 @@ function SetUpCookbook() {
             return;
         }
         const unit = $("#ddlModalUnit").val();
-        const ingredient = new Ingredient(ing, amt, unit);
+        const isLiquid = $("#matterType > .button-primary").attr("data-type") === "liquid";
+        const ingredient = new Ingredient(ing, amt, unit, isLiquid);
 
         const ingId = $("#modalAddIngredient").attr("data-id");
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
@@ -66,36 +77,21 @@ function SetUpCookbook() {
             return;
         }
         let actualVal = StringToNumber(currentVal);
-        if(actualVal.type === "decimal") {
-            if(dir > 0) {
-                if(actualVal.whole) {
-                    actualVal.value += 1;
-                } else {
-                    actualVal.value = Math.ceil(actualVal.value);
-                }
-                actualVal.str = `${actualVal.value}`;
+        if(dir > 0) {
+            if(actualVal.fraction.d === 1) {
+                actualVal.fraction = actualVal.fraction.add(1);
             } else {
-                if(actualVal.value === 1) {
-                    actualVal = StringToNumber("1/2");
-                } else if(actualVal.value < 1) {
-                    actualVal = StringToNumber("1/4");
-                } else if(actualVal.whole) {
-                    actualVal.value -= 1;
-                    actualVal.str = `${actualVal.value}`;
-                } else {
-                    actualVal.value = Math.floor(actualVal.value);
-                    actualVal.str = `${actualVal.value}`;
-                }
+                actualVal.fraction = actualVal.fraction.ceil();
             }
-        } else if(actualVal.type === "fraction") {
-            if(dir > 0) {
-                actualVal = StringToNumber(`${Math.ceil(actualVal.value)}`);
-            } else if(actualVal.val > 1) {
-                actualVal = StringToNumber(`${Math.floor(actualVal.value)}`);
-            } else if(actualVal.val === 1) {
-                actualVal = StringToNumber("1/2");
+        } else {
+            if(actualVal.fraction.equals(1)) {
+                actualVal.fraction = new Fraction("1/2");
+            } else if(actualVal.fraction.compare(1) < 0) {
+                actualVal.fraction = new Fraction("1/4");
+            } else if(actualVal.fraction.d === 1) {
+                actualVal.fraction = actualVal.fraction.add(-1);
             } else {
-                actualVal = StringToNumber("1/4");
+                actualVal.fraction = actualVal.fraction.floor();
             }
         }
         CalibrateIngredientAmounts(recipe, actualVal);
@@ -110,17 +106,24 @@ function SetUpCookbook() {
         }
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
         const recipe = dbData.dbList[dbData.currentScreen].data[recipeIdx];
-        if(actualValue.value > 0) {
-            CalibrateIngredientAmounts(recipe, StringToNumber(currentVal));
+        if(actualValue.fraction.compare(0) > 0) {
+            CalibrateIngredientAmounts(recipe, actualValue);
         } else {
             $("#currentServingSize").addClass("comeOn");
             $("#currentServingSize").val(recipe.servings);
-            alibrateIngredientAmounts(recipe, StringToNumber(`${recipe.servings}`));
+            CalibrateIngredientAmounts(recipe, StringToNumber(`${recipe.servings}`));
         }
     });
     $("#recipeViewEdit").on("click", function() {
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
         EditRecipe(recipeIdx);
+    });
+
+    $("#stepViewList").on("click", ".step-unit", function() {
+        const unit = $(this).attr("data-unit");
+        const amount = parseFloat($(this).attr("data-amount"));
+        const newAmount = ConvertBetweenMetricAndImperial(unit, amount);
+        $(this).replaceWith(GetAdjustableStepIngredientHTML(newAmount.amount, newAmount.unit, $(this).attr("data-tilde")));
     });
     // TODO: click event, settings
 }
@@ -184,38 +187,19 @@ function RecipeClick(e, $t) {
 
 function IsValidNumberString(i) { return i.match(/^~?([0-9]+)((\.|\/|,)[0-9]+)?$/g) !== null; }
 function StringToNumber(str) {
-    const origString = str;
     const isApproximate = str[0] === "~";
     if(isApproximate) { str = str.substring(1); }
-    if(str.indexOf("/") > 0) { // fraction
-        const vals = str.split("/");
-        const numerator = parseInt(vals[0]);
-        const denominator = parseInt(vals[1]);
-        return {
-            type: "fraction", approx: isApproximate, str: origString,
-            numerator: numerator,
-            denominator: denominator,
-            value: numerator / denominator
-        };
+    try {
+        return { fraction: new Fraction(str), approx: isApproximate };
+    } catch {
+        return { fraction: new Fraction(1), approx: isApproximate };
     }
-    if(str.indexOf(",") >= 0) { // decimal from countries that use commas I guess
-        str = str.replace(/,/g, ".");
-    }
-    return {
-        type: "decimal", approx: isApproximate, str: origString,
-        value: parseFloat(str), whole: str.indexOf(".") < 0
-    };
 }
 function GetServingSizeAdjustedIngredient(ingredient, baseServingSize, newServingSizeObj) {
-    if(baseServingSize === newServingSizeObj.value) { return ingredient; }
-    let newAmt = 0;
-    if(newServingSizeObj.type === "decimal") {
-        newAmt = ingredient.amount * newServingSizeObj.value / baseServingSize;
-    } else {
-        newAmt = ingredient.amount * newServingSizeObj.numerator / (baseServingSize * newServingSizeObj.denominator);
-    }
+    if(newServingSizeObj.fraction.equals(baseServingSize)) { return ingredient; }
+    let newAmt = new Fraction(ingredient.amount).mul(newServingSizeObj.fraction).div(baseServingSize);
     const newUnitAndAmount = AdjustUnitToNewAmount(ingredient.unit, ingredient.amount, newAmt);
-    const newIngredient = new Ingredient(ingredient.ingredient, newUnitAndAmount.amount, newUnitAndAmount.unit);
+    const newIngredient = new Ingredient(ingredient.ingredient, newUnitAndAmount.amount, newUnitAndAmount.unit, ingredient.isLiquid);
     newIngredient.checked = ingredient.checked;
     return newIngredient;
 }
@@ -304,22 +288,43 @@ function ShiftFromMillimeter(amount) {
     if(amount >= 1000) { return { unit: "m", amount: amount / 1000 }; }
     return { unit: "cm", amount: amount / 10 };
 }
+function ConvertBetweenMetricAndImperial(unit, amount) {
+    switch(unit) {
+        case "oz":
+            if(amount >= 35) { return { unit: "kg", amount: (amount / 35.274) }; }
+            else { return { unit: "g", amount: (amount * 28.35) }; }
+        case "lb":
+            if(amount >= 2.2) { return { unit: "kg", amount: (amount / 2.205) }; }
+            else { return { unit: "g", amount: (amount * 453.592) }; }
+        case "g":
+            if(amount > 454) { return { unit: "lb", amount: (amount / 453.592) }; }
+            else { return { unit: "oz", amount: (amount / 28.35) }; }
+        case "kg":
+            if(amount > 2.2) { return { unit: "lb", amount: (amount / 2.205) }; }
+            else { return { unit: "oz", amount: (amount / 35.274) }; }
+    }
+    return { unit: unit, amount: amount };
+}
 
 function AdjustStep(step, baseServingSize, newServingSizeObj) {
-    return step.replace(/\[(~?)([0-9]+(?:(?:\.|\/|,)[0-9]+)?) ?([A-Za-z ]*)]/g, function(whole, tilde, number, unit) {
-        if(baseServingSize === newServingSizeObj.value) { return whole.substring(1, whole.length - 1); }
+    return step.replace(/\[(~?)([0-9]+(?:(?:\.|\/|,)[0-9]+)?)(?:[ º])?([A-Za-z ]*)]/g, function(whole, tilde, number, unit) {
+        if(newServingSizeObj.fraction.equals(baseServingSize)) { return whole.substring(1, whole.length - 1); }
         const originalAmount = StringToNumber(number);
         unit = CleanUserUnit(unit);
-        let newAmount = 0;
-        if(newServingSizeObj.type === "decimal") {
-            newAmount = originalAmount.value * newServingSizeObj.value / baseServingSize;
+        const newAmount = originalAmount.fraction.mul(newServingSizeObj.fraction).div(baseServingSize);
+        const finalUnitAndAmount = AdjustUnitToNewAmount(unit, originalAmount.fraction, newAmount);
+        const isConvertible = ["tbsp", "tsp", "cup", ""].indexOf(finalUnitAndAmount.unit) < 0; // can't determine if liquid or solid
+        if(isConvertible) {
+            return GetAdjustableStepIngredientHTML(finalUnitAndAmount.amount, finalUnitAndAmount.unit, tilde);
         } else {
-            newAmount = originalAmount.value * newServingSizeObj.numerator / (baseServingSize * newServingSizeObj.denominator);
+            return `<span>${tilde}${Round(finalUnitAndAmount.amount)}${finalUnitAndAmount.unit === "" ? "" : ` ${finalUnitAndAmount.unit}`}</span>`;
         }
-        const finalUnitAndAmount = AdjustUnitToNewAmount(unit, originalAmount.value, newAmount);
-        return `${tilde}${Round(finalUnitAndAmount.amount)} ${finalUnitAndAmount.unit}`;
     });
 }
+function GetAdjustableStepIngredientHTML(amount, unit, tilde) {
+    return `<span class="step-unit" data-tilde="${tilde}" data-amount="${amount}" data-unit="${unit}">${tilde}${Round(amount)} ${unit}</span>`;
+}
+
 const unitSynonyms = {
     "teaspoon": "tsp",
     "teaspoons": "tsp",
@@ -382,7 +387,7 @@ function CleanUserUnit(unit) {
 }
 
 function CalibrateIngredientAmounts(recipe, amount) {
-    $("#currentServingSize").val(amount.str);
+    $("#currentServingSize").val(amount.fraction.toString());
     DrawRecipe(recipe, amount);
 }
 function Round(n) { return Math.round(n * 1000) / 1000; }
