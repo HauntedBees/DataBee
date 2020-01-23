@@ -291,6 +291,8 @@ function ShiftFromMillimeter(amount) {
 }
 function ConvertBetweenMetricAndImperial(unit, amount) {
     switch(unit) {
+        case "ºF": return { unit: "ºC", amount: amount.add(-32).mul(5, 9) };
+        case "ºC": return { unit: "ºF", amount: amount.mul(9, 5).add(32) };
         case "oz":
             if(amount >= 35.274) { return { unit: "kg", amount: amount.div(35.274) }; }
             else { return { unit: "g", amount: amount.mul(28.35) }; }
@@ -318,14 +320,23 @@ function AdjustStep(step, baseServingSize, newServingSizeObj) {
     });
 }
 function GetAdjustableStepIngredientHTML(amount, unit, tilde, isConvertible) {
+    amount = amount.round(5);
     const showAsFraction = amount.d <= 10;
     const amountToStore = showAsFraction ? amount.toFraction() : amount.toString();
     let amountToShow = GetDisplayNumber(amount, showAsFraction);
     if(isConvertible) {
-        return `<span class="step-unit" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${amountToShow} ${unit}</span>`;
+        return `<span class="step-unit" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
     } else {
-        return `<span>${tilde}${amountToShow}${unit === "" ? "" : ` ${unit}`}</span>`;
+        return `<span>${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
     }
+}
+function GetUnitDisplay(unit, amount) {
+    if(unit === "") { return " "; }
+    if(["ºF", "ºC"].indexOf(unit) >= 0) { return unit; }
+    if(unit === "cup") {
+        return amount.compare(1) === 0 ? " cup" : " cups";
+    }
+    return ` ${unit}`;
 }
 function GetDisplayNumber(amount, showAsFraction) {
     if(showAsFraction === undefined) { showAsFraction = amount.d <= 10; }
@@ -333,6 +344,10 @@ function GetDisplayNumber(amount, showAsFraction) {
 }
 
 const unitSynonyms = {
+    "f": "ºF",
+    "ºf": "ºF",
+    "c": "ºC",
+    "ºc": "ºC",
     "teaspoon": "tsp",
     "teaspoons": "tsp",
     "tablespoon": "tbsp",
