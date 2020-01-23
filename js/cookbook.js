@@ -123,7 +123,7 @@ function SetUpCookbook() {
         const unit = $(this).attr("data-unit");
         const amount = new Fraction($(this).attr("data-amount"));
         const newAmount = ConvertBetweenMetricAndImperial(unit, amount);
-        $(this).replaceWith(GetAdjustableStepIngredientHTML(newAmount.amount, newAmount.unit, $(this).attr("data-tilde")));
+        $(this).replaceWith(GetAdjustableStepIngredientHTML(newAmount.amount, newAmount.unit, $(this).attr("data-tilde"), true));
     });
     // TODO: click event, settings
 }
@@ -146,7 +146,7 @@ function DrawRecipe(recipe, servingsObj) {
     $("#ingredientViewList").html(recipe.ingredience.map((e, i) => {
         const adjustedRecipe = GetServingSizeAdjustedIngredient(e, recipe.servings, servingsObj);
         return `<li data-id="${i}" class="viewIngredient">
-            <span>${Round(adjustedRecipe.amount)}${adjustedRecipe.unit === "" ? "" : ` ${adjustedRecipe.unit}`} ${adjustedRecipe.ingredient}</span>
+            <span>${GetDisplayNumber(adjustedRecipe.fraction || new Fraction(adjustedRecipe.amount))}${adjustedRecipe.unit === "" ? "" : ` ${adjustedRecipe.unit}`} ${adjustedRecipe.ingredient}</span>
         </li>`}).join(""));
     $("#stepViewList").html(recipe.steps.map((e, i) => `
     <li data-id="${i}" class="viewStep">
@@ -292,16 +292,16 @@ function ShiftFromMillimeter(amount) {
 function ConvertBetweenMetricAndImperial(unit, amount) {
     switch(unit) {
         case "oz":
-            if(amount >= 35) { return { unit: "kg", amount: amount.div(35.274) }; }
+            if(amount >= 35.274) { return { unit: "kg", amount: amount.div(35.274) }; }
             else { return { unit: "g", amount: amount.mul(28.35) }; }
         case "lb":
-            if(amount >= 2.2) { return { unit: "kg", amount: amount.div(2.205) }; }
+            if(amount >= 2.205) { return { unit: "kg", amount: amount.div(2.205) }; }
             else { return { unit: "g", amount: amount.mul(453.592) }; }
         case "g":
-            if(amount > 454) { return { unit: "lb", amount: amount.div(453.592) }; }
+            if(amount > 453.592) { return { unit: "lb", amount: amount.div(453.592) }; }
             else { return { unit: "oz", amount: amount.div(28.35) }; }
         case "kg":
-            if(amount > 2.2) { return { unit: "lb", amount: amount.div(2.205) }; }
+            if(amount > 2.205) { return { unit: "lb", amount: amount.mul(2.205) }; }
             else { return { unit: "oz", amount: amount.div(35.274) }; }
     }
     return { unit: unit, amount: amount };
@@ -314,16 +314,22 @@ function AdjustStep(step, baseServingSize, newServingSizeObj) {
         const newAmount = originalAmount.fraction.mul(newServingSizeObj.fraction).div(baseServingSize);
         const finalUnitAndAmount = AdjustUnitToNewAmount(unit, originalAmount.fraction, newAmount);
         const isConvertible = ["tbsp", "tsp", "cup", ""].indexOf(finalUnitAndAmount.unit) < 0; // can't determine if liquid or solid
-        if(isConvertible) {
-            return GetAdjustableStepIngredientHTML(finalUnitAndAmount.amount, finalUnitAndAmount.unit, tilde);
-        } else {
-            return `<span>${tilde}${Round(finalUnitAndAmount.amount)}${finalUnitAndAmount.unit === "" ? "" : ` ${finalUnitAndAmount.unit}`}</span>`;
-        }
+        return GetAdjustableStepIngredientHTML(finalUnitAndAmount.amount, finalUnitAndAmount.unit, tilde, isConvertible);
     });
 }
-function GetAdjustableStepIngredientHTML(amount, unit, tilde) {
-    const amountToStore = amount.d <= 10 ? amount.toFraction() : amount.toString();
-    return `<span class="step-unit" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${Round(amount)} ${unit}</span>`;
+function GetAdjustableStepIngredientHTML(amount, unit, tilde, isConvertible) {
+    const showAsFraction = amount.d <= 10;
+    const amountToStore = showAsFraction ? amount.toFraction() : amount.toString();
+    let amountToShow = GetDisplayNumber(amount, showAsFraction);
+    if(isConvertible) {
+        return `<span class="step-unit" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${amountToShow} ${unit}</span>`;
+    } else {
+        return `<span>${tilde}${amountToShow}${unit === "" ? "" : ` ${unit}`}</span>`;
+    }
+}
+function GetDisplayNumber(amount, showAsFraction) {
+    if(showAsFraction === undefined) { showAsFraction = amount.d <= 10; }
+    return showAsFraction ? amount.toFraction(true).replace(/^(\d+)? ?(\d+)\/(\d+)$/, "$1<sup>$2</sup>&frasl;<sub>$3</sub>") : amount.round(3).toString();
 }
 
 const unitSynonyms = {
@@ -391,4 +397,3 @@ function CalibrateIngredientAmounts(recipe, amount) {
     $("#currentServingSize").val(amount.fraction.toString());
     DrawRecipe(recipe, amount);
 }
-function Round(n) { return Math.round(n * 1000) / 1000; }
