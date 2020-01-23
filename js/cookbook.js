@@ -121,7 +121,7 @@ function SetUpCookbook() {
 
     $("#stepViewList").on("click", ".step-unit", function() {
         const unit = $(this).attr("data-unit");
-        const amount = parseFloat($(this).attr("data-amount"));
+        const amount = new Fraction($(this).attr("data-amount"));
         const newAmount = ConvertBetweenMetricAndImperial(unit, amount);
         $(this).replaceWith(GetAdjustableStepIngredientHTML(newAmount.amount, newAmount.unit, $(this).attr("data-tilde")));
     });
@@ -197,8 +197,9 @@ function StringToNumber(str) {
 }
 function GetServingSizeAdjustedIngredient(ingredient, baseServingSize, newServingSizeObj) {
     if(newServingSizeObj.fraction.equals(baseServingSize)) { return ingredient; }
-    let newAmt = new Fraction(ingredient.amount).mul(newServingSizeObj.fraction).div(baseServingSize);
-    const newUnitAndAmount = AdjustUnitToNewAmount(ingredient.unit, ingredient.amount, newAmt);
+    const oldAmt = new Fraction(ingredient.amount);
+    const newAmt = oldAmt.mul(newServingSizeObj.fraction).div(baseServingSize);
+    const newUnitAndAmount = AdjustUnitToNewAmount(ingredient.unit, oldAmt, newAmt);
     const newIngredient = new Ingredient(ingredient.ingredient, newUnitAndAmount.amount, newUnitAndAmount.unit, ingredient.isLiquid);
     newIngredient.checked = ingredient.checked;
     return newIngredient;
@@ -206,7 +207,7 @@ function GetServingSizeAdjustedIngredient(ingredient, baseServingSize, newServin
 function AdjustUnitToNewAmount(unit, oldAmount, newAmount) {
     const obj = { unit: unit, amount: newAmount };
     if(["", "pinch", "dash"].indexOf(unit) >= 0 || newAmount == oldAmount) { return obj; }
-    if(newAmount > oldAmount) {
+    if(newAmount.compare(oldAmount) > 0) {
         if(["gal", "L", "lb", "kg", "m", "ft"].indexOf(unit) >= 0) {
             return obj; // these are already the largest units of their type
         }
@@ -218,97 +219,96 @@ function AdjustUnitToNewAmount(unit, oldAmount, newAmount) {
     switch(unit) {
         // Volume - Imperial
         case "tsp": return ShiftFromTsp(newAmount);
-        case "tbsp": return ShiftFromTsp(newAmount * 3);
-        case "fl oz": return ShiftFromTsp(newAmount * 6, true);
-        case "cup": return ShiftFromTsp(newAmount * 48);
-        case "qt": return ShiftFromTsp(newAmount * 192, true);
-        case "gal": return ShiftFromTsp(newAmount * 768, true);
+        case "tbsp": return ShiftFromTsp(newAmount.mul(3));
+        case "fl oz": return ShiftFromTsp(newAmount.mul(6), true);
+        case "cup": return ShiftFromTsp(newAmount.mul(48));
+        case "qt": return ShiftFromTsp(newAmount.mul(192), true);
+        case "gal": return ShiftFromTsp(newAmount.mul(768), true);
         // Volume - Metric
         case "mL": return ShiftFromMilliliter(newAmount);
-        case "dL": return ShiftFromMilliliter(newAmount * 100);
-        case "L": return ShiftFromMilliliter(newAmount * 1000);
+        case "dL": return ShiftFromMilliliter(newAmount.mul(100));
+        case "L": return ShiftFromMilliliter(newAmount.mul(1000));
         // Weight - Imperial
         case "oz":
             if(newAmount >= 16) {
-                return { unit: "lb", amount: newAmount / 16 };
+                return { unit: "lb", amount: newAmount.div(16) };
             } else { return obj; }
         case "lb":
             if(newAmount < 1) {
-                return { unit: "oz", amount: newAmount * 16 };
+                return { unit: "oz", amount: newAmount.mul(16) };
             } else { return obj; }
         // Weight - Metric
         case "mg": return ShiftFromMilligram(newAmount);
-        case "g": return ShiftFromMilligram(newAmount * 1000);
-        case "kg": return ShiftFromMilligram(newAmount * 1000000);
+        case "g": return ShiftFromMilligram(newAmount.mul(1000));
+        case "kg": return ShiftFromMilligram(newAmount.mul(1000000));
         // Length - Imperial
         case "in": 
             if(newAmount >= 12) {
-                return { unit: "ft", amount: newAmount / 12 };
+                return { unit: "ft", amount: newAmount.div(12) };
             } else { return obj; }
         case "lb":
             if(newAmount < 1) {
-                return { unit: "in", amount: newAmount * 12 };
+                return { unit: "in", amount: newAmount.mul(12) };
             } else { return obj; }
         // Length - Metric
         case "mm": return ShiftFromMillimeter(newAmount);
-        case "cm": return ShiftFromMillimeter(newAmount * 10);
-        case "m": return ShiftFromMillimeter(newAmount * 1000);
+        case "cm": return ShiftFromMillimeter(newAmount.mul(10));
+        case "m": return ShiftFromMillimeter(newAmount.mul(1000));
     }
     return obj;
 }
 function ShiftFromTsp(amount, liquidOkay) {
     if(amount < 3) { return { unit: "tsp", amount: amount }; }
     if(liquidOkay && amount < 16) {
-        return { unit: "fl oz", amount: amount / 6 };
+        return { unit: "fl oz", amount: amount.div(6) };
     } else if(amount < 12) {
-        return { unit: "tbsp", amount: amount / 3 };
+        return { unit: "tbsp", amount: amount.div(3) };
     }
     if(liquidOkay && amount >= 192) {
         if(amount < 768) {
-            return { unit: "qt", amount: amount / 192 };
+            return { unit: "qt", amount: amount.div(192) };
         } else {
-            return { unit: "gal", amount: amount / 768 };
+            return { unit: "gal", amount: amount.div(768) };
         }
     } else {
-        return { unit: "cup", amount: amount / 48 };
+        return { unit: "cup", amount: amount.div(48) };
     }
 }
 function ShiftFromMilliliter(amount) {
     if(amount < 200) { return { unit: "mL", amount: amount }; }
-    if(amount >= 1000) { return { unit: "L", amount: amount / 1000 }; }
-    return { unit: "dL", amount: amount / 100 };
+    if(amount >= 1000) { return { unit: "L", amount: amount.div(1000) }; }
+    return { unit: "dL", amount: amount.div(100) };
 }
 function ShiftFromMilligram(amount) {
     if(amount < 1000) { return { unit: "mg", amount: amount }; }
-    if(amount >= 1000000) { return { unit: "kg", amount: amount / 1000000 }; }
-    return { unit: "g", amount: amount / 1000 };
+    if(amount >= 1000000) { return { unit: "kg", amount: amount.div(1000000) }; }
+    return { unit: "g", amount: amount.div(1000) };
 }
 function ShiftFromMillimeter(amount) {
     if(amount < 10) { return { unit: "mm", amount: amount }; }
-    if(amount >= 1000) { return { unit: "m", amount: amount / 1000 }; }
-    return { unit: "cm", amount: amount / 10 };
+    if(amount >= 1000) { return { unit: "m", amount: amount.div(1000) }; }
+    return { unit: "cm", amount: amount.div(10) };
 }
 function ConvertBetweenMetricAndImperial(unit, amount) {
     switch(unit) {
         case "oz":
-            if(amount >= 35) { return { unit: "kg", amount: (amount / 35.274) }; }
-            else { return { unit: "g", amount: (amount * 28.35) }; }
+            if(amount >= 35) { return { unit: "kg", amount: amount.div(35.274) }; }
+            else { return { unit: "g", amount: amount.mul(28.35) }; }
         case "lb":
-            if(amount >= 2.2) { return { unit: "kg", amount: (amount / 2.205) }; }
-            else { return { unit: "g", amount: (amount * 453.592) }; }
+            if(amount >= 2.2) { return { unit: "kg", amount: amount.div(2.205) }; }
+            else { return { unit: "g", amount: amount.mul(453.592) }; }
         case "g":
-            if(amount > 454) { return { unit: "lb", amount: (amount / 453.592) }; }
-            else { return { unit: "oz", amount: (amount / 28.35) }; }
+            if(amount > 454) { return { unit: "lb", amount: amount.div(453.592) }; }
+            else { return { unit: "oz", amount: amount.div(28.35) }; }
         case "kg":
-            if(amount > 2.2) { return { unit: "lb", amount: (amount / 2.205) }; }
-            else { return { unit: "oz", amount: (amount / 35.274) }; }
+            if(amount > 2.2) { return { unit: "lb", amount: amount.div(2.205) }; }
+            else { return { unit: "oz", amount: amount.div(35.274) }; }
     }
     return { unit: unit, amount: amount };
 }
 
 function AdjustStep(step, baseServingSize, newServingSizeObj) {
     return step.replace(/\[(~?)([0-9]+(?:(?:\.|\/|,)[0-9]+)?)(?:[ º])?([A-Za-z ]*)]/g, function(whole, tilde, number, unit) {
-        if(newServingSizeObj.fraction.equals(baseServingSize)) { return whole.substring(1, whole.length - 1); }
         const originalAmount = StringToNumber(number);
         unit = CleanUserUnit(unit);
         const newAmount = originalAmount.fraction.mul(newServingSizeObj.fraction).div(baseServingSize);
@@ -322,7 +322,8 @@ function AdjustStep(step, baseServingSize, newServingSizeObj) {
     });
 }
 function GetAdjustableStepIngredientHTML(amount, unit, tilde) {
-    return `<span class="step-unit" data-tilde="${tilde}" data-amount="${amount}" data-unit="${unit}">${tilde}${Round(amount)} ${unit}</span>`;
+    const amountToStore = amount.d <= 10 ? amount.toFraction() : amount.toString();
+    return `<span class="step-unit" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${Round(amount)} ${unit}</span>`;
 }
 
 const unitSynonyms = {
