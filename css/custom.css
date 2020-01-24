@@ -699,3 +699,8 @@ input, option, select, textarea { color: #000000 }
 }
 .timeInfo > span:first-child { font-size: 0.75em }
 #recipeBy, #recipeNotes { padding: 0 0.5em }
+
+#sidebarData > li > span.by-icon {
+    overflow-x: hidden;
+    white-space: nowrap;
+}
