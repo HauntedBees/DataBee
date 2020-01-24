@@ -52,7 +52,7 @@ $(function() {
         }
     });
     $("#btnExport").on("click", function() {
-        const b = new Blob([JSON.stringify(dbData)], { type: "application/json" });
+        const b = new Blob([JSON.stringify(dbData, null, 2)], { type: "application/json" });
         if(typeof cordova !== "undefined") {
             window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory + "Download", function(entry) {
                 entry.getFile(`databee_${+new Date()}.json`, { create: true, exclusive: false }, function(file) {
@@ -72,12 +72,12 @@ $(function() {
     });
     $("#btnImport").on("click", function() {
         if(typeof chooser !== "undefined") {
-            chooser.getFile().then(data.ImportChooser, function(e) { ShowAlert("Import Failed", e); });
+            chooser.getFile().then(data.ImportBackupChooser, function(e) { ShowAlert("Import Failed", e); });
         } else {
             const input = document.createElement("input");
             input.setAttribute("type", "file");
             input.setAttribute("accept", ".json");
-            input.setAttribute("onchange", "data.Import(this.files)");
+            input.setAttribute("onchange", "data.ImportBackup(this.files)");
             input.dispatchEvent(new MouseEvent("click"));
         }
     });
@@ -324,6 +324,37 @@ $(function() {
         dbData.dbList[dbData.currentScreen][key] = newVal;
         DrawMain();
         data.Save();
+    });
+    $("#shareChecklist").on("click", function() {
+        const thisList = dbData.dbList[dbData.currentScreen];
+        const b = new Blob([JSON.stringify(thisList, null, 2)], { type: "application/json" });
+        if(typeof cordova !== "undefined") {
+            window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory + "Download", function(entry) {
+                entry.getFile(`databee_${thisList.name}_${+new Date()}.json`, { create: true, exclusive: false }, function(file) {
+                    file.createWriter(function(writer) {
+                        writer.onwriteend = function() { ShowAlert("Export Successful!", "Check your Download folder!"); }
+                        writer.onerror = function(e) { ShowAlert("Export Failed", e); }
+                        writer.write(b);
+                    });
+                }, function(e) { ShowAlert("File Export Failed", e) });
+            }, function(e) { ShowAlert("Directory Export Failed", e)});
+        } else {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(b);
+            a.download = `databee_${thisList.name}_${+new Date()}.json`;
+            a.dispatchEvent(new MouseEvent("click"));
+        }
+    });
+    $("#btnImportList").on("click", function() {
+        if(typeof chooser !== "undefined") {
+            chooser.getFile().then(data.ImportListChooser, function(e) { ShowAlert("Import Failed", e); });
+        } else {
+            const input = document.createElement("input");
+            input.setAttribute("type", "file");
+            input.setAttribute("accept", ".json");
+            input.setAttribute("onchange", "data.ImportList(this.files)");
+            input.dispatchEvent(new MouseEvent("click"));
+        }
     });
 
     // Tags

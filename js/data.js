@@ -511,24 +511,18 @@ const data = {
             ShowAlert("Saving Error", JSON.stringify(err));
         });
     },
-    ImportChooser: function(file) {
-        const dObj = file.dataURI;
-        const prefix = "data:application/octet-stream;base64,";
-        if(dObj.indexOf(prefix) !== 0) {
-            ShowAlert("Import Failed", "Invalid databee format.");
-            return;
-        }
-        // https://stackoverflow.com/questions/30106476/using-javascripts-atob-to-decode-base64-doesnt-properly-decode-utf-8-strings
-        const decodedData = decodeURIComponent(window.atob(dObj.replace(prefix, "")).split("").map(c => `%${("00" + c.charCodeAt(0).toString(16)).slice(-2)}`).join(""));
-        data.ProcessJSON(decodedData);
+    ImportBackupChooser: function(file) {
+        const decodedData = data.GetJSONFromChooser(file);
+        if(decodedData === false) { return; }
+        data.ProcessBackupJSON(decodedData);
     },
-    Import: function(files) {
+    ImportBackup: function(files) {
         const reader = new FileReader();
-        reader.onload = function(e) { data.ProcessJSON(e.target.result); };
+        reader.onload = function(e) { data.ProcessBackupJSON(e.target.result); };
         reader.onerror = function() { ShowAlert("Import Failed", "Reading file as text was unsuccessful."); };
         reader.readAsText(files[0]);
     },
-    ProcessJSON: function(str) {
+    ProcessBackupJSON: function(str) {
         if(str.indexOf("databee") < 0) {
             ShowAlert("Import Failed", "Invalid databee format.");
             return;
@@ -544,6 +538,59 @@ const data = {
         } catch {
             ShowAlert("Import Failed", "Invalid databee json format.");
         }
+    },
+    ImportListChooser: function(file) {
+        const decodedData = data.GetJSONFromChooser(file);
+        if(decodedData === false) { return; }
+        data.ProcessListJSON(decodedData);
+    },
+    ImportList: function(files) {
+        const reader = new FileReader();
+        reader.onload = function(e) { data.ProcessListJSON(e.target.result); };
+        reader.onerror = function() { ShowAlert("Import Failed", "Reading file as text was unsuccessful."); };
+        reader.readAsText(files[0]);
+    },
+    ProcessListJSON: function(str) {
+        if(str.indexOf("name") < 0) {
+            ShowAlert("Import Failed", "Invalid databee list format.");
+            return;
+        }
+        try {
+            const list = JSON.parse(str);
+            const originalName = list.name;
+            let uniqueName = false, i = 0, newName = list.name;
+            while(!uniqueName) {
+                const hasOthers = dbData.dbList.some(e => e.name === newName);
+                if(hasOthers) {
+                    newName = `${list.name} (${i++})`;
+                } else {
+                    list.name = newName;
+                    uniqueName = true;
+                }
+            }
+            dbData.dbList.push(list);
+            data.Save(function() {
+                if(originalName === newName) {
+                    ShowAlert("Import Succeeded!", `Your list <em>${originalName}</em> has been imported!`);
+                } else {
+                    ShowAlert("Import Succeeded!", `Your list <em>${originalName}</em> has been imported as <em>${newName}</em>!`);
+                }
+                DrawSidebar();
+            });
+        } catch {
+            ShowAlert("Import Failed", "Invalid list json format.");
+        }
+    },
+    GetJSONFromChooser: function(file) {
+        const dObj = file.dataURI;
+        const prefix = "data:application/octet-stream;base64,";
+        if(dObj.indexOf(prefix) !== 0) {
+            ShowAlert("Import Failed", "Invalid databee format.");
+            return false;
+        }
+        // https://stackoverflow.com/questions/30106476/using-javascripts-atob-to-decode-base64-doesnt-properly-decode-utf-8-strings
+        return decodeURIComponent(window.atob(dObj.replace(prefix, "")).split("").map(c => `%${("00" + c.charCodeAt(0).toString(16)).slice(-2)}`).join(""));
+
     },
     GetGUID: function() {
         let dt = new Date().getTime();
