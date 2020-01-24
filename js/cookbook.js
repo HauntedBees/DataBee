@@ -6,17 +6,7 @@ function SetUpCookbook() {
         $("#modalAddIngredient > div > .modalHeader").text("Add Ingredient");
         $("#modalAddIngredient").attr("data-id", "");
         $("#ddlModalUnit").val("");
-        $("#matterType > button").removeClass("button-primary");
-        $("#matterType > button:first").addClass("button-primary");
-        $("#ddlModalUnit .liquid").hide();
-        $("#ddlModalUnit .solid").show();
         $("#txtModalIngredient").focus();
-    });
-    $("#matterType > button").on("click", function() {
-        $("#matterType > button").removeClass("button-primary");
-        $(this).addClass("button-primary");
-        $("#ddlModalUnit .liquid, #ddlModalUnit .solid").hide();
-        $(`#ddlModalUnit .${$(this).attr("data-type")}`).show();
     });
     $("#btnConfirmIngredient").on("click", function() {
         $("#modalAddIngredient .comeOn").removeClass("comeOn");
@@ -34,8 +24,7 @@ function SetUpCookbook() {
             return;
         }
         const unit = $("#ddlModalUnit").val();
-        const isLiquid = $("#matterType > .button-primary").attr("data-type") === "liquid";
-        const ingredient = new Ingredient(ing, amt, unit, isLiquid);
+        const ingredient = new Ingredient(ing, amt, unit);
 
         const ingId = $("#modalAddIngredient").attr("data-id");
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
@@ -60,8 +49,6 @@ function SetUpCookbook() {
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
         const ingredient = dbData.dbList[dbData.currentScreen].data[recipeIdx].ingredience[ingId];
         ShowModal("modalAddIngredient", true);
-        $("#matterType > button").removeClass("button-primary");
-        $(`#matterType > button[data-type=${ingredient.isLiquid?"liquid":"solid"}]`).addClass("button-primary");
         $("#modalAddIngredient").attr("data-id", ingId);
         $("#txtModalIngredient").val(ingredient.ingredient);
         $("#txtModalAmount").val(ingredient.amount);
@@ -121,11 +108,11 @@ function SetUpCookbook() {
         EditRecipe(recipeIdx);
     });
 
-    $("#stepViewList").on("click", ".step-unit", function() {
+    $(document).on("click", ".step-unit", function() {
         const unit = $(this).attr("data-unit");
         const amount = new Fraction($(this).attr("data-amount"));
         const newAmount = ConvertBetweenMetricAndImperial(unit, amount);
-        $(this).replaceWith(GetAdjustableStepIngredientHTML(newAmount.amount, newAmount.unit, $(this).attr("data-tilde"), true));
+        $(this).replaceWith(GetAdjustableIngredientHTML(newAmount.amount, newAmount.unit, $(this).attr("data-tilde"), true));
     });
     // TODO: click event, settings
 }
@@ -147,8 +134,12 @@ function ViewRecipe(idx) {
 function DrawRecipe(recipe, servingsObj) {
     $("#ingredientViewList").html(recipe.ingredience.map((e, i) => {
         const adjustedRecipe = GetServingSizeAdjustedIngredient(e, recipe.servings, servingsObj);
+        const hasTilde = adjustedRecipe.amount[0] === "~";
+        if(hasTilde) { adjustedRecipe.amount = adjustedRecipe.amount.substring(1); }
+        const amt = adjustedRecipe.fraction === undefined ? new Fraction(adjustedRecipe.amount) : new Fraction(adjustedRecipe.fraction.replace(/~/g, ""));
         return `<li data-id="${i}" class="viewIngredient">
-            <span>${GetDisplayNumber(adjustedRecipe.fraction === undefined ? new Fraction(adjustedRecipe.amount) : new Fraction(adjustedRecipe.fraction))}${adjustedRecipe.unit === "" ? "" : ` ${adjustedRecipe.unit}`} ${adjustedRecipe.ingredient}</span>
+            ${GetAdjustableIngredientHTML(amt, adjustedRecipe.unit, hasTilde ? "~" : "", adjustedRecipe.unit !== "")}
+            <!--<span>${GetDisplayNumber(amt)}${GetUnitDisplay(adjustedRecipe.unit, amt)} ${adjustedRecipe.ingredient}</span>-->
         </li>`}).join(""));
     $("#stepViewList").html(recipe.steps.map((e, i) => `
     <li data-id="${i}" class="viewStep">
@@ -165,7 +156,7 @@ function EditRecipe(idx) {
     $("#recipeServingSize").val(recipe.servings);
     $("#ingredientEditList").html(recipe.ingredience.map((e, i) => `
     <li data-id="${i}" class="editIngredient">
-        <span>${e.amount}${e.unit === "" ? "" : ` ${e.unit}`} ${e.ingredient}</span>
+        <span>${e.amount}${GetUnitDisplay(e.unit, e.amount)} ${e.ingredient}</span>
         <i class="material-icons recipeEditBtn recipeEdit">edit</i>
         <i class="material-icons recipeEditBtn recipeDel">delete</i>
     </li>`).join(""));
@@ -201,12 +192,12 @@ function GetServingSizeAdjustedIngredient(ingredient, baseServingSize, newServin
     if(newServingSizeObj.fraction.equals(baseServingSize)) { return ingredient; }
     const oldAmt = new Fraction(ingredient.amount);
     const newAmt = oldAmt.mul(newServingSizeObj.fraction).div(baseServingSize);
-    const newUnitAndAmount = AdjustUnitToNewAmount(ingredient.unit, oldAmt, newAmt, ingredient.isLiquid);
+    const newUnitAndAmount = AdjustUnitToNewAmount(ingredient.unit, oldAmt, newAmt);
     const newIngredient = new Ingredient(ingredient.ingredient, newUnitAndAmount.amount, newUnitAndAmount.unit, ingredient.isLiquid);
     newIngredient.checked = ingredient.checked;
     return newIngredient;
 }
-function AdjustUnitToNewAmount(unit, oldAmount, newAmount, isLiquid) {
+function AdjustUnitToNewAmount(unit, oldAmount, newAmount) {
     if(unit === "ºF" || unit === "ºC") { return { unit: unit, amount: oldAmount }; }
     const obj = { unit: unit, amount: newAmount };
     if(["", "pinch", "dash"].indexOf(unit) >= 0 || newAmount == oldAmount) { return obj; }
@@ -215,16 +206,16 @@ function AdjustUnitToNewAmount(unit, oldAmount, newAmount, isLiquid) {
             return obj; // these are already the largest units of their type
         }
     } else {
-        if(["tsp", "fl oz", "mL", "oz", "mg", "mm", "in"].indexOf(unit) >= 0) {
+        if(["tspv", "tspm", "fl oz", "mL", "oz", "mg", "mm", "in"].indexOf(unit) >= 0) {
             return obj; // these are already the smallest units of their type
         }
     }
     switch(unit) {
         // Volume - Imperial
-        case "tsp": return ShiftFromTsp(newAmount, isLiquid);
-        case "tbsp": return ShiftFromTsp(newAmount.mul(3), isLiquid);
+        case "tspv": return ShiftFromTsp(newAmount, true);
+        case "tbspv": return ShiftFromTsp(newAmount.mul(3), true);
         case "fl oz": return ShiftFromTsp(newAmount.mul(6), true);
-        case "cup": return ShiftFromTsp(newAmount.mul(48), isLiquid);
+        case "cupv": return ShiftFromTsp(newAmount.mul(48), true);
         case "qt": return ShiftFromTsp(newAmount.mul(192), true);
         case "gal": return ShiftFromTsp(newAmount.mul(768), true);
         // Volume - Metric
@@ -232,6 +223,9 @@ function AdjustUnitToNewAmount(unit, oldAmount, newAmount, isLiquid) {
         case "dL": return ShiftFromMilliliter(newAmount.mul(100));
         case "L": return ShiftFromMilliliter(newAmount.mul(1000));
         // Weight - Imperial
+        case "tspm": return ShiftFromTsp(newAmount, false);
+        case "tbspm": return ShiftFromTsp(newAmount.mul(3), false);
+        case "cupm": return ShiftFromTsp(newAmount.mul(48), false);
         case "oz":
             if(newAmount >= 16) {
                 return { unit: "lb", amount: newAmount.div(16) };
@@ -260,16 +254,16 @@ function AdjustUnitToNewAmount(unit, oldAmount, newAmount, isLiquid) {
     }
     return obj;
 }
-function ShiftFromTsp(amount, isLiquid) {
-    if(amount < 3) { return { unit: "tsp", amount: amount }; }
-    if(amount < 12) { return { unit: "tbsp", amount: amount.div(3) } };
-    if(isLiquid) {
+function ShiftFromTsp(amount, isVolume) {
+    if(amount < 3) { return { unit: `tsp${isVolume?"v":"m"}`, amount: amount }; }
+    if(amount < 12) { return { unit: `tbsp${isVolume?"v":"m"}`, amount: amount.div(3) } };
+    if(isVolume) {
         if(amount < 16) { return { unit: "fl oz", amount: amount.div(6) }; }
-        if(amount < 192) { return { unit: "cup", amount: amount.div(48) }; }
+        if(amount < 192) { return { unit: "cupv", amount: amount.div(48) }; }
         if(amount < 768) { return { unit: "qt", amount: amount.div(192) }; }
         return { unit: "gal", amount: amount.div(768) };
     } else {
-        return { unit: "cup", amount: amount.div(48) };
+        return { unit: "cupm", amount: amount.div(48) };
     }
 }
 function ShiftFromMilliliter(amount) {
@@ -289,20 +283,91 @@ function ShiftFromMillimeter(amount) {
 }
 function ConvertBetweenMetricAndImperial(unit, amount) {
     switch(unit) {
+        // temperature
         case "ºF": return { unit: "ºC", amount: amount.add(-32).mul(5, 9) };
         case "ºC": return { unit: "ºF", amount: amount.mul(9, 5).add(32) };
+        // weight/mass
+        case "tspm":
+            if(amount >= 202.8841362) { return { unit: "kg", amount: amount.div(202.8841362) }; }
+            else { return { unit: "g", amount: amount.mul(4.928921594) }; }
+        case "tbspm":
+            if(amount >= 67.6280454) { return { unit: "kg", amount: amount.div(67.6280454) }; }
+            else { return { unit: "g", amount: amount.mul(14.7867648) }; }
+        case "cupm":
+            if(amount >= 4.226752838) { return { unit: "kg", amount: amount.div(4.226752838) }; }
+            else { return { unit: "g", amount: amount.mul(136) }; }
         case "oz":
             if(amount >= 35.274) { return { unit: "kg", amount: amount.div(35.274) }; }
             else { return { unit: "g", amount: amount.mul(28.35) }; }
         case "lb":
             if(amount >= 2.205) { return { unit: "kg", amount: amount.div(2.205) }; }
             else { return { unit: "g", amount: amount.mul(453.592) }; }
+        case "mg":
+            return { unit: "oz", amount: amount.div(28350) };
         case "g":
-            if(amount > 453.592) { return { unit: "lb", amount: amount.div(453.592) }; }
+            if(amount >= 453.592) { return { unit: "lb", amount: amount.div(453.592) }; }
             else { return { unit: "oz", amount: amount.div(28.35) }; }
         case "kg":
-            if(amount > 2.205) { return { unit: "lb", amount: amount.mul(2.205) }; }
-            else { return { unit: "oz", amount: amount.div(35.274) }; }
+            if(amount >= 0.453592) { return { unit: "lb", amount: amount.mul(2.205) }; }
+            else { return { unit: "oz", amount: amount.mul(35.274) }; }
+        // Length
+        case "in":
+            if(amount < 0.3937) { return { unit: "mm", amount: amount.mul(25.4) }; }
+            if(amount < 39.3701) { return { unit: "cm", amount: amount.mul(2.54) }; }
+            return { unit: "m", amount: amount.div(39.3701) };
+        case "ft":
+            if(amount < 0.032) { return { unit: "mm", amount: amount.mul(304.8) }; }
+            if(amount < 3.28) { return { unit: "cm", amount: amount.mul(30.48) }; }
+            return { unit: "m", amount: amount.div(3.281) };
+        case "mm":
+            if(amount <= 304.8) { return { unit: "in", amount: amount.div(25.4) }; }
+            else { return { unit: "ft", amount: amount.div(304.8) }; }
+        case "cm":
+            if(amount < 30.48) { return { unit: "in", amount: amount.div(2.54) }; }
+            else { return { unit: "ft", amount: amount.div(30.48) }; }
+        case "m":
+            return { unit: "ft", amount: amount.mul(3.281) };
+        // volume
+        case "tspv":
+            if(amount < 20.2884) { return {unit: "mL", amount: amount.mul(4.92892) }; }
+            if(amount < 202.884) { return {unit: "dL", amount: amount.div(20.2884) }; }
+            return {unit: "L", amount: amount.div(202.884) };
+        case "tbspv":
+            if(amount < 6.7628) { return {unit: "mL", amount: amount.mul(14.7868) }; }
+            if(amount < 67.628) { return {unit: "dL", amount: amount.div(6.7628) }; }
+            return {unit: "L", amount: amount.div(67.628) };
+        case "fl oz":
+            if(amount < 3.3814) { return {unit: "mL", amount: amount.mul(29.5735) }; }
+            if(amount < 33.814) { return {unit: "dL", amount: amount.div(3.3814) }; }
+            return {unit: "L", amount: amount.div(33.814) };
+        case "cupv":
+            if(amount < 4.22675) { return {unit: "dL", amount: amount.mul(2.36588) }; }
+            return {unit: "L", amount: amount.div(4.22675) };
+        case "qt":
+            if(amount < 1.05669) { return {unit: "dL", amount: amount.mul(9.46353) }; }
+            return {unit: "L", amount: amount.div(1.05669) };
+        case "gal":
+            if(amount < 0.264172) { return {unit: "dL", amount: amount.mul(37.8541) }; }
+            return {unit: "L", amount: amount.mul(3.785) };
+        case "ml":
+        case "mL":
+            if(amount < 14.7868) { return {unit: "tspv", amount: amount.div(4.92892) }; }
+            if(amount < 29.5735) { return {unit: "tbspv", amount: amount.div(14.7868) }; }
+            if(amount < 946.353) { return {unit: "fl oz", amount: amount.div(29.5735) }; }
+            if(amount < 3785.41) { return {unit: "qt", amount: amount.div(946.353) }; }
+            return {unit: "gal", amount: amount.div(3785.41) };
+        case "dl":
+        case "dL":
+            if(amount < 0.147868) { return {unit: "tspv", amount: amount.mul(20.2884) }; }
+            if(amount < 0.295735) { return {unit: "tbspv", amount: amount.mul(6.7628) }; }
+            if(amount < 9.46353) { return {unit: "fl oz", amount: amount.mul(3.3814) }; }
+            if(amount < 37.8541) { return {unit: "qt", amount: amount.div(9.46353) }; }
+            return {unit: "gal", amount: amount.div(37.8541) };
+        case "l":
+        case "L":
+            if(amount < 1.05669) { return {unit: "fl oz", amount: amount.mul(33.814) }; }
+            if(amount < 3.78541) { return {unit: "qt", amount: amount.mul(1.05669) }; }
+            return {unit: "gal", amount: amount.div(3.785) };
     }
     return { unit: unit, amount: amount };
 }
@@ -312,12 +377,19 @@ function AdjustStep(step, baseServingSize, newServingSizeObj) {
         const originalAmount = StringToNumber(number);
         unit = CleanUserUnit(unit);
         const newAmount = originalAmount.fraction.mul(newServingSizeObj.fraction).div(baseServingSize);
-        const finalUnitAndAmount = AdjustUnitToNewAmount(unit, originalAmount.fraction, newAmount, false); // TODO: isLiquid
-        const isConvertible = ["tbsp", "tsp", "cup", ""].indexOf(finalUnitAndAmount.unit) < 0; // can't determine if liquid or solid
-        return GetAdjustableStepIngredientHTML(finalUnitAndAmount.amount, finalUnitAndAmount.unit, tilde, isConvertible);
+        const finalUnitAndAmount = AdjustUnitToNewAmount(unit, originalAmount.fraction, newAmount);
+        return GetAdjustableIngredientHTML(finalUnitAndAmount.amount, finalUnitAndAmount.unit, tilde, finalUnitAndAmount.unit !== "");
     });
 }
-function GetAdjustableStepIngredientHTML(amount, unit, tilde, isConvertible) {
+const validUnits = ["ºF", "ºC", 
+                    "tsp", "tbsp", "cup", 
+                    "tspv", "tbspv", "cupv", 
+                    "tspm", "tbspm", "cupm", 
+                    "fl oz", "qt", "gal", "ml", "dl", "l", "mL", "dL", "L", 
+                    "lb", "oz", "mg", "g", "kg", 
+                    "mm", "cm", "m", "in", "ft"];
+function GetAdjustableIngredientHTML(amount, unit, tilde, isConvertible) {
+    if(validUnits.indexOf(unit) < 0) { isConvertible = false; }
     amount = amount.round(5);
     const showAsFraction = amount.d <= 10;
     const amountToStore = showAsFraction ? amount.toFraction() : amount.toString();
@@ -331,7 +403,12 @@ function GetAdjustableStepIngredientHTML(amount, unit, tilde, isConvertible) {
 function GetUnitDisplay(unit, amount) {
     if(unit === "") { return " "; }
     if(["ºF", "ºC"].indexOf(unit) >= 0) { return unit; }
-    if(unit === "cup") { return amount.compare(1) === 0 ? " cup" : " cups"; }
+    if(["cup", "cupv", "cupm"].indexOf(unit) >= 0) { return amount.compare(1) === 0 ? " cup" : " cups"; }
+    if(unit === "tspv" || unit === "tspm") { return "tsp"; }
+    if(unit === "tbspv" || unit === "tbspm") { return "tbsp"; }
+    if(unit === "ml") { return "mL"; }
+    if(unit === "dl") { return "dL"; }
+    if(unit === "l") { return "L"; }
     return ` ${unit}`;
 }
 function GetDisplayNumber(amount, showAsFraction) {

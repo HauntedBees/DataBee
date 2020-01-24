@@ -645,4 +645,5 @@ input, option, select, textarea { color: #000000 }
     border: 1px dashed var(--bg-color-important);
     border-radius: 0.35em;
     padding: 0.15em;
+    white-space: nowrap;
 }

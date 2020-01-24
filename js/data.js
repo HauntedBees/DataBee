@@ -57,7 +57,7 @@ class Recipe extends DataItem {
     }
 }
 class Ingredient {
-    constructor(item, amt, unit, isLiquid) {
+    constructor(item, amt, unit) {
         this.ingredient = item;
         if(typeof amt === "number") {
             this.amount = amt;
@@ -66,7 +66,6 @@ class Ingredient {
             this.fraction = amt;
         }
         this.unit = unit;
-        this.isLiquid = isLiquid;
         this.checked = false;
     }
 }
