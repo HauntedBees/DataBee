@@ -471,7 +471,7 @@ function ToggleDataItemSettings($e, i, type) {
         ctx.stateForBackButton = "checkboxSettings";
         const settings = [
             `<div class="btn option ci-delete"><i class="material-icons">delete</i><div>Delete</div></div>`,
-            `<div class="btn option ci-rename"><i class="material-icons">edit</i><div>Rename</div></div>`,
+            `<div class="btn option ci-rename"><i class="material-icons">edit</i><div>Edit</div></div>`,
             `<div class="btn option ci-move"><i class="material-icons">arrow_forward</i><div>Move</div></div>`,
             `<div class="btn option ci-notes"><i class="material-icons">question_answer</i><div>Notes</div></div>`,
             `<div class="btn option ci-tags"><i class="material-icons">label</i><div>Tags</div></div>`,
