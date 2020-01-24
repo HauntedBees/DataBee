@@ -138,8 +138,7 @@ function DrawRecipe(recipe, servingsObj) {
         if(hasTilde) { adjustedRecipe.amount = adjustedRecipe.amount.substring(1); }
         const amt = adjustedRecipe.fraction === undefined ? new Fraction(adjustedRecipe.amount) : new Fraction(adjustedRecipe.fraction.replace(/~/g, ""));
         return `<li data-id="${i}" class="viewIngredient">
-            ${GetAdjustableIngredientHTML(amt, adjustedRecipe.unit, hasTilde ? "~" : "", adjustedRecipe.unit !== "")}
-            <!--<span>${GetDisplayNumber(amt)}${GetUnitDisplay(adjustedRecipe.unit, amt)} ${adjustedRecipe.ingredient}</span>-->
+            ${GetAdjustableIngredientHTML(amt, adjustedRecipe.unit, hasTilde ? "~" : "", adjustedRecipe.unit !== "")} ${adjustedRecipe.ingredient}
         </li>`}).join(""));
     $("#stepViewList").html(recipe.steps.map((e, i) => `
     <li data-id="${i}" class="viewStep">
