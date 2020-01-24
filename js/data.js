@@ -416,29 +416,48 @@ const data = {
     },
     SearchDataItems: function(query) {
         const results = [];
-        const queryWords = query.split(" ");
+        const queryWords = query.trim().split(" ");
         dbData.dbList.forEach((arr, arrIdx) => {
             arr.data.forEach((elem, elemIdx) => {
                 if(elem.val === undefined) { elem.val = elem.name; } // lazy hack for recipes
                 let rank = 0;
-                if(elem.val.toLowerCase().indexOf(query) >= 0) {
-                    isMatch = true;
-                    rank = 1000;
+                const arrName = arr.name.toLowerCase();
+                if(arrName.indexOf(query) >= 0) {
+                    rank += 50;
                 } else {
                     for(let i = 0; i < queryWords.length; i++) {
-                        if(elem.val.toLowerCase().indexOf(queryWords[i]) >= 0) {
-                            rank += 10;
+                        if(arrName === queryWords[i]) {
+                            rank += 15;
+                        } else {
+                            const idx = arrName.indexOf(queryWords[i]);
+                            if(idx >= 0) { rank += idx === 0 ? 20 : 5; }
+                        }
+                    }
+                }
+                const elemStr = elem.val.toLowerCase();
+                if(elemStr.indexOf(query) >= 0) {
+                    rank += 1000;
+                } else {
+                    for(let i = 0; i < queryWords.length; i++) {
+                        if(elemStr === queryWords[i]) {
+                            rank += 20;
+                        } else {
+                            const idx = elemStr.indexOf(queryWords[i]);
+                            if(idx >= 0) { rank += idx === 0 ? 20 : 5; }
                         }
                     }
                 }
                 for(let i = 0; i < elem.tags.length; i++) {
-                    const tag = arr.tags[elem.tags[i]];
-                    if(tag.tag.indexOf(query) >= 0) {
+                    const tagStr = arr.tags[elem.tags[i]].tag.toLowerCase();
+                    if(tagStr.indexOf(query) >= 0) {
                         rank += 50;
                     } else {
                         for(let i = 0; i < queryWords.length; i++) {
-                            if(tag.tag.toLowerCase().indexOf(queryWords[i]) >= 0) {
-                                rank += 5;
+                            if(tagStr === queryWords[i]) {
+                                rank += 20;
+                            } else {
+                                const idx = tagStr.indexOf(queryWords[i]);
+                                if(idx >= 0) { rank += idx === 0 ? 20 : 5; }
                             }
                         }
                     }
