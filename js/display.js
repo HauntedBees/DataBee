@@ -224,7 +224,7 @@ function ShowCredits() {
     $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
     $("#bCredits, #backBtn").show();
     HideSidebars();
-    $("#title").text("DataBee v0JAN20");
+    $("#title").text("DataBee v0JAN23");
     ctx.stateForBackButton = "secondary";
 }
 function ShowSearch() {

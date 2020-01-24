@@ -518,7 +518,8 @@ const data = {
             ShowAlert("Import Failed", "Invalid databee format.");
             return;
         }
-        const decodedData = window.atob(dObj.replace(prefix, ""));
+        // https://stackoverflow.com/questions/30106476/using-javascripts-atob-to-decode-base64-doesnt-properly-decode-utf-8-strings
+        const decodedData = decodeURIComponent(window.atob(dObj.replace(prefix, "")).split("").map(c => `%${("00" + c.charCodeAt(0).toString(16)).slice(-2)}`).join(""));
         data.ProcessJSON(decodedData);
     },
     Import: function(files) {
