@@ -207,6 +207,7 @@ function GetServingSizeAdjustedIngredient(ingredient, baseServingSize, newServin
     return newIngredient;
 }
 function AdjustUnitToNewAmount(unit, oldAmount, newAmount, isLiquid) {
+    if(unit === "ºF" || unit === "ºC") { return { unit: unit, amount: oldAmount }; }
     const obj = { unit: unit, amount: newAmount };
     if(["", "pinch", "dash"].indexOf(unit) >= 0 || newAmount == oldAmount) { return obj; }
     if(newAmount.compare(oldAmount) > 0) {
