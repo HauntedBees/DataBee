@@ -405,6 +405,11 @@ i.important { vertical-align: sub }
     margin: -0.75em 0 0.25em 3em;
 }
 
+.addtlRecipeDetails {
+    font-size: 0.75em;
+    font-style: italic;
+}
+
 .sidebar_header {
     font-weight: bold;
     background-color: var(--secondary-bg-color);
@@ -595,11 +600,15 @@ input, option, select, textarea { color: #000000 }
     display: inline-block;
     width: 3em;
 }
-.recipeSection { overflow-y: scroll }
-.recipeSection-tiny { max-height: 15vh }
+.recipeSection {
+    border-bottom: 1px solid var(--header-bg-color);
+    margin-bottom: 0;
+    overflow-y: scroll;
+}
+.recipeSection-tiny { height: 15vh }
 .recipeSection-small { height: 25vh }
 .recipeSection-smallMaybe { max-height: 25vh }
-.recipeSection-big { height: 35vh }
+.recipeSection-big { height: 47.75vh }
 .recipeBtn {
     height: 25px;
     width: 30px;
@@ -633,6 +642,23 @@ input, option, select, textarea { color: #000000 }
 }
 .btn-small > i { vertical-align: sub }
 #recipeTopBtns { display: none }
+#recipeHeader {
+    display: grid;
+    grid-template-columns: 33.3% 33.3% 33.3%;
+    grid-auto-rows: min-content;
+    margin-bottom: 0.5em;
+}
+#recipeHeader > div {
+    text-align: center;
+    border: 1px solid var(--button-text-color);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    background-color: var(--bg-color-important);
+}
+#recipeHeader > div.active {
+    border-bottom: 0;
+    background-color: var(--bg-color);
+}
 .ingredientHeader {
     font-weight: bold;
     padding: 0 0.5em;
@@ -646,3 +672,25 @@ input, option, select, textarea { color: #000000 }
     padding: 0.15em;
     white-space: nowrap;
 }
+.recipeSection.full {
+    height: 100vh;
+    max-height: 100vh;
+}
+#recipeMetadata {
+    display: grid;
+    grid-template-columns: 30% 70%;
+    padding: 0 0.5em;
+}
+#recipeNotes { font-size: 0.75em }
+#recipeTimeInfo {
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+    padding: 0 0.5em;
+}
+.timeInfo {
+    display: grid;
+    grid-template-rows: 33% 67%;
+    text-align: center;
+}
+.timeInfo > span:first-child { font-size: 0.75em }
+#recipeBy, #recipeNotes { padding: 0 0.5em }

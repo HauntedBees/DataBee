@@ -111,18 +111,98 @@ function SetUpCookbook() {
         EditRecipe(recipeIdx);
     });
 
+    $("#btnRecipeFull").on("click", function() {
+        $("#recipeHeader > div").removeClass("active");
+        $("#btnRecipeFull").addClass("active");
+        $("#recipeRead > *, #recipeEdit > *").removeClass("full").show();
+    });
+    $("#btnRecipeIngr").on("click", function() {
+        $("#recipeHeader > div").removeClass("active");
+        $("#btnRecipeIngr").addClass("active");
+        $("#recipeRead > *").removeClass("full").hide();
+        $("#recipeRead > *, #recipeEdit > *").removeClass("full").hide();
+        $(".showIng").addClass("full").show();
+    });
+    $("#btnRecipeSteps").on("click", function() {
+        $("#recipeHeader > div").removeClass("active");
+        $("#btnRecipeSteps").addClass("active");
+        $("#recipeRead > *, #recipeEdit > *").removeClass("full").hide();
+        $(".showStep").addClass("full").show();
+    });
+
+
+    $("#btnAddStep").on("click", function() {
+        ShowModal("modalAddStep", true);
+        $("#btnConfirmStep").text("Add");
+        $("#modalAddStep > div > .modalHeader").text("Add Step");
+        $("#modalAddStep").attr("data-id", "");
+        $("#txtStep").val("").focus();
+    });
+    $("#btnConfirmStep").on("click", function() {
+        $("#txtStep").removeClass("comeOn");
+        const stepText = $("#txtStep").val();
+        if(stepText === "") {
+            $("#txtStep").addClass("comeOn");
+            return;
+        }
+        const step = new Step(stepText);
+        const stepId = $("#modalAddStep").attr("data-id");
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        if(stepId === "") { // new
+            data.AddRecipeStep(dbData.currentScreen, recipeIdx, step);
+        } else { // edit
+            data.ReplaceRecipeStep(dbData.currentScreen, recipeIdx, parseInt(stepId), step);
+        }
+        EditRecipe(recipeIdx);
+        CloseModal("modalAddStep");
+    });
+    $("#stepEditList").on("click", ".recipeDel", function() {
+        const stepId = parseInt($(this).parent().attr("data-id"));
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        data.RemoveRecipeStep(dbData.currentScreen, recipeIdx, stepId);
+        EditRecipe(recipeIdx);
+    });
+    $("#stepEditList").on("click", ".recipeEdit", function() {
+        $("#modalAddStep > div > .modalHeader").text("Edit Step");
+        $("#btnConfirmStep").text("Save");
+        const stepId = parseInt($(this).parent().attr("data-id"));
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        const step = dbData.dbList[dbData.currentScreen].data[recipeIdx].steps[stepId];
+        ShowModal("modalAddStep", true);
+        $("#modalAddStep").attr("data-id", stepId);
+        $("#txtStep").val(step.step);
+    });
+
+    $("#recipeServingSize").on("blur", function() {
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        const recipe = dbData.dbList[dbData.currentScreen].data[recipeIdx];
+        const newServings = $(this).val();
+        if(IsValidNumberString(newServings)) {
+            recipe.servings = newServings;
+            data.Save();
+        } else {
+            $(this).val(recipe.servings);
+        }
+    });
+    $(".rMetadata").on("blur", function() {
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        const recipe = dbData.dbList[dbData.currentScreen].data[recipeIdx];
+        const value = $(this).val();
+        const type = $(this).attr("data-val");
+        recipe[type] = value;
+        data.Save();
+    });
+
     $(document).on("click", ".step-unit", function() {
         const unit = $(this).attr("data-unit");
         const amount = new Fraction($(this).attr("data-amount"));
         const newAmount = ConvertBetweenMetricAndImperial(unit, amount);
         $(this).replaceWith(GetAdjustableIngredientHTML(newAmount.amount, newAmount.unit, $(this).attr("data-tilde"), true));
     });
-    // TODO: click event, settings
+    // TODO: settings
 }
 
 // Display
-
-/* Cookbook */
 function ViewRecipe(idx) {
     const recipe = dbData.dbList[dbData.currentScreen].data[idx];
     $(".body, #menuBtn, #menuRight, #recipeEdit").hide();
@@ -131,7 +211,32 @@ function ViewRecipe(idx) {
     ctx.stateForBackButton = "recipeviewer";
     $("#bRecipeEditor").attr("data-id", idx);
     $("#currentServingSize").val(recipe.servings);
-    // TODO: author, url, notes, est prep time, est cook time, ready in
+    if(recipe.author) {
+        $("#recipeBy").show();
+        if(recipe.source) {
+            if(recipe.source.indexOf("http") === 0) {
+                $("#recipeBy").html(`Recipe by: <a href="${recipe.source}">${recipe.author}</a>`);
+            } else {
+                $("#recipeBy").html(`Recipe by: ${recipe.author}, ${recipe.source}`);
+            }
+        } else {
+            $("#recipeBy").html(`Recipe by: ${recipe.author}`);
+        }
+    } else {
+        $("#recipeBy").hide();
+    }
+    if(recipe.notes) {
+        $("#recipeNotes").text(recipe.notes).show();
+    } else {
+        $("#recipeNotes").hide();
+    }
+    const recipeTimeHTML = [];
+    if(recipe.prepTime) { recipeTimeHTML.push(`<div class="timeInfo"><span>Prep Time</span><span>${recipe.prepTime}</span></div>`); }
+    if(recipe.cookTime) { recipeTimeHTML.push(`<div class="timeInfo"><span>Cook Time</span><span>${recipe.cookTime}</span></div>`); }
+    if(recipe.totalTime) { recipeTimeHTML.push(`<div class="timeInfo"><span>Total Time</span><span>${recipe.totalTime}</span></div>`); }
+    $("#recipeTimeInfo").html(recipeTimeHTML.join(""));
+    $("#recipeHeader > div").removeClass("active");
+    $("#btnRecipeFull").addClass("active");
     DrawRecipe(recipe, StringToNumber(`${recipe.servings}`));
 }
 function DrawRecipe(recipe, servingsObj) {
@@ -165,6 +270,10 @@ function EditRecipe(idx) {
     ctx.stateForBackButton = "recipeeditor";
     $("#bRecipeEditor").attr("data-id", idx);
     $("#recipeServingSize").val(recipe.servings);
+    $(".rMetadata").each(function(i, e) {
+        const $e = $(e);
+        $e.val(recipe[$e.attr("data-val")]);
+    });
     $("#ingredientEditList").html(recipe.ingredience.map((e, i) => `
     <li data-id="${i}" class="editIngredient">
         ${(e.unit === "toTaste" || e.unit === "none") ? `<span>${e.ingredient}${e.unit === "toTaste" ? ", to taste" : ""}</span>` : `<span>${e.amount}${GetUnitDisplay(e.unit, e.amount)} ${e.ingredient}</span>`}
@@ -390,6 +499,9 @@ function AdjustStep(step, baseServingSize, newServingSizeObj) {
         const newAmount = originalAmount.fraction.mul(newServingSizeObj.fraction).div(baseServingSize);
         const finalUnitAndAmount = AdjustUnitToNewAmount(unit, originalAmount.fraction, newAmount);
         return GetAdjustableIngredientHTML(finalUnitAndAmount.amount, finalUnitAndAmount.unit, tilde, finalUnitAndAmount.unit !== "");
+    }).replace(/\[([0-9]+(?:(?:\.|\/|,)[0-9]+)?)]/g, function(number) {
+        const newAmount = new Fraction(number).mul(newServingSizeObj.fraction).div(baseServingSize);
+        return newAmount;
     });
 }
 const validUnits = ["ºF", "ºC", 
@@ -434,16 +546,16 @@ const unitSynonyms = {
     "ºf": "ºF",
     "c": "ºC",
     "ºc": "ºC",
-    "teaspoon": "tsp",
-    "teaspoons": "tsp",
-    "tablespoon": "tbsp",
-    "tablespoons": "tbsp",
+    "teaspoon": "tspv",
+    "teaspoons": "tspv",
+    "tablespoon": "tbspv",
+    "tablespoons": "tbspv",
     "fl. oz": "fl oz",
     "floz": "fl oz",
     "fluid oz": "fl oz",
     "fluid ounce": "fl oz",
     "fluid ounces": "fl oz",
-    "cups": "cup",
+    "cups": "cupv",
     "quart": "qt",
     "quarts": "qt",
     "gallon": "gal",

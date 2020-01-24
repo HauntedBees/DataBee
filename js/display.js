@@ -388,6 +388,13 @@ function GetRecipeHTML(e, i, isSearchQuery) {
         ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i>` : ``}
         <i class="edit material-icons">more_horiz</i>
         ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
+        <div class="addtlRecipeDetails">
+            ${e.author ? `by ${e.author}`: ""}
+            ${e.source ? `from ${
+                e.source.indexOf("http") === 0 ? `<a href="${e.source}">${e.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>` : e.source
+            }`: ""}
+        </div>
+        <div class="addtlRecipeDetails">${e.notes.substring(0, 100) + (e.notes.length > 100 ? "..." : "")}</div>
         </li>`;
 }
 function GetNoteHTML(e, i, isSearchQuery) {

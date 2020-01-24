@@ -189,6 +189,11 @@
                     </div>
                 </div>
                 <div id="bRecipeEditor" class="body one-half column">
+                    <div id="recipeHeader">
+                        <div id="btnRecipeFull" class="active">Full</div>
+                        <div id="btnRecipeIngr">Ingredients</div id="btnRecipeFull">
+                        <div id="btnRecipeSteps">Steps</div id="btnRecipeFull">
+                    </div>
                     <div id="recipeRead" class="recipeDetails">
                         <div class="recipeSection recipeSection-tiny">
                             <div>Serves: 
@@ -196,29 +201,37 @@
                                 <input type="text" id="currentServingSize" class="servingSize">
                                 <button data-dir="1" class="servingSizeAdjustment btn-small"><i class="material-icons">add</i></button>
                             </div>
+                            <div id="recipeTimeInfo"></div>
                             <div id="recipeBy"></div>
-                            <div id="recipeURL"></div>
                             <div id="recipeNotes"></div>
                         </div>
-                        <ul id="ingredientViewList" class="recipeSection recipeSection-smallMaybe"></ul>
-                        <ul id="stepViewList" class="recipeSection recipeSection-big"></ul>
+                        <ul id="ingredientViewList" class="showIng recipeSection recipeSection-smallMaybe"></ul>
+                        <ul id="stepViewList" class="showStep recipeSection recipeSection-big"></ul>
                     </div>
                     <div id="recipeEdit" class="recipeDetails">
                         <h4>Servings: <input id="recipeServingSize" class="servingSize" type="text" placeholder="1"></h4>
-                        <h4>
+                        <div id="recipeMetadata">
+                            <label for="txtPrepTime">Prep Time</label><input data-val="prepTime" class="rMetadata" id="txtPrepTime" type="text" placeholder="Prep Time (optional)">
+                            <label for="txtCookTime">Cook Time</label><input data-val="cookTime" class="rMetadata" id="txtCookTime" type="text" placeholder="Cook Time (optional)">
+                            <label for="txtTotalTime">Total Time</label><input data-val="totalTime" class="rMetadata" id="txtTotalTime" type="text" placeholder="Total Time (optional)">
+                            <label for="txtAuthor">Author</label><input data-val="author" class="rMetadata" id="txtAuthor" type="text" placeholder="Author (optional)">
+                            <label for="txtSource">Source</label><input data-val="source" class="rMetadata" id="txtSource" type="text" placeholder="Source (optional)">
+                            <label for="txtNotes">Notes</label><textarea data-val="notes" class="rMetadata" id="txtNotes" placeholder="Notes (optional)"></textarea>
+                        </div>
+                        <h4 class="showIng">
                             Ingredience
                             <div id="btnAddIngredient" class="recipeBtn">
                                 <i class="material-icons">add</i>
                             </div>
                         </h4>
-                        <ul id="ingredientEditList" class="recipeSection recipeSection-small"></ul>
-                        <h4>
+                        <ul id="ingredientEditList" class="showIng recipeSection recipeSection-small"></ul>
+                        <h4 class="showStep">
                             Steps
                             <div id="btnAddStep" class="recipeBtn">
                                 <i class="material-icons">add</i>
                             </div>
                         </h4>
-                        <ul id="stepEditList" class="recipeSection recipeSection-big"></ul>
+                        <ul id="stepEditList" class="showStep recipeSection recipeSection-big"></ul>
                     </div>
                 </div>
                 <div id="bSearch" class="body one-half column">

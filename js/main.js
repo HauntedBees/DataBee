@@ -442,60 +442,6 @@ $(function() {
 
     SetUpCookbook();
 
-    $("#btnAddStep").on("click", function() {
-        ShowModal("modalAddStep", true);
-        $("#btnConfirmStep").text("Add");
-        $("#modalAddStep > div > .modalHeader").text("Add Step");
-        $("#modalAddStep").attr("data-id", "");
-        $("#txtStep").val("").focus();
-    });
-    $("#btnConfirmStep").on("click", function() {
-        $("#txtStep").removeClass("comeOn");
-        const stepText = $("#txtStep").val();
-        if(stepText === "") {
-            $("#txtStep").addClass("comeOn");
-            return;
-        }
-        const step = new Step(stepText);
-        const stepId = $("#modalAddStep").attr("data-id");
-        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
-        if(stepId === "") { // new
-            data.AddRecipeStep(dbData.currentScreen, recipeIdx, step);
-        } else { // edit
-            data.ReplaceRecipeStep(dbData.currentScreen, recipeIdx, parseInt(stepId), step);
-        }
-        EditRecipe(recipeIdx);
-        CloseModal("modalAddStep");
-    });
-    $("#stepEditList").on("click", ".recipeDel", function() {
-        const stepId = parseInt($(this).parent().attr("data-id"));
-        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
-        data.RemoveRecipeStep(dbData.currentScreen, recipeIdx, stepId);
-        EditRecipe(recipeIdx);
-    });
-    $("#stepEditList").on("click", ".recipeEdit", function() {
-        $("#modalAddStep > div > .modalHeader").text("Edit Step");
-        $("#btnConfirmStep").text("Save");
-        const stepId = parseInt($(this).parent().attr("data-id"));
-        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
-        const step = dbData.dbList[dbData.currentScreen].data[recipeIdx].steps[stepId];
-        ShowModal("modalAddStep", true);
-        $("#modalAddStep").attr("data-id", stepId);
-        $("#txtStep").val(step.step);
-    });
-
-    $("#recipeServingSize").on("blur", function() {
-        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
-        const recipe = dbData.dbList[dbData.currentScreen].data[recipeIdx];
-        const newServings = $(this).val();
-        if(IsValidNumberString(newServings)) {
-            recipe.servings = newServings;
-            data.Save();
-        } else {
-            $(this).val(recipe.servings);
-        }
-    });
-
     // Note List
     $("#btnAddNotes").on("click", function() { ShowInputModal("newNotes", "New Notes List", "New Notes List", "Create"); });
     $("#btnEditNote").on("click", function() {
