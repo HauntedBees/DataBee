@@ -15,15 +15,17 @@ function SetUpCookbook() {
             $("#txtModalIngredient").addClass("comeOn");
             return;
         }
-        const amt = $("#txtModalAmount").val();
-        if(amt === "") {
-            $("#txtModalAmount").addClass("comeOn");
-            return;
-        } else if(!IsValidNumberString(amt)) {
-            $("#txtModalAmount").addClass("comeOn").val("Integer, decimal, or fraction.").focus().select();
-            return;
-        }
         const unit = $("#ddlModalUnit").val();
+        const amt = $("#txtModalAmount").val();
+        if(unit !== "toTaste") {
+            if(amt === "") {
+                $("#txtModalAmount").addClass("comeOn");
+                return;
+            } else if(!IsValidNumberString(amt)) {
+                $("#txtModalAmount").addClass("comeOn").val("Integer, decimal, or fraction.").focus().select();
+                return;
+            }
+        }
         const ingredient = new Ingredient(ing, amt, unit);
 
         const ingId = $("#modalAddIngredient").attr("data-id");
@@ -133,6 +135,7 @@ function ViewRecipe(idx) {
 }
 function DrawRecipe(recipe, servingsObj) {
     $("#ingredientViewList").html(recipe.ingredience.map((e, i) => {
+        if(e.unit === "toTaste") { return `<li data-id="${i}" class="viewIngredient">${e.ingredient}, to taste</li>`; }
         const adjustedRecipe = GetServingSizeAdjustedIngredient(e, recipe.servings, servingsObj);
         const hasTilde = adjustedRecipe.amount[0] === "~";
         if(hasTilde) { adjustedRecipe.amount = adjustedRecipe.amount.substring(1); }
@@ -155,7 +158,7 @@ function EditRecipe(idx) {
     $("#recipeServingSize").val(recipe.servings);
     $("#ingredientEditList").html(recipe.ingredience.map((e, i) => `
     <li data-id="${i}" class="editIngredient">
-        <span>${e.amount}${GetUnitDisplay(e.unit, e.amount)} ${e.ingredient}</span>
+        ${e.unit === "toTaste" ? `<span>${e.ingredient}, to taste</span>` : `<span>${e.amount}${GetUnitDisplay(e.unit, e.amount)} ${e.ingredient}</span>`}
         <i class="material-icons recipeEditBtn recipeEdit">edit</i>
         <i class="material-icons recipeEditBtn recipeDel">delete</i>
     </li>`).join(""));
@@ -402,7 +405,8 @@ function GetAdjustableIngredientHTML(amount, unit, tilde, isConvertible) {
 function GetUnitDisplay(unit, amount) {
     if(unit === "") { return " "; }
     if(["ºF", "ºC"].indexOf(unit) >= 0) { return unit; }
-    if(["cup", "cupv", "cupm"].indexOf(unit) >= 0) { return amount.compare(1) === 0 ? " cup" : " cups"; }
+    console.log(amount);
+    if(["cup", "cupv", "cupm"].indexOf(unit) >= 0) { return amount === 1 ? " cup" : " cups"; }
     if(unit === "tspv" || unit === "tspm") { return "tsp"; }
     if(unit === "tbspv" || unit === "tbspm") { return "tbsp"; }
     if(unit === "ml") { return "mL"; }
