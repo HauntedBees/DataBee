@@ -350,7 +350,7 @@ const data = {
         if(elemIdx < 0 || elemIdx >= list.length) { return; }
         const elem = list[elemIdx];
         elem.date = +new Date();
-        if(name !== undefined) { elem.val = name; }
+        if(name !== undefined) { elem.val = name; elem.name = name; }
         if(checked !== undefined) { elem.checked = checked; }
         if(notes !== undefined) { elem.notes = notes; }
         data.SortDataItems(dataIdx);

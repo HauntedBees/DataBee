@@ -387,7 +387,6 @@ function GetRecipeHTML(e, i, isSearchQuery) {
         ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
         ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i>` : ``}
         <i class="edit material-icons">more_horiz</i>
-        ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
         <div class="addtlRecipeDetails">
             ${e.author ? `by ${e.author}`: ""}
             ${e.source ? `from ${
@@ -395,7 +394,8 @@ function GetRecipeHTML(e, i, isSearchQuery) {
             }`: ""}
         </div>
         <div class="addtlRecipeDetails">${e.notes.substring(0, 100) + (e.notes.length > 100 ? "..." : "")}</div>
-        </li>`;
+        ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
+    </li>`;
 }
 function GetNoteHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
@@ -480,6 +480,8 @@ function ToggleDataItemSettings($e, i, type) {
             settings.splice(3, 1); // remove NOTES
             settings.splice(1, 1); // remove RENAME
             settings.push(`<div class="btn option ci-edit"><i class="material-icons">edit</i><div>Edit</div></div>`);
+        } else if(type === "recipe") {
+            settings.splice(3, 1); // remove NOTES
         }
         if(dbData.settings.leftHanded) { settings.reverse(); }
         $e.append(`<div class="settings" data-id="${i}">${settings.join("")}</div>`);

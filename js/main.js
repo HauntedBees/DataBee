@@ -129,7 +129,7 @@ $(function() {
             case "renameItem":
                 data.UpdateChecklistItem(dbData.currentScreen, idx, val);
                 if(data.IsManualSorting()) {
-                    $(`#cbitem${idx} > span.itemContainer > span.name`).text(val);
+                    $(`#cbitem${idx} > span.itemContainer > span.name, #recipeitem${idx} > span.itemContainer > span.name`).text(val);
                 } else {
                     DrawMain();
                 }

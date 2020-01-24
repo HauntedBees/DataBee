@@ -199,7 +199,6 @@ function SetUpCookbook() {
         const newAmount = ConvertBetweenMetricAndImperial(unit, amount);
         $(this).replaceWith(GetAdjustableIngredientHTML(newAmount.amount, newAmount.unit, $(this).attr("data-tilde"), true));
     });
-    // TODO: settings
 }
 
 // Display
@@ -293,9 +292,26 @@ function RecipeClick(e, $t) {
     const targType = e.target.tagName.toLowerCase();
     const idx = parseInt($t.attr("data-id"));
     const $clicked = $(e.target);
+    console.log($clicked);
+    if(targType === "i") { // button
+        if($clicked.closest(".settings").length) { return; } // settings
+        if($clicked.hasClass("goToResult")) { // Search
+            const listIdx = $clicked.attr("data-parent");
+            SelectDatalist.call($(`#sidebarData > li[data-id='${listIdx}']`));
+            $(`#recipeitem${idx} .edit`).click();
+            document.documentElement.scrollTop = $(`#recipeitem${idx}`).offset().top - 40;
+        } else { // Edit
+            console.log("edit");
+            if($clicked.hasClass("dispTag")) { return; }
+            ToggleDataItemSettings($t, idx, "recipe");
+        }
+        return;
+    } else if($clicked.hasClass("addtlRecipeDetails")) {
+    } else if(targType !== "input" && targType !== "span" && targType !== "li") { // settings
+        console.log("settings");
+        return;
+    }
     ViewRecipe(idx);
-    // TODO: recipe click
-    console.log(e);
 }
 
 function IsValidNumberString(i) { return i.match(/^~?([0-9]+)((\.|\/|,)[0-9]+)?$/g) !== null; }
