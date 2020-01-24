@@ -556,7 +556,7 @@ const data = {
             return;
         }
         try {
-            const list = JSON.parse(str);
+            const list = JSON.parse(str.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace("javascript:","").replace("data:", ""));
             const originalName = list.name;
             let uniqueName = false, i = 0, newName = list.name;
             while(!uniqueName) {
