@@ -17,7 +17,7 @@ function SetUpCookbook() {
         }
         const unit = $("#ddlModalUnit").val();
         const amt = $("#txtModalAmount").val();
-        if(unit !== "toTaste") {
+        if(unit !== "toTaste" && unit !== "none") {
             if(amt === "") {
                 $("#txtModalAmount").addClass("comeOn");
                 return;
@@ -26,7 +26,7 @@ function SetUpCookbook() {
                 return;
             }
         }
-        const ingredient = new Ingredient(ing, amt, unit);
+        const ingredient = new Ingredient(ing, amt, unit, $("#txtIngGroup").val());
 
         const ingId = $("#modalAddIngredient").attr("data-id");
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
@@ -55,6 +55,7 @@ function SetUpCookbook() {
         $("#txtModalIngredient").val(ingredient.ingredient);
         $("#txtModalAmount").val(ingredient.amount);
         $("#ddlModalUnit").val(ingredient.unit);
+        $("#txtIngGroup").val(ingredient.group);
     });
     $(".servingSizeAdjustment").on("click", function() {
         const dir = $(this).attr("data-dir") === "1" ? 1 : -1;
@@ -130,17 +131,25 @@ function ViewRecipe(idx) {
     ctx.stateForBackButton = "recipeviewer";
     $("#bRecipeEditor").attr("data-id", idx);
     $("#currentServingSize").val(recipe.servings);
-    // TODO: author, url, notes
+    // TODO: author, url, notes, est prep time, est cook time, ready in
     DrawRecipe(recipe, StringToNumber(`${recipe.servings}`));
 }
 function DrawRecipe(recipe, servingsObj) {
+    recipe.ingredience.sort((a, b) => a.group.localeCompare(b.group));
     $("#ingredientViewList").html(recipe.ingredience.map((e, i) => {
-        if(e.unit === "toTaste") { return `<li data-id="${i}" class="viewIngredient">${e.ingredient}, to taste</li>`; }
+        const lastGroup = (i === 0 ? "" : recipe.ingredience[i - 1].group);
+        const categoryPrefix = (lastGroup !== e.group) ? `<li class="ingredientHeader">${e.group}</li>` : "";
+        if(e.unit === "toTaste") { return `${categoryPrefix}<li data-id="${i}" class="viewIngredient">${e.ingredient}, to taste</li>`; }
         const adjustedRecipe = GetServingSizeAdjustedIngredient(e, recipe.servings, servingsObj);
         const hasTilde = adjustedRecipe.amount[0] === "~";
         if(hasTilde) { adjustedRecipe.amount = adjustedRecipe.amount.substring(1); }
-        const amt = adjustedRecipe.fraction === undefined ? new Fraction(adjustedRecipe.amount) : new Fraction(adjustedRecipe.fraction.replace(/~/g, ""));
-        return `<li data-id="${i}" class="viewIngredient">
+        if(typeof adjustedRecipe.fraction === "object") { 
+            adjustedRecipe.fraction = new Fraction(adjustedRecipe.fraction);
+        } else {
+            adjustedRecipe.fraction = new Fraction(adjustedRecipe.fraction.replace("~", "") || 0);
+        }
+        const amt = adjustedRecipe.fraction === undefined ? new Fraction(adjustedRecipe.amount || 0) : adjustedRecipe.fraction;
+        return `${categoryPrefix}<li data-id="${i}" class="viewIngredient">
             ${GetAdjustableIngredientHTML(amt, adjustedRecipe.unit, hasTilde ? "~" : "", adjustedRecipe.unit !== "")} ${adjustedRecipe.ingredient}
         </li>`}).join(""));
     $("#stepViewList").html(recipe.steps.map((e, i) => `
@@ -158,7 +167,7 @@ function EditRecipe(idx) {
     $("#recipeServingSize").val(recipe.servings);
     $("#ingredientEditList").html(recipe.ingredience.map((e, i) => `
     <li data-id="${i}" class="editIngredient">
-        ${e.unit === "toTaste" ? `<span>${e.ingredient}, to taste</span>` : `<span>${e.amount}${GetUnitDisplay(e.unit, e.amount)} ${e.ingredient}</span>`}
+        ${(e.unit === "toTaste" || e.unit === "none") ? `<span>${e.ingredient}${e.unit === "toTaste" ? ", to taste" : ""}</span>` : `<span>${e.amount}${GetUnitDisplay(e.unit, e.amount)} ${e.ingredient}</span>`}
         <i class="material-icons recipeEditBtn recipeEdit">edit</i>
         <i class="material-icons recipeEditBtn recipeDel">delete</i>
     </li>`).join(""));
@@ -191,11 +200,11 @@ function StringToNumber(str) {
     }
 }
 function GetServingSizeAdjustedIngredient(ingredient, baseServingSize, newServingSizeObj) {
-    if(newServingSizeObj.fraction.equals(baseServingSize)) { return ingredient; }
+    if(newServingSizeObj.fraction.equals(baseServingSize) || ["none", "toTaste"].indexOf(ingredient.unit) >= 0) { return ingredient; }
     const oldAmt = new Fraction(ingredient.amount);
     const newAmt = oldAmt.mul(newServingSizeObj.fraction).div(baseServingSize);
     const newUnitAndAmount = AdjustUnitToNewAmount(ingredient.unit, oldAmt, newAmt);
-    const newIngredient = new Ingredient(ingredient.ingredient, newUnitAndAmount.amount, newUnitAndAmount.unit, ingredient.isLiquid);
+    const newIngredient = new Ingredient(ingredient.ingredient, newUnitAndAmount.amount, newUnitAndAmount.unit, ingredient.group);
     newIngredient.checked = ingredient.checked;
     return newIngredient;
 }
@@ -398,6 +407,8 @@ function GetAdjustableIngredientHTML(amount, unit, tilde, isConvertible) {
     let amountToShow = GetDisplayNumber(amount, showAsFraction);
     if(isConvertible) {
         return `<span class="step-unit" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
+    } else if(unit === "toTaste" || unit === "none") {
+        return "";
     } else {
         return `<span>${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
     }
@@ -405,7 +416,6 @@ function GetAdjustableIngredientHTML(amount, unit, tilde, isConvertible) {
 function GetUnitDisplay(unit, amount) {
     if(unit === "") { return " "; }
     if(["ºF", "ºC"].indexOf(unit) >= 0) { return unit; }
-    console.log(amount);
     if(["cup", "cupv", "cupm"].indexOf(unit) >= 0) { return amount === 1 ? " cup" : " cups"; }
     if(unit === "tspv" || unit === "tspm") { return "tsp"; }
     if(unit === "tbspv" || unit === "tbspm") { return "tbsp"; }

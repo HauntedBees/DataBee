@@ -399,10 +399,10 @@
                     <input id="txtModalIngredient" type="text" placeholder="Ingredient">
                     <label for="txtModalAmount">Quantity</label>
                     <input id="txtModalAmount" type="text" placeholder="2, 1.5, 3/4, 10,5, etc.">
-                    <label for="matterType">Type</label>
                     <label for="ddlModalUnit">Unit</label>
                     <select id="ddlModalUnit">
                         <option value="">Unit</option>
+                        <option value="none">None</option>
                         <option value="toTaste">to taste</option>
                         <optgroup label="Volume">
                             <option value="pinch">Pinch</option class="solid">
@@ -435,6 +435,8 @@
                             <option value="ft">Foot (ft)</option>
                         </optgroup>
                     </select>
+                    <label for="txtIngGroup">Grouping (optional)</label>
+                    <input id="txtIngGroup" type="text" placeholder="for grouping ingredients together">
                 </div>
                 <div class="modalFooter">
                     <button id="btnConfirmIngredient" class="button-primary">Add</button>

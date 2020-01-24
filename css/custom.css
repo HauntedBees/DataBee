@@ -633,12 +633,11 @@ input, option, select, textarea { color: #000000 }
 }
 .btn-small > i { vertical-align: sub }
 #recipeTopBtns { display: none }
-#ingredientViewList {
-    display: grid;
-    grid-template-columns: 50% 50%;
-    grid-auto-rows: min-content;
+.ingredientHeader {
+    font-weight: bold;
+    padding: 0 0.5em;
 }
-.viewIngredient { padding: 0 0.5em }
+.viewIngredient { padding: 0 0.5em 0 1em }
 #stepViewList { padding: 0 0.75em }
 #matterType { text-align: center }
 .step-unit {
