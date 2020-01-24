@@ -567,6 +567,11 @@ i.tc23 { color: #0099FF }
                   1px  0px 1px var(--text-color), 
                  -1px  0px 1px var(--text-color);
 }
+.hiddenTag {
+    text-shadow: none !important;
+    color: var(--text-color) !important;
+    opacity: 0.5;
+}
 .editorTagBox {
     font-size: 26px;
     width: 0.75em;

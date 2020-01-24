@@ -94,6 +94,8 @@ function GetTagEditHTML(e) {
     let tagImg = "";
     if(e.imgVal === "") {
         tagImg = `<div class='modalTagColor tc${e.color}' data-color="${e.color}"></div>`;
+    } else if(e.imgVal === "border_clear") {
+        tagImg = `<i class="material-icons hiddenTag">${e.imgVal}</i>`;
     } else {
         tagImg = `<i class="material-icons tc${e.color}">${e.imgVal}</i>`;
     }
@@ -449,6 +451,8 @@ function GetTagsHTML(allTags, myTags) {
 function GetTagHTML(tag) {
     if(tag.imgVal === "") {
         return `<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
+    } else if(tag.imgVal === "border_clear") {
+        return "";
     } else {
         return `<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
     }
@@ -515,6 +519,8 @@ function GetTogglingTagListHTML(allTags, myTags) {
         let innerHTML = "";
         if(tag.imgVal === "") {
             innerHTML = `<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
+        } else if(tag.imgVal === "border_clear") {
+            innerHTML = `<i class="material-icons dispTag hiddenTag" data-id="${tag.id}">${tag.imgVal}</i>`;
         } else {
             innerHTML = `<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
         }
