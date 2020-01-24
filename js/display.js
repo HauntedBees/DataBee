@@ -245,7 +245,8 @@ function DoSearch(searchQuery) {
     if(results.length === 0) {
         $("#searchData").html(`<li class="citem-text">No results found.</li>`);
     } else {
-        const html = results.map(e => {
+        const html = results.map(re => {
+            const e = re.elem;
             if(e.listType === "checklist") {
                 return GetCheckboxItemHTML(e, e.myIdx, true);
             } else if(e.listType === "notes") {

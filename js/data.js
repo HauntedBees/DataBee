@@ -54,6 +54,12 @@ class Recipe extends DataItem {
         this.servings = 1;
         this.ingredience = [];
         this.steps = [];
+        this.author = "";
+        this.notes = "";
+        this.source = "";
+        this.prepTime = "";
+        this.cookTime = "";
+        this.totalTime = "";
     }
 }
 class Ingredient {
@@ -410,17 +416,46 @@ const data = {
     },
     SearchDataItems: function(query) {
         const results = [];
+        const queryWords = query.split(" ");
         dbData.dbList.forEach((arr, arrIdx) => {
             arr.data.forEach((elem, elemIdx) => {
                 if(elem.val === undefined) { elem.val = elem.name; } // lazy hack for recipes
+                let rank = 0;
                 if(elem.val.toLowerCase().indexOf(query) >= 0) {
+                    isMatch = true;
+                    rank = 1000;
+                } else {
+                    for(let i = 0; i < queryWords.length; i++) {
+                        if(elem.val.toLowerCase().indexOf(queryWords[i]) >= 0) {
+                            rank += 10;
+                        }
+                    }
+                }
+                for(let i = 0; i < elem.tags.length; i++) {
+                    const tag = arr.tags[elem.tags[i]];
+                    if(tag.tag.indexOf(query) >= 0) {
+                        rank += 50;
+                    } else {
+                        for(let i = 0; i < queryWords.length; i++) {
+                            if(tag.tag.toLowerCase().indexOf(queryWords[i]) >= 0) {
+                                rank += 5;
+                            }
+                        }
+                    }
+                }
+                if(rank > 0) {
                     elem.ownerName = arr.name;
                     elem.ownerIdx = arrIdx;
                     elem.myIdx = elemIdx;
                     elem.listType = arr.type;
-                    results.push(elem);
+                    results.push({ rank: rank, elem: elem });
                 }
             });
+        });
+        results.sort((a, b) => {
+            if(a.rank > b.rank) { return -1; }
+            if(a.rank < b.rank) { return 1; }
+            return 0;
         });
         return results;
     },
