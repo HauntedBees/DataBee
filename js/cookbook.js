@@ -468,10 +468,12 @@ function ConvertBetweenMetricAndImperial(unit, amount) {
         case "m":
             return { unit: "ft", amount: amount.mul(3.281) };
         // volume
+        case "tsp":
         case "tspv":
             if(amount < 20.2884) { return {unit: "mL", amount: amount.mul(4.92892) }; }
             if(amount < 202.884) { return {unit: "dL", amount: amount.div(20.2884) }; }
             return {unit: "L", amount: amount.div(202.884) };
+        case "tbsp":
         case "tbspv":
             if(amount < 6.7628) { return {unit: "mL", amount: amount.mul(14.7868) }; }
             if(amount < 67.628) { return {unit: "dL", amount: amount.div(6.7628) }; }
@@ -480,6 +482,7 @@ function ConvertBetweenMetricAndImperial(unit, amount) {
             if(amount < 3.3814) { return {unit: "mL", amount: amount.mul(29.5735) }; }
             if(amount < 33.814) { return {unit: "dL", amount: amount.div(3.3814) }; }
             return {unit: "L", amount: amount.div(33.814) };
+        case "cup":
         case "cupv":
             if(amount < 4.22675) { return {unit: "dL", amount: amount.mul(2.36588) }; }
             return {unit: "L", amount: amount.div(4.22675) };
