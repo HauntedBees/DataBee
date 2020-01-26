@@ -449,7 +449,7 @@ function GetRecipeHTML(e, i, isSearchQuery) {
     return ReplaceCommonHTML(Sanitize`<li id="recipeitem${i}" data-id="${i}" class="cbitem ritem ui-sortable-handle${e.important ? " important" : ""}">
         <span class="itemContainer">
             {beeIMPORTANT}
-            <div class="tagGroup">{beeTAG}</div>
+            <div class="tagGroup">{beeTAGS}</div>
             <span class="name">${e.name}</span>
         </span>
         {beeHANDLE}
@@ -568,7 +568,9 @@ function ToggleDataItemSettings($e, i, type) {
             settings.splice(1, 1); // remove RENAME
             settings.push(`<div class="btn option ci-edit"><i class="material-icons">edit</i><div>Edit</div></div>`);
             if($e.hasClass("locked")) {
+                settings.push(`<div class="btn option ci-lock"><i class="material-icons">lock_open</i><div>Show Info</div></div>`);
             } else {
+                settings.push(`<div class="btn option ci-lock"><i class="material-icons">lock</i><div>Hide Info</div></div>`);
             }
         } else if(type === "recipe") {
             settings.splice(3, 1); // remove NOTES
