@@ -6,14 +6,16 @@ class DataObj {
         this.tags = {};
         this.sortType = "manual";
         this.sortDir = 1;
-        this.filterChecks = true;
         this.date = +new Date();
         this.carousel = true;
-        this.advancedView = false;
     }
 }
 class Checklist extends DataObj {
-    constructor(name) { super(name, "checklist"); }
+    constructor(name) {
+        super(name, "checklist");
+        this.filterChecks = true;
+        this.advancedView = false;
+    }
 }
 class NoteList extends DataObj {
     constructor(name) {
@@ -127,10 +129,6 @@ const data = {
             }
             if(dObj.carousel === undefined) {               // 0JAN19 to 0JAN20
                 dObj.carousel = true;
-                hasChanges = true;
-            }
-            if(dObj.advancedView === undefined) {           // 0JAN19 to 0JAN20
-                dObj.advancedView = false;
                 hasChanges = true;
             }
             const dTags = Object.keys(dObj.tags).map(key => dObj.tags[key]);
@@ -620,5 +618,54 @@ const data = {
             return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16);
         });
         return guid;
+    }
+};
+const validation = {
+    EnsureValidDatabase: function(db) {
+        return true;
+    },
+    EnsureValidList: function(list) {
+        if(typeof list.name !== "string"
+        || typeof list.type !== "string"
+        || typeof list.data !== "object"
+        || typeof list.tags !== "object"
+        || typeof list.sortDir !== "number"
+        || typeof list.sortType !== "string"
+        || typeof list.date !== "number"
+        || typeof list.carousel !== "boolean") {
+            return false;
+        }
+        switch(list.type) {
+            case "checklist":
+                if(typeof list.filterChecks !== "boolean" 
+                || typeof list.advancedView !== "boolean") { 
+                    return false;
+                }
+                break;
+            case "notes":
+                if(typeof list.displayType !== "string") { 
+                    return false;
+                }
+                break;
+            case "recipe":
+                break;
+            default: return false;
+        }
+        const validListKeys = ["name", "type", "data", "tags", "sortDir", "sortType", "date", "carousel",
+                               "filterChecks", "advancedView", "displayType", "hiddenComment"];
+        for(const key in list.keys) {
+            if(validListKeys.indexOf(key) < 0) { delete list[key]; }
+        }
+        // TODO: validating individual items, tags, etc.
+        return true;
+    },
+    EnsureValidChecklistItem: function(item) {
+        return true;
+    },
+    EnsureValidNote: function(item) {
+        return true;
+    },
+    EnsureValidRecipe: function(item) {
+        return true;
     }
 };
