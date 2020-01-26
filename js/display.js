@@ -77,7 +77,7 @@ function ShowEditTagModal(tagId) {
         document.documentElement.style.setProperty("--current-tag-color", "#FF0000");
     } else { // Existing Tag
         $("#modalTagEdit").attr("data-id", tagId);
-        const tag = dbData.dbList[dbData.currentScreen].tags[tagId];
+        const tag = CurList().tags[tagId];
         $("#modalTagEdit > div > .modalHeader").html(Sanitize`Editing <em>${tag.tag}</em>`);
         $("#txtModalTagInput").val(tag.tag);
         const $colorTag = $(Sanitize`.tagColorSelector.tc${tag.color}`);
@@ -92,7 +92,7 @@ function ShowEditTagModal(tagId) {
 }
 function ShowAdvancedAddModal() {
     $("#txtAdvName, #txtAdvNote").val("");
-    const currlist = dbData.dbList[dbData.currentScreen];
+    const currlist = CurList();
     if(Object.keys(currlist.tags).length === 0) {
         $("#advTagsLabel").hide();
         $("#advTags").empty();
@@ -107,7 +107,7 @@ function ShowTagEditor() {
     $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
     $("#bTagEditor, #backBtn").show();
     HideSidebars();
-    const currentList = dbData.dbList[dbData.currentScreen];
+    const currentList = CurList();
     $("#title").html(Sanitize`Editing Tags for <em>${currentList.name}</em>`);
     ctx.stateForBackButton = "secondary";
     const tagHTMLs = [];
@@ -141,7 +141,7 @@ function GetTagEditHTML(e) {
     </li>`;
 }
 function ShowMoveModal(elemIdx) {
-    const currentList = dbData.dbList[dbData.currentScreen];
+    const currentList = CurList();
     const currentListType = currentList.type;
     const currentItem = currentList.data[elemIdx];
     $("#modalMove > div > .modalHeader > em").text(currentItem.name);
@@ -185,7 +185,7 @@ function ShowSidebar() {
 }
 function ShowRightbar() {
     if(dbData.currentScreen < 0) { return; }
-    switch(dbData.dbList[dbData.currentScreen].type) {
+    switch(CurList().type) {
         case "checklist":
             $(".note-only, .recipe-only").hide();
             $(".checklist-only").show();
@@ -296,7 +296,7 @@ function DoSearch(searchQuery) {
 }
 function ShowNoteEditor(idx, readView) {
     const isNew = idx < 0;
-    const elem = isNew ? {} : dbData.dbList[dbData.currentScreen].data[idx];
+    const elem = isNew ? {} : CurList().data[idx];
     const title = elem.title || "";
     const body = elem.body || "";
     $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
@@ -371,7 +371,7 @@ function DrawMain() {
     $(".body").hide();
     $("#bChecklist").show();
     $("#content").addClass("listView");
-    const datalist = dbData.dbList[dbData.currentScreen];
+    const datalist = CurList();
     $("#listData").empty().attr("data-type", datalist.type).removeClass("tileView");
     $("#title").text(datalist.name);
     if(datalist.type === "checklist") {
@@ -539,7 +539,7 @@ function SetSettingsTagSelectionHTML($tagButton, $settingsPanel, allTags, myTags
     if($tagButton.hasClass("active")) {
         $tagButton.removeClass("active");
         $settingsPanel.parent().find(".tagList").remove();
-        if(dbData.dbList[dbData.currentScreen].sortType === "tag") {
+        if(CurList().sortType === "tag") {
             data.SortDataItems(dbData.currentScreen);
             DrawMain();
         }
@@ -574,7 +574,7 @@ function GetTogglingTagListHTML(allTags, myTags) {
 function AddSortOrderImg($li, sortOrder) {
     $("#sortDirIcon").remove();
     if(sortOrder === "manual") { return; }
-    $li.append(`<i id="sortDirIcon" class="material-icons">keyboard_arrow_${dbData.dbList[dbData.currentScreen].sortDir > 0 ? "up" : "down"}</i>`);
+    $li.append(`<i id="sortDirIcon" class="material-icons">keyboard_arrow_${CurList().sortDir > 0 ? "up" : "down"}</i>`);
 }
 function FormatDate(dateNumber) {
     const d = new Date(dateNumber);

@@ -49,7 +49,7 @@ function SetUpCookbook() {
         $("#btnConfirmIngredient").text("Save");
         const ingId = parseInt($(this).parent().attr("data-id"));
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
-        const ingredient = dbData.dbList[dbData.currentScreen].data[recipeIdx].ingredience[ingId];
+        const ingredient = CurList().data[recipeIdx].ingredience[ingId];
         ShowModal("modalAddIngredient", true);
         $("#modalAddIngredient").attr("data-id", ingId);
         $("#txtModalIngredient").val(ingredient.ingredient);
@@ -61,7 +61,7 @@ function SetUpCookbook() {
         const dir = $(this).attr("data-dir") === "1" ? 1 : -1;
         const currentVal = $("#currentServingSize").val();
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
-        const recipe = dbData.dbList[dbData.currentScreen].data[recipeIdx];
+        const recipe = CurList().data[recipeIdx];
         if(!IsValidNumberString(currentVal)) {
             $("#currentServingSize").addClass("comeOn");
             $("#currentServingSize").val(recipe.servings);
@@ -97,7 +97,7 @@ function SetUpCookbook() {
             actualValue = StringToNumber("0");
         }
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
-        const recipe = dbData.dbList[dbData.currentScreen].data[recipeIdx];
+        const recipe = CurList().data[recipeIdx];
         if(actualValue.fraction.compare(0) > 0) {
             CalibrateIngredientAmounts(recipe, actualValue);
         } else {
@@ -167,7 +167,7 @@ function SetUpCookbook() {
         $("#btnConfirmStep").text("Save");
         const stepId = parseInt($(this).parent().attr("data-id"));
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
-        const step = dbData.dbList[dbData.currentScreen].data[recipeIdx].steps[stepId];
+        const step = CurList().data[recipeIdx].steps[stepId];
         ShowModal("modalAddStep", true);
         $("#modalAddStep").attr("data-id", stepId);
         $("#txtStep").val(step.step);
@@ -175,7 +175,7 @@ function SetUpCookbook() {
 
     $("#recipeServingSize").on("blur", function() {
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
-        const recipe = dbData.dbList[dbData.currentScreen].data[recipeIdx];
+        const recipe = CurList().data[recipeIdx];
         const newServings = $(this).val();
         if(IsValidNumberString(newServings)) {
             recipe.servings = newServings;
@@ -186,7 +186,7 @@ function SetUpCookbook() {
     });
     $(".rMetadata").on("blur", function() {
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
-        const recipe = dbData.dbList[dbData.currentScreen].data[recipeIdx];
+        const recipe = CurList().data[recipeIdx];
         const value = $(this).val();
         const type = $(this).attr("data-val");
         recipe[type] = value;
@@ -203,7 +203,7 @@ function SetUpCookbook() {
 
 // Display
 function ViewRecipe(idx) {
-    const recipe = dbData.dbList[dbData.currentScreen].data[idx];
+    const recipe = CurList().data[idx];
     $(".body, #menuBtn, #menuRight, #recipeEdit").hide();
     $("#bRecipeEditor, #backBtn, #recipeRead, #recipeTopBtns").show();
     $("#title").text(recipe.name);
@@ -262,7 +262,7 @@ function DrawRecipe(recipe, servingsObj) {
     </li>`).join(""));
 }
 function EditRecipe(idx) {
-    const recipe = dbData.dbList[dbData.currentScreen].data[idx];
+    const recipe = CurList().data[idx];
     $(".body, #menuBtn, #menuRight, #recipeRead, #recipeTopBtns").hide();
     $("#bRecipeEditor, #backBtn, #recipeEdit").show();
     $("#title").text(recipe.name);

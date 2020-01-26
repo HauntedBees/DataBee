@@ -99,10 +99,10 @@ $(function() {
     // Rightbar
     $("#menuRight").on("click", ShowRightbar);
     $("#renameChecklist").on("click", function() {
-        ShowInputModal("renameChecklist", Sanitize`Rename <em>${dbData.dbList[dbData.currentScreen].name}</em>.`, "New List Name", "Rename");
+        ShowInputModal("renameChecklist", Sanitize`Rename <em>${CurList().name}</em>.`, "New List Name", "Rename");
     });
     $("#deleteChecklist").on("click", function() {
-        ShowInfoModal("deleteChecklist", Sanitize`Delete <em>${dbData.dbList[dbData.currentScreen].name}</em>.`, Sanitize`Are you sure you want to delete the <em>${dbData.dbList[dbData.currentScreen].name}</em> list and all of its items? This cannot be undone.`, "Delete");
+        ShowInfoModal("deleteChecklist", Sanitize`Delete <em>${CurList().name}</em>.`, Sanitize`Are you sure you want to delete the <em>${CurList().name}</em> list and all of its items? This cannot be undone.`, "Delete");
     });
     $("#btnConfirmModalInput").on("click", function() {
         const $txtBox = $("#txtModalInput");
@@ -185,7 +185,7 @@ $(function() {
                 const newRecipe = new Recipe(val);
                 data.AddDataItem(dbData.currentScreen, newRecipe);
                 CloseModal("modalInput");
-                EditRecipe(dbData.dbList[dbData.currentScreen].data.length - 1);
+                EditRecipe(CurList().data.length - 1);
                 return;
         }
         CloseModal("modalInput");
@@ -237,7 +237,7 @@ $(function() {
         if($subList.hasClass("active")) {
             $subList.hide().removeClass("active");
         } else {
-            const mySort = dbData.dbList[dbData.currentScreen].sortType;
+            const mySort = CurList().sortType;
             $("li", $subList).removeClass("active");
             const $child = $(Sanitize`#sort${mySort}`);
             $child.addClass("active");
@@ -246,7 +246,7 @@ $(function() {
         }
     });
     $("#sortTypes > li").on("click", function() {
-        const currData = dbData.dbList[dbData.currentScreen];
+        const currData = CurList();
         const oldSort = currData.sortType;
         const newSort = $(this).attr("data-type");
         if(oldSort === newSort) {
@@ -268,7 +268,7 @@ $(function() {
         if($subList.hasClass("active")) {
             $subList.hide().removeClass("active");
         } else {
-            const doFilterChecks = dbData.dbList[dbData.currentScreen].filterChecks;
+            const doFilterChecks = CurList().filterChecks;
             $("li", $subList).removeClass("active");
             if(doFilterChecks) {
                 $("#checkedDown").addClass("active");
@@ -280,26 +280,26 @@ $(function() {
     });
     $("#filterTypes > li").on("click", function() {
         const doFilterChecks = $(this).attr("data-val") === "true";
-        if(dbData.dbList[dbData.currentScreen].filterChecks === doFilterChecks) { return; }
+        if(CurList().filterChecks === doFilterChecks) { return; }
         $("#filterTypes > li").removeClass("active");
         if(doFilterChecks) {
             $("#checkedDown").addClass("active");
         } else {
             $("#checkedFine").addClass("active");
         }
-        dbData.dbList[dbData.currentScreen].filterChecks = doFilterChecks;
+        CurList().filterChecks = doFilterChecks;
         data.SortDataItems(dbData.currentScreen);
         DrawMain();
         data.Save();
     });
     $("#checkAll").on("click", function() {
-        dbData.dbList[dbData.currentScreen].data.forEach(e => { e.checked = true });
+        CurList().data.forEach(e => { e.checked = true });
         data.SortDataItems(dbData.currentScreen);
         data.Save(DrawMain);
         HideSidebars();
     });
     $("#uncheckAll").on("click", function() {
-        dbData.dbList[dbData.currentScreen].data.forEach(e => { e.checked = false });
+        CurList().data.forEach(e => { e.checked = false });
         data.SortDataItems(dbData.currentScreen);
         data.Save(DrawMain);
         HideSidebars();
@@ -309,7 +309,7 @@ $(function() {
         if($subList.hasClass("active")) {
             $subList.hide().removeClass("active");
         } else {
-            const valueToCheck = dbData.dbList[dbData.currentScreen][$(this).attr("data-val")];
+            const valueToCheck = CurList()[$(this).attr("data-val")];
             $("li", $subList).removeClass("active");
             $(Sanitize`li[data-val="${valueToCheck}"]`).addClass("active");
             $subList.show().addClass("active");
@@ -321,12 +321,12 @@ $(function() {
         $toggler.find("li").removeClass("active");
         $toggler.find(Sanitize`li[data-val="${newVal}"]`).addClass("active");
         const key = $toggler.attr("data-val");
-        dbData.dbList[dbData.currentScreen][key] = newVal;
+        CurList()[key] = newVal;
         DrawMain();
         data.Save();
     });
     $("#shareChecklist").on("click", function() {
-        const thisList = dbData.dbList[dbData.currentScreen];
+        const thisList = CurList();
         const b = new Blob([JSON.stringify(thisList, null, 2)], { type: "application/json" });
         if(typeof cordova !== "undefined") {
             window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory + "Download", function(entry) {
@@ -379,10 +379,10 @@ $(function() {
         const imgText = $("#tagColorList").attr("data-selectedImg");
         const tagId = $("#modalTagEdit").attr("data-id");
         if(tagId === "") {
-            const tag = new Tag(tagText, colorIdx, imgText, Object.keys(dbData.dbList[dbData.currentScreen].tags).length);
+            const tag = new Tag(tagText, colorIdx, imgText, Object.keys(CurList().tags).length);
             data.SaveTag(dbData.currentScreen, tag);
         } else {
-            const tag = dbData.dbList[dbData.currentScreen].tags[tagId];
+            const tag = CurList().tags[tagId];
             tag.tag = tagText;
             tag.color = colorIdx;
             tag.imgVal = imgText;
@@ -457,7 +457,7 @@ $(function() {
         if(e.keyCode === 13) { $("#btnConfirmModalInput").click(); }
     });
     $("#btnAddItemModal").on("click", function() {
-        const currentList = dbData.dbList[dbData.currentScreen];
+        const currentList = CurList();
         if(currentList.type === "checklist") {
             if(currentList.advancedView) {
                 ShowAdvancedAddModal();
@@ -554,16 +554,16 @@ $(function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.ToggleDataItemImportance(dbData.currentScreen, idx);
         DrawMain();
-        $(this).closest("li").replaceWith(GetCheckboxItemHTML(dbData.dbList[dbData.currentScreen].data[idx], idx));
+        $(this).closest("li").replaceWith(GetCheckboxItemHTML(CurList().data[idx], idx));
         ctx.stateForBackButton = "home";
     });
     $("#listData").on("click", ".ci-tags", function(e) {
         e.stopPropagation();
         const $parent = $(this).closest(".settings");
-        const allTagsObj = dbData.dbList[dbData.currentScreen].tags;
+        const allTagsObj = CurList().tags;
         const allTags = Object.keys(allTagsObj).map(key => allTagsObj[key]);
         const idx = parseInt($parent.attr("data-id"));
-        const myTags = dbData.dbList[dbData.currentScreen].data[idx].tags;
+        const myTags = CurList().data[idx].tags;
         SetSettingsTagSelectionHTML($(this), $parent, allTags, myTags);
     });
     $(document).on("click", ".tagList > .tag", function(e) {
@@ -575,8 +575,8 @@ $(function() {
         if($(this).hasClass("active")) {
             $(Sanitize`[data-id="${tagId}"]`, $parent.find(".tagGroup")).remove();
         } else {
-            const allTags = dbData.dbList[dbData.currentScreen].tags;
-            $parent.find(".tagGroup").html(GetTagsHTML(allTags, dbData.dbList[dbData.currentScreen].data[elemIdx].tags));
+            const allTags = CurList().tags;
+            $parent.find(".tagGroup").html(GetTagsHTML(allTags, CurList().data[elemIdx].tags));
         }
         $(this).toggleClass("active");
     });
@@ -729,3 +729,4 @@ function TouchMove(e) {
 function TouchRelease() {
     potentialSwitch = false;
 }
+function CurList() { return dbData.dbList[dbData.currentScreen]; }

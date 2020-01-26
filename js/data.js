@@ -232,7 +232,7 @@ const data = {
         if(dontSave !== true) { data.Save(DrawSidebar); }
     },
     SwapDatas: function(oldIdx, newIdx, dontSave) {
-        const currentName = dbData.dbList[dbData.currentScreen].name;
+        const currentName = CurList().name;
         const elem = dbData.dbList[oldIdx];
         dbData.dbList.splice(oldIdx, 1);
         dbData.dbList.splice(newIdx, 0, elem);
