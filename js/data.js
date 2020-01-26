@@ -416,6 +416,18 @@ const data = {
         recipe.steps[stepIdx] = step;
         if(dontSave !== true) { data.Save(); }
     },
+    ToggleRecipeStepCheck: function(dataIdx, recipeIdx, stepIdx, dontSave) {
+        const list = dbData.dbList[dataIdx];
+        const recipe = list.data[recipeIdx];
+        recipe.steps[stepIdx].checked = !recipe.steps[stepIdx].checked;
+        if(dontSave !== true) { data.Save(); }
+    },
+    ClearRecipeStepChecks: function(dataIdx, recipeIdx, dontSave) {
+        const list = dbData.dbList[dataIdx];
+        const recipe = list.data[recipeIdx];
+        recipe.steps.forEach(e => e.checked = false);
+        if(dontSave !== true) { data.Save(); }
+    },
     RemoveRecipeStep: function(dataIdx, recipeIdx, stepIdx, dontSave) {
         const list = dbData.dbList[dataIdx];
         const recipe = list.data[recipeIdx];

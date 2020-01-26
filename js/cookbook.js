@@ -110,6 +110,12 @@ function SetUpCookbook() {
         const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
         EditRecipe(recipeIdx);
     });
+    $("#recipeViewClear").on("click", function() {
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        data.ClearRecipeStepChecks(dbData.currentScreen, recipeIdx);
+        $(".viewStep").removeClass("checked");
+        $(".recipeStep").prop("checked", "");
+    });
 
     $("#btnRecipeFull").on("click", function() {
         $("#recipeHeader > div").removeClass("active");
@@ -193,6 +199,15 @@ function SetUpCookbook() {
         data.Save();
     });
 
+    $("#stepViewList").on("click", ".recipeStep", function() {
+        const $parent = $(this).closest("li");
+        const listItemIdx = parseInt($parent.attr("data-id"));
+        data.ToggleRecipeStepCheck(dbData.currentScreen, 
+                                    parseInt($("#bRecipeEditor").attr("data-id")),
+                                    listItemIdx);
+        $parent.toggleClass("checked");
+    });
+    
     $(document).on("click", ".step-unit", function() {
         const unit = $(this).attr("data-unit");
         const amount = new Fraction($(this).attr("data-amount"));
@@ -263,8 +278,8 @@ function DrawRecipe(recipe, servingsObj) {
             ${GetAdjustableIngredientHTML(amt, adjustedRecipe.unit, hasTilde ? "~" : "", adjustedRecipe.unit !== "")} ${adjustedRecipe.ingredient}
         </li>`}).join(""));
     $("#stepViewList").html(recipe.steps.map((e, i) => SanitizeException(2)`
-    <li data-id="${i}" class="viewStep">
-        <span>${i + 1}. ${AdjustStep(e.step, recipe.servings, servingsObj)}</span>
+    <li data-id="${i}" class="viewStep ${e.checked?"checked":""}">
+        <span><input class="recipeStep checkbox" ${e.checked?"checked=checked":""} type="checkbox"> ${i + 1}. ${AdjustStep(e.step, recipe.servings, servingsObj)}</span>
     </li>`).join(""));
 }
 function EditRecipe(idx) {

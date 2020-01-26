@@ -709,3 +709,6 @@ input, option, select, textarea { color: #000000 }
     overflow-x: hidden;
     white-space: nowrap;
 }
+.viewStep.checked {
+    text-decoration: line-through;
+}
