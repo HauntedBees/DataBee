@@ -49,6 +49,8 @@ $(function() {
             const newIdx = $("#sidebarData > li").index($me[0]);
             data.SwapDatas(oldIdx, newIdx);
             DrawSidebar();
+            SetScroller("prevScroller", dbData.currentScreen, -1);
+            SetScroller("nextScroller", dbData.currentScreen, 1);
         }
     });
     $("#btnExport").on("click", function() {
