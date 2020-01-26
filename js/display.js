@@ -577,6 +577,7 @@ function ToggleDataItemSettings($e, i, type) {
             settings[1] = settings[1].replace("<div>Edit</div>", "<div>Rename</div>");
         }
         if(dbData.settings.leftHanded) { settings.reverse(); }
+        $(".elem > .settings").remove();
         $e.append(`<div class="settings" data-id="${i}">${settings.join("")}</div>`);
     }
 }
