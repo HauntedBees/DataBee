@@ -613,7 +613,12 @@ $(function() {
         } else {
             const cookbook = CurList();
             cookbook.groceryListIdx = listIdx;
-            $("#groceryListName").text(dbData.dbList[listIdx].name);
+            data.Save();
+            if(listIdx < 0) {
+                $("#groceryListName").text("None");
+            } else {
+                $("#groceryListName").text(dbData.dbList[listIdx].name);
+            }
             CloseModal("modalMove");
         }
     });

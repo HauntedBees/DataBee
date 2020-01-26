@@ -24,7 +24,10 @@ class NoteList extends DataObj {
     }
 }
 class Cookbook extends DataObj {
-    constructor(name) { super(name, "recipe"); }
+    constructor(name) {
+        super(name, "recipe");
+        this.groceryListIdx = -1;
+    }
 }
 class DataItem {
     constructor() {
@@ -63,7 +66,6 @@ class Recipe extends DataItem {
         this.prepTime = "";
         this.cookTime = "";
         this.totalTime = "";
-        this.groceryListIdx = 0;
     }
 }
 class Ingredient {

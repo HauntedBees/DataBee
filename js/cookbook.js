@@ -284,7 +284,7 @@ function ViewRecipe(idx) {
 }
 function DrawRecipe(recipe, servingsObj) {
     const groceryListIdx = parseInt(CurList().groceryListIdx);
-    const groceryListHTML = isNaN(groceryListIdx) ? "" : `<i data-grocery="${groceryListIdx}" class="material-icons addToCart">shopping_cart</i>`;
+    const groceryListHTML = (isNaN(groceryListIdx) || groceryListIdx < 0) ? "" : `<i data-grocery="${groceryListIdx}" class="material-icons addToCart">shopping_cart</i>`;
     recipe.ingredience.sort((a, b) => a.group.localeCompare(b.group));
     $("#ingredientViewList").html(recipe.ingredience.map((e, i) => {
         const lastGroup = (i === 0 ? "" : recipe.ingredience[i - 1].group);

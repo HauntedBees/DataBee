@@ -169,6 +169,7 @@ function ShowGrocerySelectModal() {
                               .map((e, i) => [i, e.type, Sanitize`<li data-id="${i}">${e.name}</li>`])
                               .filter(e => e[1] === "checklist")
                               .map(e => e[2]);
+    html.unshift(`<li data-id="-1"><em>None</em></li>`);
     $("#moveChecklists").html(html.join(""));
     ShowModal("modalMove");
 }
@@ -217,7 +218,7 @@ function ShowRightbar() {
             $(".checklist-only, .note-only").hide();
             $(".recipe-only").show();
             const gIdx = parseInt(CurList().groceryListIdx);
-            if(!isNaN(gIdx)) {
+            if(!isNaN(gIdx) && gIdx >= 0) {
                 const groceryList = dbData.dbList[gIdx];
                 $("#groceryListName").text(groceryList.name);
             } else {
