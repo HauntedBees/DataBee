@@ -231,7 +231,7 @@ function ViewRecipe(idx) {
         $("#recipeBy").hide();
     }
     if(recipe.notes) {
-        $("#recipeNotes").text(recipe.notes).show();
+        $("#recipeNotes").html(Sanitize`<strong>Notes:</strong> ${recipe.notes}`).show();
     } else {
         $("#recipeNotes").hide();
     }
