@@ -712,3 +712,13 @@ input, option, select, textarea { color: #000000 }
 .viewStep.checked {
     text-decoration: line-through;
 }
+.groceryDetails {
+    font-size: 0.75em;
+    margin-left: 1em;
+}
+#groceryInfo { font-size: 0.75em; margin-bottom: 0.25em }
+.addToCart {
+    float: right;
+    margin-right: 0.25em;
+}
+.addToCart.alreadyAdded { color: var(--secondary-border-color) }

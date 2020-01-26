@@ -208,6 +208,29 @@ function SetUpCookbook() {
         $parent.toggleClass("checked");
     });
     
+    $("#manageGroceryList").on("click", function() { ShowGrocerySelectModal(); });
+    $("#ingredientViewList").on("click", ".addToCart", function() {
+        if($(this).hasClass("alreadyAdded")) { return; }
+        const myGroceryList = parseInt($(this).attr("data-grocery"));
+        if(isNaN(myGroceryList)) { return; }
+
+        const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+        if(isNaN(recipeIdx)) { return; }
+        const recipe = CurList().data[recipeIdx];
+        
+        const $listItem = $(this).parent();
+        const ingredientIdx = parseInt($listItem.attr("data-id"));
+        if(isNaN(ingredientIdx)) { return; }
+        const ingredient = recipe.ingredience[ingredientIdx];
+
+        const item = new ChecklistItem(ingredient.ingredient);
+        const unitInfo = $listItem.find(".unitInfo").text();
+        item.notes = unitInfo;
+
+        data.AddDataItem(myGroceryList, item);
+        $(this).addClass("alreadyAdded");
+    });
+
     $(document).on("click", ".step-unit", function() {
         const unit = $(this).attr("data-unit");
         const amount = new Fraction($(this).attr("data-amount"));
@@ -260,11 +283,13 @@ function ViewRecipe(idx) {
     DrawRecipe(recipe, StringToNumber(`${recipe.servings}`));
 }
 function DrawRecipe(recipe, servingsObj) {
+    const groceryListIdx = parseInt(CurList().groceryListIdx);
+    const groceryListHTML = isNaN(groceryListIdx) ? "" : `<i data-grocery="${groceryListIdx}" class="material-icons addToCart">shopping_cart</i>`;
     recipe.ingredience.sort((a, b) => a.group.localeCompare(b.group));
     $("#ingredientViewList").html(recipe.ingredience.map((e, i) => {
         const lastGroup = (i === 0 ? "" : recipe.ingredience[i - 1].group);
         const categoryPrefix = (lastGroup !== e.group) ? Sanitize`<li class="ingredientHeader">${e.group}</li>` : "";
-        if(e.unit === "toTaste") { return SanitizeException(0)`${categoryPrefix}<li data-id="${i}" class="viewIngredient">${e.ingredient}, to taste</li>`; }
+        if(e.unit === "toTaste") { return SanitizeException(0, 3)`${categoryPrefix}<li data-id="${i}" class="viewIngredient">${e.ingredient}, to taste ${groceryListHTML}</li>`; }
         const adjustedRecipe = GetServingSizeAdjustedIngredient(e, recipe.servings, servingsObj);
         const hasTilde = adjustedRecipe.amount[0] === "~";
         if(hasTilde) { adjustedRecipe.amount = adjustedRecipe.amount.substring(1); }
@@ -274,8 +299,9 @@ function DrawRecipe(recipe, servingsObj) {
             adjustedRecipe.fraction = new Fraction(adjustedRecipe.fraction.replace("~", "") || 0);
         }
         const amt = adjustedRecipe.fraction === undefined ? new Fraction(adjustedRecipe.amount || 0) : adjustedRecipe.fraction;
-        return SanitizeException(0, 2)`${categoryPrefix}<li data-id="${i}" class="viewIngredient">
+        return SanitizeException(0, 2, 4)`${categoryPrefix}<li data-id="${i}" class="viewIngredient">
             ${GetAdjustableIngredientHTML(amt, adjustedRecipe.unit, hasTilde ? "~" : "", adjustedRecipe.unit !== "")} ${adjustedRecipe.ingredient}
+            ${groceryListHTML}
         </li>`}).join(""));
     $("#stepViewList").html(recipe.steps.map((e, i) => SanitizeException(2)`
     <li data-id="${i}" class="viewStep ${e.checked?"checked":""}">
@@ -556,11 +582,11 @@ function GetAdjustableIngredientHTML(amount, unit, tilde, isConvertible) {
     const amountToStore = showAsFraction ? amount.toFraction() : amount.toString();
     let amountToShow = GetDisplayNumber(amount, showAsFraction);
     if(isConvertible) {
-        return SanitizeException(4)`<span class="step-unit" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
+        return SanitizeException(4)`<span class="unitInfo step-unit" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
     } else if(unit === "toTaste" || unit === "none") {
         return "";
     } else {
-        return SanitizeException(1)`<span>${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
+        return SanitizeException(1)`<span class="unitInfo">${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
     }
 }
 function GetUnitDisplay(unit, amount) {

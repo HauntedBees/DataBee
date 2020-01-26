@@ -602,12 +602,20 @@ $(function() {
         e.stopPropagation();
         ShowNoteEditor(parseInt($(this).closest(".settings").attr("data-id")), false);
     });
-    $(document).on("click", "#moveChecklists > li", function() {
+    $("#moveChecklists").on("click", "li", function() {
         const listIdx = parseInt($(this).attr("data-id"));
-        const elemIdx = parseInt($("#modalMove").attr("data-id"));
-        data.MoveDataItem(dbData.currentScreen, listIdx, elemIdx);
-        DrawMain();
-        CloseModal("modalMove");
+        const moveType = $("#modalMove").attr("data-type");
+        if(moveType === "move") {
+            const elemIdx = parseInt($("#modalMove").attr("data-id"));
+            data.MoveDataItem(dbData.currentScreen, listIdx, elemIdx);
+            DrawMain();
+            CloseModal("modalMove");
+        } else {
+            const cookbook = CurList();
+            cookbook.groceryListIdx = listIdx;
+            $("#groceryListName").text(dbData.dbList[listIdx].name);
+            CloseModal("modalMove");
+        }
     });
 
     // Swipe Handlers

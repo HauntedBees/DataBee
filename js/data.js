@@ -63,6 +63,7 @@ class Recipe extends DataItem {
         this.prepTime = "";
         this.cookTime = "";
         this.totalTime = "";
+        this.groceryListIdx = 0;
     }
 }
 class Ingredient {
@@ -231,16 +232,26 @@ const data = {
         if(dontSave !== true) { data.Save(DrawSidebar); }
     },
     SwapDatas: function(oldIdx, newIdx, dontSave) {
+        const cookbookGroceryInfo = dbData.dbList.map((e, i) => 
+                                                    e.type === "recipe"
+                                                        ? [i, isNaN(e.groceryListIdx)
+                                                            ? undefined
+                                                            : dbData.dbList[e.groceryListIdx].name]
+                                                        : [i, undefined])
+                                                .filter(e => e[1] !== undefined);
         const currentName = CurList().name;
         const elem = dbData.dbList[oldIdx];
         dbData.dbList.splice(oldIdx, 1);
         dbData.dbList.splice(newIdx, 0, elem);
         for(let i = 0; i < dbData.dbList.length; i++) {
-            const elem = dbData.dbList[i];
-            if(elem.name === currentName) {
+            const list = dbData.dbList[i];
+            if(list.name === currentName) {
                 dbData.currentScreen = i;
-                break;
             }
+            const affectedCookbooks = cookbookGroceryInfo.filter(e => e[1] === list.name);
+            affectedCookbooks.forEach(e => {
+                dbData.dbList[e[0]].groceryListIdx = i;
+            });
         }
         if(dontSave !== true) { data.Save(); }
     },

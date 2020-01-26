@@ -62,6 +62,11 @@
             </ul>
             <h4>List Settings</h4>
             <ul>
+                <li id="manageGroceryList" class="recipe-only">
+                    <i class="material-icons">arrow_forward</i>
+                    <span class="by-icon">Grocery List</span><i class="sideMore material-icons">more_horiz</i>
+                    <div class="groceryDetails"><strong>Current List:</strong> <span id="groceryListName">None</span></div>
+                </li>
                 <li id="manageTags"><i class="material-icons">label</i><span class="by-icon">Tags</span><i class="sideMore material-icons">more_horiz</i></li>
                 <li>
                     <span id="sortChecklist"><i class="material-icons">sort</i><span class="by-icon">Sort Order</span><i class="sideMore material-icons">more_horiz</i></span>
@@ -402,7 +407,12 @@
         <div id="modalMove" class="modal">
             <div>
                 <div class="modalHeader">Move <em>Item</em> to...</div>
-                <div class="modalContent"><ul id="moveChecklists"></ul></div>
+                <div class="modalContent">
+                    <div id="groceryInfo">Here you can designate a checklist to be your Grocery List for this Cookbook. If a Grocery List is selected, 
+                        you'll be able to tap the <i class="material-icons addToCart">shopping_cart</i> icon next to ingredients to move them to that list. If you 
+                        use one of your checklists as a grocery list, this is a good way to prepare for cooking a new dish!</div>
+                    <ul id="moveChecklists"></ul>
+                </div>
                 <div class="modalFooter">
                     <button class="btnCancel">Cancel</button>
                 </div>

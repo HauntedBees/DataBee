@@ -149,11 +149,25 @@ function ShowMoveModal(elemIdx) {
     const currentList = CurList();
     const currentListType = currentList.type;
     const currentItem = currentList.data[elemIdx];
-    $("#modalMove > div > .modalHeader > em").text(currentItem.name);
+    $("#modalMove > div > .modalHeader").html(Sanitize`Move <em>${currentItem.val}</em> to...`);
     $("#modalMove").attr("data-id", elemIdx);
+    $("#modalMove").attr("data-type", "move");
+    $("#groceryInfo").hide();
     const html = dbData.dbList
                               .map((e, i) => [i, e.type, Sanitize`<li data-id="${i}">${e.name}</li>`])
                               .filter(e => e[1] === currentListType && e[0] !== dbData.currentScreen)
+                              .map(e => e[2]);
+    $("#moveChecklists").html(html.join(""));
+    ShowModal("modalMove");
+}
+function ShowGrocerySelectModal() {
+    $("#modalMove > div > .modalHeader").html("Designate a Grocery List.");
+    $("#modalMove").attr("data-id", "0");
+    $("#modalMove").attr("data-type", "grocery");
+    $("#groceryInfo").show();
+    const html = dbData.dbList
+                              .map((e, i) => [i, e.type, Sanitize`<li data-id="${i}">${e.name}</li>`])
+                              .filter(e => e[1] === "checklist")
                               .map(e => e[2]);
     $("#moveChecklists").html(html.join(""));
     ShowModal("modalMove");
@@ -202,6 +216,13 @@ function ShowRightbar() {
         case "recipe":
             $(".checklist-only, .note-only").hide();
             $(".recipe-only").show();
+            const gIdx = parseInt(CurList().groceryListIdx);
+            if(!isNaN(gIdx)) {
+                const groceryList = dbData.dbList[gIdx];
+                $("#groceryListName").text(groceryList.name);
+            } else {
+                $("#groceryListName").text("None");
+            }
             break;
     }
     $(".settingToggled").hide();
