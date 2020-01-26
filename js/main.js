@@ -621,6 +621,10 @@ function NoteClick(e, $t) {
     const $clicked = $(e.target);
     if($clicked.hasClass("tag")) { return; }
     if(targType === "i") { // button
+        if($clicked.hasClass("lockedIcon")) {
+            ShowNoteEditor(idx, true);
+            return;
+        }
         if($clicked.closest(".settings").length) { return; } // settings
         if($clicked.hasClass("goToResult")) { // Search
             const listIdx = $clicked.attr("data-parent");

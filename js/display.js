@@ -478,14 +478,15 @@ function GetNoteHTML(e, i, isSearchQuery) {
             <div class="note_title">
                 {beeIMPORTANT}
                 <div class="tagGroup">{beeTAGS}</div>
+                {beeTITLE}
                 {beeHANDLE}
                 {beeSQ}
                 <i class="edit material-icons">more_horiz</i>
             </div>
-            <div class="lock"><i class="material-icons">lock</i></div>
+            <div class="lock"><i class="material-icons lockedIcon">lock</i></div>
             <div class="citem_cname">${FormatDate(e.date)}</div>
             {beeSOWNER}
-        </li>`, e, showHandle, isSearchQuery, tagsHTML);
+        </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeTITLE}", title.replace(/(?<=\b[^\s]+)[^\s]/g, "*"));
     } else {
         return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="note elem ui-sortable-handle${e.important ? " important" : ""}">
             <div class="note_title">
