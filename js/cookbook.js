@@ -221,6 +221,12 @@ function ViewRecipe(idx) {
         } else {
             $("#recipeBy").html(Sanitize`Recipe by: ${recipe.author}`);
         }
+    } else if(recipe.source) {
+        if(recipe.source.indexOf("http") === 0) {
+            $("#recipeBy").html(Sanitize`Recipe from: <a href="${recipe.source}">${recipe.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>`);
+        } else {
+            $("#recipeBy").html(Sanitize`Recipe from: ${recipe.source}`);
+        }
     } else {
         $("#recipeBy").hide();
     }
