@@ -473,7 +473,7 @@ function GetCheckboxItemHTML(e, i, isSearchQuery) {
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = GetTagsHTML(allTags, e.tags);
-    return ReplaceCommonHTML(Sanitize`<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
+    return ReplaceCommonHTML(Sanitize`<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important && e.checked === false ? " important" : ""}">
         <input class="checkbox" type="checkbox"${e.checked ? " checked" : ""}>
         <span class="itemContainer">
             {beeIMPORTANT}
