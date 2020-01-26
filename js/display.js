@@ -449,10 +449,11 @@ function GetRecipeHTML(e, i, isSearchQuery) {
 function GetNoteHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
+    const isTileView =$("#listData").hasClass("tileView");
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = GetTagsHTML(allTags, e.tags);
     const title = e.title === "" ? e.body.substring(0, 30) + (e.body.length > 30 ? "..." : "") : e.title;
-    const body = e.title === "" ? "" : (e.body.length < 100 ? e.body : e.body.substring(0, 100) + "...");
+    const body = e.title === "" ? "" : (e.body.length < 100 || isTileView ? e.body : e.body.substring(0, 100) + "...");
     return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
         <div class="note_title">
             {beeIMPORTANT}

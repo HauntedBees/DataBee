@@ -463,7 +463,7 @@ i.important { vertical-align: sub }
     overflow-wrap: break-word;
     white-space: pre-wrap;
     max-height: 8em;
-    overflow-y: hidden;
+    overflow-y: scroll;
 }
 
 #noteTitleRead, #noteBodyRead { padding: 0 1em }
