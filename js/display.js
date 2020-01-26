@@ -1,6 +1,40 @@
+/* Data Sanitization */
+function Sanitize(strs, ...vals) {
+    const finishedStr = [];
+    for(let i = 0; i < vals.length; i++) {
+        finishedStr.push(strs[i]);
+        const val = vals[i];
+        if(typeof val === "number") {
+            finishedStr.push(val);
+        } else {
+            finishedStr.push(he.encode(val, { useNamedReferences: true }));
+        }
+    }
+    finishedStr.push(strs[strs.length - 1]);
+    return finishedStr.join("");
+}
+function SanitizeException(...exceptions) {
+    return function(strs, ...vals) {
+        const finishedStr = [];
+        for(let i = 0; i < vals.length; i++) {
+            finishedStr.push(strs[i]);
+            const val = vals[i];
+            if(exceptions.indexOf(i) >= 0) {
+                finishedStr.push(val);
+            } else if(typeof val === "number") {
+                finishedStr.push(val);
+            } else {
+                finishedStr.push(he.encode(val, { useNamedReferences: true }));
+            }
+        }
+        finishedStr.push(strs[strs.length - 1]);
+        return finishedStr.join("");
+    }
+}
+
 /* Modals */
 function ShowModal(id, reset) {
-    const $modal = $(`#${id}`);
+    const $modal = $(Sanitize`#${id}`);
     $modal.show();
     ctx.stateForBackButton = ctx.stateForBackButton + "|" + id;
     if(reset) { ResetElements($modal); }
@@ -44,11 +78,11 @@ function ShowEditTagModal(tagId) {
     } else { // Existing Tag
         $("#modalTagEdit").attr("data-id", tagId);
         const tag = dbData.dbList[dbData.currentScreen].tags[tagId];
-        $("#modalTagEdit > div > .modalHeader").html(`Editing <em>${tag.tag}</em>`);
+        $("#modalTagEdit > div > .modalHeader").html(Sanitize`Editing <em>${tag.tag}</em>`);
         $("#txtModalTagInput").val(tag.tag);
-        const $colorTag = $(`.tagColorSelector.tc${tag.color}`);
+        const $colorTag = $(Sanitize`.tagColorSelector.tc${tag.color}`);
         $colorTag.addClass("active");
-        $(`.tagImgSelector[data-id="${tag.imgVal}"]`).addClass("active");
+        $(Sanitize`.tagImgSelector[data-id="${tag.imgVal}"]`).addClass("active");
         $("#tagColorList").attr("data-selectedColor", tag.color);
         $("#tagColorList").attr("data-selectedImg", tag.imgVal);
         document.documentElement.style.setProperty("--current-tag-color", $colorTag.attr("data-color"));
@@ -74,7 +108,7 @@ function ShowTagEditor() {
     $("#bTagEditor, #backBtn").show();
     HideSidebars();
     const currentList = dbData.dbList[dbData.currentScreen];
-    $("#title").html(`Editing Tags for <em>${currentList.name}</em>`);
+    $("#title").html(Sanitize`Editing Tags for <em>${currentList.name}</em>`);
     ctx.stateForBackButton = "secondary";
     const tagHTMLs = [];
     const tagsSorted = Object.keys(currentList.tags).map(e => currentList.tags[e]).sort((a, b) => {
@@ -93,13 +127,13 @@ function ShowTagEditor() {
 function GetTagEditHTML(e) {
     let tagImg = "";
     if(e.imgVal === "") {
-        tagImg = `<div class='modalTagColor tc${e.color}' data-color="${e.color}"></div>`;
+        tagImg = Sanitize`<div class='modalTagColor tc${e.color}' data-color="${e.color}"></div>`;
     } else if(e.imgVal === "border_clear") {
-        tagImg = `<i class="material-icons hiddenTag">${e.imgVal}</i>`;
+        tagImg = Sanitize`<i class="material-icons hiddenTag">${e.imgVal}</i>`;
     } else {
-        tagImg = `<i class="material-icons tc${e.color}">${e.imgVal}</i>`;
+        tagImg = Sanitize`<i class="material-icons tc${e.color}">${e.imgVal}</i>`;
     }
-    return `<li class="tagEdit" data-id="${e.id}">
+    return SanitizeException(1)`<li class="tagEdit" data-id="${e.id}">
         <div class="tagImg">${tagImg}</div>
         <span>${e.tag.replace(/"/g, '\\"')}</span>
         <i class='editTag material-icons'>more_horiz</i>
@@ -113,7 +147,7 @@ function ShowMoveModal(elemIdx) {
     $("#modalMove > div > .modalHeader > em").text(currentItem.name);
     $("#modalMove").attr("data-id", elemIdx);
     const html = dbData.dbList
-                              .map((e, i) => [i, e.type, `<li data-id="${i}">${e.name}</li>`])
+                              .map((e, i) => [i, e.type, Sanitize`<li data-id="${i}">${e.name}</li>`])
                               .filter(e => e[1] === currentListType && e[0] !== dbData.currentScreen)
                               .map(e => e[2]);
     $("#moveChecklists").html(html.join(""));
@@ -127,7 +161,7 @@ function ResetElements(elem) {
     });
 }
 function CloseModal(id) {
-    $(`#${id}`).hide();
+    $(Sanitize`#${id}`).hide();
     if(ctx.stateForBackButton.indexOf("|") > 0) {
         ctx.stateForBackButton = ctx.stateForBackButton.split("|")[0];
     }
@@ -139,7 +173,7 @@ function DrawAll() {
     $("#front").hide();
     DrawSidebar();
     DrawMain();
-    $(`#themes .box.theme${dbData.settings.theme}`).html(`<i class="material-icons">check</i>`);
+    $(Sanitize`#themes .box.theme${dbData.settings.theme}`).html(`<i class="material-icons">check</i>`);
 }
 
 /* Sidebar */
@@ -191,7 +225,7 @@ function DrawSidebar() {
     const $data = $("#sidebarData");
     $data.empty();
     const current = dbData.currentScreen;
-    const html = dbData.dbList.map((e, i) => `<li data-id="${i}"${current === i ? ` class="active"` : ""}><i class="material-icons handle">unfold_more</i><span class="by-icon">${e.name}</span></li>`);
+    const html = dbData.dbList.map((e, i) => SanitizeException(1)`<li data-id="${i}"${current === i ? ` class="active"` : ""}><i class="material-icons handle">unfold_more</i><span class="by-icon">${e.name}</span></li>`);
     $data.html(html.join(""));
 }
 function SelectDatalist() {
@@ -209,7 +243,7 @@ function ShowSettings() {
     for(const setting in dbData.settings) {
         const value = dbData.settings[setting];
         if(typeof value !== "boolean") { continue; }
-        const $setting = $(`[data-setting="${setting}"]`);
+        const $setting = $(Sanitize`[data-setting="${setting}"]`);
         if($setting.length === 0) { continue; }
         $setting.attr("data-val", value).text(value ? "Enabled" : "Disabled");
         if(value) { $setting.addClass("button-primary"); }
@@ -224,7 +258,7 @@ function ShowCredits() {
     $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
     $("#bCredits, #backBtn").show();
     HideSidebars();
-    $("#title").text("DataBee v0JAN23");
+    $("#title").text("DataBee v0JAN25");
     ctx.stateForBackButton = "secondary";
 }
 function ShowSearch() {
@@ -339,14 +373,12 @@ function DrawMain() {
     $("#content").addClass("listView");
     const datalist = dbData.dbList[dbData.currentScreen];
     $("#listData").empty().attr("data-type", datalist.type).removeClass("tileView");
-    $("#title").text(`${datalist.name}`);
+    $("#title").text(datalist.name);
     if(datalist.type === "checklist") {
         const html = datalist.data.map((e, i) => GetCheckboxItemHTML(e, i));
         $("#listData").html(html.join(""));
     } else if(datalist.type === "notes") {
-        if(datalist.displayType === "tiles") {
-            $("#listData").addClass("tileView");
-        }
+        if(datalist.displayType === "tiles") { $("#listData").addClass("tileView"); }
         const html = datalist.data.map((e, i) => GetNoteHTML(e, i));
         $("#listData").html(html.join(""));
     } else if(datalist.type === "recipe") {
@@ -361,7 +393,7 @@ function SetScroller(elemId, currIdx, dir, origIdx) {
     let idx = currIdx + dir;
     if(idx < 0) { idx = dbData.dbList.length - 1; }
     else if(idx >= dbData.dbList.length) { idx = 0; }
-    const $elem = $(`#${elemId}`);
+    const $elem = $(Sanitize`#${elemId}`);
     const list = dbData.dbList[idx];
     if(origIdx === idx) { // did a full loop; there are no scrollable lists!
         $(".scrollerBtn_text", $elem).text(list.name);
@@ -376,29 +408,38 @@ function SetScroller(elemId, currIdx, dir, origIdx) {
         $("#checklistScroller").show();
     }
 }
+// beeIMPORTANT, beeTAGS, beeHANDLE, beeSQ, beeSOWNER
+// TODO: can probably merge a fair amount of these 3 GetThingHTML functions
+function ReplaceCommonHTML(str, e, showHandle, isSearchQuery, tagsHTML) {
+    return str.replace("{beeIMPORTANT}", e.important ? "<i class='important material-icons'>error_outline</i>" : "")
+              .replace("{beeTAGS}", tagsHTML)
+              .replace("{beeHANDLE}", showHandle ? `<i class="material-icons handle">unfold_more</i>` : "")
+              .replace("{beeSOWNER}", isSearchQuery === true ? Sanitize`<div class="citem_cname">${e.ownerName}</div>` : ``)
+              .replace("{beeSQ}", isSearchQuery === true ? Sanitize`<i data-parent="${e.ownerIdx}" class="goToResult material-icons">arrow_forward</i>` : "");
+}
 function GetRecipeHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = GetTagsHTML(allTags, e.tags);
-    return `<li id="recipeitem${i}" data-id="${i}" class="cbitem ritem ui-sortable-handle${e.important ? " important" : ""}">
+    return ReplaceCommonHTML(Sanitize`<li id="recipeitem${i}" data-id="${i}" class="cbitem ritem ui-sortable-handle${e.important ? " important" : ""}">
         <span class="itemContainer">
-            ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
-            <div class="tagGroup">${tagsHTML}</div>
+            {beeIMPORTANT}
+            <div class="tagGroup">{beeTAG}</div>
             <span class="name">${e.name}</span>
         </span>
-        ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
-        ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i>` : ``}
+        {beeHANDLE}
+        {beeSQ}
         <i class="edit material-icons">more_horiz</i>
         <div class="addtlRecipeDetails">
             ${e.author ? `by ${e.author}`: ""}
-            ${e.source ? `from ${
-                e.source.indexOf("http") === 0 ? `<a href="${e.source}">${e.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>` : e.source
-            }`: ""}
+            {beeSOURCE}
         </div>
         <div class="addtlRecipeDetails">${e.notes.substring(0, 100) + (e.notes.length > 100 ? "..." : "")}</div>
-        ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
-    </li>`;
+        {beeSOWNER}
+    </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeSOURCE}", e.source ? `from ${
+            e.source.indexOf("http") === 0 ? Sanitize`<a href="${e.source}">${e.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>` : Sanitize`${e.source}`
+        }`: "");
 }
 function GetNoteHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
@@ -407,38 +448,39 @@ function GetNoteHTML(e, i, isSearchQuery) {
     const tagsHTML = GetTagsHTML(allTags, e.tags);
     const title = e.title === "" ? e.body.substring(0, 30) + (e.body.length > 30 ? "..." : "") : e.title;
     const body = e.title === "" ? "" : (e.body.length < 100 ? e.body : e.body.substring(0, 100) + "...");
-    return `<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
+    return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
         <div class="note_title">
-            ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
-            <div class="tagGroup">${tagsHTML}</div>
-            ${BasicMarkdown(title)}
-            ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
-            ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i>` : ``}
+            {beeIMPORTANT}
+            <div class="tagGroup">{beeTAGS}</div>
+            {beeTITLE}
+            {beeHANDLE}
+            {beeSQ}
             <i class="edit material-icons">more_horiz</i>
         </div>
-        <div class="note_body">${BasicMarkdown(body)}</div>
+        <div class="note_body">{beeBODY}</div>
         <div class="citem_cname">${FormatDate(e.date)}</div>
-        ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
-    </li>`;
+        {beeSOWNER}
+    </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeTITLE}", BasicMarkdown(title))
+                                                   .replace("{beeBODY}", BasicMarkdown(body));
 }
 function GetCheckboxItemHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = GetTagsHTML(allTags, e.tags);
-    return `<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
+    return ReplaceCommonHTML(Sanitize`<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important ? " important" : ""}">
         <input class="checkbox" type="checkbox"${e.checked ? " checked" : ""}>
         <span class="itemContainer">
-            ${e.important ? "<i class='important material-icons'>error_outline</i>" : ""}
-            <div class="tagGroup">${tagsHTML}</div>
+            {beeIMPORTANT}
+            <div class="tagGroup">{beeTAGS}</div>
             <span class="name">${e.val}</span>
         </span>
-        ${showHandle ? `<i class="material-icons handle">unfold_more</i>` : ""}
-        ${isSearchQuery === true ? `<i data-parent=${e.ownerIdx} class="goToResult material-icons">arrow_forward</i>` : ``}
+        {beeHANDLE}
+        {beeSQ}
         <i class="edit material-icons">more_horiz</i>
-        ${e.notes !== "" ? `<div class="citem_notes">${e.notes}</div>` : ``}
-        ${isSearchQuery === true ? `<div class="citem_cname">${e.ownerName}</div>` : ``}
-        </li>`;
+        {beeNOTES}
+        {beeSOWNER}
+        </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeNOTES}", e.notes !== "" ? Sanitize`<div class="citem_notes">${e.notes}</div>` : ``);
 }
 function GetTagsHTML(allTags, myTags) {
     const tags = myTags.map(t => allTags[t]).sort((a, b) => {
@@ -450,15 +492,15 @@ function GetTagsHTML(allTags, myTags) {
 }
 function GetTagHTML(tag) {
     if(tag.imgVal === "") {
-        return `<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
+        return Sanitize`<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
     } else if(tag.imgVal === "border_clear") {
         return "";
     } else {
-        return `<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
+        return Sanitize`<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
     }
 }
 function BasicMarkdown(s) {
-    return s.replace(/\*\*(.*?)\*\*/g, `<strong>$1</strong>`)
+    return he.encode(s, { useNamedReferences: true }).replace(/\*\*(.*?)\*\*/g, `<strong>$1</strong>`)
             .replace(/__(.*?)__/g, `<strong>$1</strong>`)
             .replace(/\*(.*?)\*/g, `<em>$1</em>`)
             .replace(/_(.*?)_/g, `<em>$1</em>`)
@@ -519,15 +561,15 @@ function GetTogglingTagListHTML(allTags, myTags) {
     const tagHTML = tags.map(tag => {
         let innerHTML = "";
         if(tag.imgVal === "") {
-            innerHTML = `<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
+            innerHTML = Sanitize`<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
         } else if(tag.imgVal === "border_clear") {
-            innerHTML = `<i class="material-icons dispTag hiddenTag" data-id="${tag.id}">${tag.imgVal}</i>`;
+            innerHTML = Sanitize`<i class="material-icons dispTag hiddenTag" data-id="${tag.id}">${tag.imgVal}</i>`;
         } else {
-            innerHTML = `<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
+            innerHTML = Sanitize`<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
         }
-        return `<div class="tag${myTags.indexOf(tag.id) < 0 ? "" : " active"}" data-id="${tag.id}">${innerHTML} ${tag.tag}</div>`
+        return SanitizeException(2)`<div class="tag${myTags.indexOf(tag.id) < 0 ? "" : " active"}" data-id="${tag.id}">${innerHTML} ${tag.tag}</div>`
     });
-    return `${tagHTML.join("")}`;
+    return tagHTML.join("");
 }
 function AddSortOrderImg($li, sortOrder) {
     $("#sortDirIcon").remove();

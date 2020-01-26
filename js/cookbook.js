@@ -214,12 +214,12 @@ function ViewRecipe(idx) {
         $("#recipeBy").show();
         if(recipe.source) {
             if(recipe.source.indexOf("http") === 0) {
-                $("#recipeBy").html(`Recipe by: <a href="${recipe.source}">${recipe.author}</a>`);
+                $("#recipeBy").html(Sanitize`Recipe by: <a href="${recipe.source}">${recipe.author}</a>`);
             } else {
-                $("#recipeBy").html(`Recipe by: ${recipe.author}, ${recipe.source}`);
+                $("#recipeBy").html(Sanitize`Recipe by: ${recipe.author}, ${recipe.source}`);
             }
         } else {
-            $("#recipeBy").html(`Recipe by: ${recipe.author}`);
+            $("#recipeBy").html(Sanitize`Recipe by: ${recipe.author}`);
         }
     } else {
         $("#recipeBy").hide();
@@ -230,9 +230,9 @@ function ViewRecipe(idx) {
         $("#recipeNotes").hide();
     }
     const recipeTimeHTML = [];
-    if(recipe.prepTime) { recipeTimeHTML.push(`<div class="timeInfo"><span>Prep Time</span><span>${recipe.prepTime}</span></div>`); }
-    if(recipe.cookTime) { recipeTimeHTML.push(`<div class="timeInfo"><span>Cook Time</span><span>${recipe.cookTime}</span></div>`); }
-    if(recipe.totalTime) { recipeTimeHTML.push(`<div class="timeInfo"><span>Total Time</span><span>${recipe.totalTime}</span></div>`); }
+    if(recipe.prepTime) { recipeTimeHTML.push(Sanitize`<div class="timeInfo"><span>Prep Time</span><span>${recipe.prepTime}</span></div>`); }
+    if(recipe.cookTime) { recipeTimeHTML.push(Sanitize`<div class="timeInfo"><span>Cook Time</span><span>${recipe.cookTime}</span></div>`); }
+    if(recipe.totalTime) { recipeTimeHTML.push(Sanitize`<div class="timeInfo"><span>Total Time</span><span>${recipe.totalTime}</span></div>`); }
     $("#recipeTimeInfo").html(recipeTimeHTML.join(""));
     $("#recipeHeader > div").removeClass("active");
     $("#btnRecipeFull").addClass("active");
@@ -242,8 +242,8 @@ function DrawRecipe(recipe, servingsObj) {
     recipe.ingredience.sort((a, b) => a.group.localeCompare(b.group));
     $("#ingredientViewList").html(recipe.ingredience.map((e, i) => {
         const lastGroup = (i === 0 ? "" : recipe.ingredience[i - 1].group);
-        const categoryPrefix = (lastGroup !== e.group) ? `<li class="ingredientHeader">${e.group}</li>` : "";
-        if(e.unit === "toTaste") { return `${categoryPrefix}<li data-id="${i}" class="viewIngredient">${e.ingredient}, to taste</li>`; }
+        const categoryPrefix = (lastGroup !== e.group) ? Sanitize`<li class="ingredientHeader">${e.group}</li>` : "";
+        if(e.unit === "toTaste") { return SanitizeException(0)`${categoryPrefix}<li data-id="${i}" class="viewIngredient">${e.ingredient}, to taste</li>`; }
         const adjustedRecipe = GetServingSizeAdjustedIngredient(e, recipe.servings, servingsObj);
         const hasTilde = adjustedRecipe.amount[0] === "~";
         if(hasTilde) { adjustedRecipe.amount = adjustedRecipe.amount.substring(1); }
@@ -253,10 +253,10 @@ function DrawRecipe(recipe, servingsObj) {
             adjustedRecipe.fraction = new Fraction(adjustedRecipe.fraction.replace("~", "") || 0);
         }
         const amt = adjustedRecipe.fraction === undefined ? new Fraction(adjustedRecipe.amount || 0) : adjustedRecipe.fraction;
-        return `${categoryPrefix}<li data-id="${i}" class="viewIngredient">
+        return SanitizeException(0, 2)`${categoryPrefix}<li data-id="${i}" class="viewIngredient">
             ${GetAdjustableIngredientHTML(amt, adjustedRecipe.unit, hasTilde ? "~" : "", adjustedRecipe.unit !== "")} ${adjustedRecipe.ingredient}
         </li>`}).join(""));
-    $("#stepViewList").html(recipe.steps.map((e, i) => `
+    $("#stepViewList").html(recipe.steps.map((e, i) => SanitizeException(2)`
     <li data-id="${i}" class="viewStep">
         <span>${i + 1}. ${AdjustStep(e.step, recipe.servings, servingsObj)}</span>
     </li>`).join(""));
@@ -273,13 +273,13 @@ function EditRecipe(idx) {
         const $e = $(e);
         $e.val(recipe[$e.attr("data-val")]);
     });
-    $("#ingredientEditList").html(recipe.ingredience.map((e, i) => `
+    $("#ingredientEditList").html(recipe.ingredience.map((e, i) => SanitizeException(1)`
     <li data-id="${i}" class="editIngredient">
-        ${(e.unit === "toTaste" || e.unit === "none") ? `<span>${e.ingredient}${e.unit === "toTaste" ? ", to taste" : ""}</span>` : `<span>${e.amount}${GetUnitDisplay(e.unit, e.amount)} ${e.ingredient}</span>`}
+        ${(e.unit === "toTaste" || e.unit === "none") ? Sanitize`<span>${e.ingredient}${e.unit === "toTaste" ? ", to taste" : ""}</span>` : Sanitize`<span>${e.amount}${GetUnitDisplay(e.unit, e.amount)} ${e.ingredient}</span>`}
         <i class="material-icons recipeEditBtn recipeEdit">edit</i>
         <i class="material-icons recipeEditBtn recipeDel">delete</i>
     </li>`).join(""));
-    $("#stepEditList").html(recipe.steps.map((e, i) => `
+    $("#stepEditList").html(recipe.steps.map((e, i) => Sanitize`
     <li data-id="${i}" class="editStep">
         <span>${i + 1}. ${e.step}</span>
         <i class="material-icons recipeEditBtn recipeEdit">edit</i>
@@ -292,23 +292,21 @@ function RecipeClick(e, $t) {
     const targType = e.target.tagName.toLowerCase();
     const idx = parseInt($t.attr("data-id"));
     const $clicked = $(e.target);
-    console.log($clicked);
     if(targType === "i") { // button
         if($clicked.closest(".settings").length) { return; } // settings
         if($clicked.hasClass("goToResult")) { // Search
             const listIdx = $clicked.attr("data-parent");
-            SelectDatalist.call($(`#sidebarData > li[data-id='${listIdx}']`));
-            $(`#recipeitem${idx} .edit`).click();
-            document.documentElement.scrollTop = $(`#recipeitem${idx}`).offset().top - 40;
+            SelectDatalist.call($(Sanitize`#sidebarData > li[data-id='${listIdx}']`));
+            $(Sanitize`#recipeitem${idx} .edit`).click();
+            document.documentElement.scrollTop = $(Sanitize`#recipeitem${idx}`).offset().top - 40;
         } else { // Edit
-            console.log("edit");
             if($clicked.hasClass("dispTag")) { return; }
             ToggleDataItemSettings($t, idx, "recipe");
         }
         return;
     } else if($clicked.hasClass("addtlRecipeDetails")) {
+        // this is fine
     } else if(targType !== "input" && targType !== "span" && targType !== "li") { // settings
-        console.log("settings");
         return;
     }
     ViewRecipe(idx);
@@ -509,7 +507,7 @@ function ConvertBetweenMetricAndImperial(unit, amount) {
 }
 
 function AdjustStep(step, baseServingSize, newServingSizeObj) {
-    return step.replace(/\[(~?)([0-9]+(?:(?:\.|\/|,)[0-9]+)?)(?:[ º])?([A-Za-z ]*)]/g, function(whole, tilde, number, unit) {
+    return he.encode(step, { useNamedReferences: true }).replace(/\[(~?)([0-9]+(?:(?:\.|\/|,)[0-9]+)?)(?:[ º])?([A-Za-z ]*)]/g, function(whole, tilde, number, unit) {
         const originalAmount = StringToNumber(number);
         unit = CleanUserUnit(unit);
         const newAmount = originalAmount.fraction.mul(newServingSizeObj.fraction).div(baseServingSize);
@@ -534,11 +532,11 @@ function GetAdjustableIngredientHTML(amount, unit, tilde, isConvertible) {
     const amountToStore = showAsFraction ? amount.toFraction() : amount.toString();
     let amountToShow = GetDisplayNumber(amount, showAsFraction);
     if(isConvertible) {
-        return `<span class="step-unit" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
+        return SanitizeException(4)`<span class="step-unit" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
     } else if(unit === "toTaste" || unit === "none") {
         return "";
     } else {
-        return `<span>${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
+        return SanitizeException(1)`<span>${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
     }
 }
 function GetUnitDisplay(unit, amount) {

@@ -10,8 +10,8 @@ $(function() {
     // Settings
     $(".box").on("click", function() {
         const newTheme = parseInt($(this).attr("data-id"));
-        $(`#themes .box.theme${dbData.settings.theme}`).html("");
-        $(`#themes .box.theme${newTheme}`).html(`<i class="material-icons">check</i>`);
+        $(Sanitize`#themes .box.theme${dbData.settings.theme}`).html("");
+        $(Sanitize`#themes .box.theme${newTheme}`).html(`<i class="material-icons">check</i>`);
         dbData.settings.theme = newTheme;
         SetTheme();
         data.Save();
@@ -84,7 +84,7 @@ $(function() {
 
     $("#nextScroller, #prevScroller").on("click", function() {
         const listIdx = $(this).attr("data-idx");
-        SelectDatalist.call($(`#sidebarData > li[data-id='${listIdx}']`));
+        SelectDatalist.call($(Sanitize`#sidebarData > li[data-id='${listIdx}']`));
     });
 
     // Sidebar
@@ -99,10 +99,10 @@ $(function() {
     // Rightbar
     $("#menuRight").on("click", ShowRightbar);
     $("#renameChecklist").on("click", function() {
-        ShowInputModal("renameChecklist", `Rename <em>${dbData.dbList[dbData.currentScreen].name}</em>.`, "New List Name", "Rename");
+        ShowInputModal("renameChecklist", Sanitize`Rename <em>${dbData.dbList[dbData.currentScreen].name}</em>.`, "New List Name", "Rename");
     });
     $("#deleteChecklist").on("click", function() {
-        ShowInfoModal("deleteChecklist", `Delete <em>${dbData.dbList[dbData.currentScreen].name}</em>.`, `Are you sure you want to delete the <em>${dbData.dbList[dbData.currentScreen].name}</em> list and all of its items? This cannot be undone.`, "Delete");
+        ShowInfoModal("deleteChecklist", Sanitize`Delete <em>${dbData.dbList[dbData.currentScreen].name}</em>.`, Sanitize`Are you sure you want to delete the <em>${dbData.dbList[dbData.currentScreen].name}</em> list and all of its items? This cannot be undone.`, "Delete");
     });
     $("#btnConfirmModalInput").on("click", function() {
         const $txtBox = $("#txtModalInput");
@@ -129,7 +129,7 @@ $(function() {
             case "renameItem":
                 data.UpdateChecklistItem(dbData.currentScreen, idx, val);
                 if(data.IsManualSorting()) {
-                    $(`#cbitem${idx} > span.itemContainer > span.name, #recipeitem${idx} > span.itemContainer > span.name`).text(val);
+                    $(Sanitize`#cbitem${idx} > span.itemContainer > span.name, #recipeitem${idx} > span.itemContainer > span.name`).text(val);
                 } else {
                     DrawMain();
                 }
@@ -239,7 +239,7 @@ $(function() {
         } else {
             const mySort = dbData.dbList[dbData.currentScreen].sortType;
             $("li", $subList).removeClass("active");
-            const $child = $(`#sort${mySort}`);
+            const $child = $(Sanitize`#sort${mySort}`);
             $child.addClass("active");
             if(mySort !== "manual") { AddSortOrderImg($child, mySort); }
             $subList.show().addClass("active");
@@ -311,7 +311,7 @@ $(function() {
         } else {
             const valueToCheck = dbData.dbList[dbData.currentScreen][$(this).attr("data-val")];
             $("li", $subList).removeClass("active");
-            $(`li[data-val="${valueToCheck}"]`).addClass("active");
+            $(Sanitize`li[data-val="${valueToCheck}"]`).addClass("active");
             $subList.show().addClass("active");
         }
     });
@@ -319,7 +319,7 @@ $(function() {
         const $toggler = $(this).parent();
         const newVal = $toggler.attr("data-boolean") === "true" ? $(this).attr("data-val") === "true" : $(this).attr("data-val");
         $toggler.find("li").removeClass("active");
-        $toggler.find(`li[data-val="${newVal}"]`).addClass("active");
+        $toggler.find(Sanitize`li[data-val="${newVal}"]`).addClass("active");
         const key = $toggler.attr("data-val");
         dbData.dbList[dbData.currentScreen][key] = newVal;
         DrawMain();
@@ -537,7 +537,7 @@ $(function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         const name = $(this).closest("li").find(".name").text();
         $(this).closest(".settings").remove();
-        ShowInputModal("renameItem", `Rename <em>${name}</em>.`, "Entry Name", "Rename", idx);
+        ShowInputModal("renameItem", Sanitize`Rename <em>${name}</em>.`, "Entry Name", "Rename", idx);
         $("#txtModalInput").val(name).select();
     });
     $("#listData").on("click", ".ci-notes", function(e) {
@@ -546,7 +546,7 @@ $(function() {
         const notes = data.GetChecklistItemNotes(dbData.currentScreen, idx);
         const name = $(this).closest("li").find(".name").text();
         $(this).closest(".settings").remove();
-        ShowInputModal("editNotes", `Notes for <em>${name}</em>.`, "Notes", "Save", idx);
+        ShowInputModal("editNotes", Sanitize`Notes for <em>${name}</em>.`, "Notes", "Save", idx);
         $("#txtModalInput").val(notes).select();
     });
     $("#listData").on("click", ".ci-important", function(e) {
@@ -573,7 +573,7 @@ $(function() {
         const tagId = $(this).attr("data-id");
         data.ToggleTag(dbData.currentScreen, elemIdx, tagId);
         if($(this).hasClass("active")) {
-            $(`[data-id="${tagId}"`, $parent.find(".tagGroup")).remove();
+            $(Sanitize`[data-id="${tagId}"]`, $parent.find(".tagGroup")).remove();
         } else {
             const allTags = dbData.dbList[dbData.currentScreen].tags;
             $parent.find(".tagGroup").html(GetTagsHTML(allTags, dbData.dbList[dbData.currentScreen].data[elemIdx].tags));
@@ -616,7 +616,7 @@ function NoteClick(e, $t) {
         if($clicked.closest(".settings").length) { return; } // settings
         if($clicked.hasClass("goToResult")) { // Search
             const listIdx = $clicked.attr("data-parent");
-            SelectDatalist.call($(`#sidebarData > li[data-id='${listIdx}']`));
+            SelectDatalist.call($(Sanitize`#sidebarData > li[data-id='${listIdx}']`));
             $(`#note${idx} .edit`).click();
             document.documentElement.scrollTop = $(`#note${idx}`).offset().top - 40;
         } else { // Edit
@@ -638,7 +638,7 @@ function ChecklistItemClick(e, $t) {
         if($clicked.closest(".settings").length) { return; } // settings
         if($clicked.hasClass("goToResult")) { // Search
             const listIdx = $clicked.attr("data-parent");
-            SelectDatalist.call($(`#sidebarData > li[data-id='${listIdx}']`));
+            SelectDatalist.call($(Sanitize`#sidebarData > li[data-id='${listIdx}']`));
             $(`#cbitem${idx} .edit`).click();
             document.documentElement.scrollTop = $(`#cbitem${idx}`).offset().top - 40;
         } else { // Edit

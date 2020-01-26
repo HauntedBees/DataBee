@@ -571,9 +571,9 @@ const data = {
             dbData.dbList.push(list);
             data.Save(function() {
                 if(originalName === newName) {
-                    ShowAlert("Import Succeeded!", `Your list <em>${originalName}</em> has been imported!`);
+                    ShowAlert("Import Succeeded!", Sanitize`Your list <em>${originalName}</em> has been imported!`);
                 } else {
-                    ShowAlert("Import Succeeded!", `Your list <em>${originalName}</em> has been imported as <em>${newName}</em>!`);
+                    ShowAlert("Import Succeeded!", Sanitize`Your list <em>${originalName}</em> has been imported as <em>${newName}</em>!`);
                 }
                 DrawSidebar();
             });
