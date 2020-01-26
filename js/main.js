@@ -503,7 +503,7 @@ $(function() {
 
     // Checklist
     $("#btnAddChecklist").on("click", function() { ShowInputModal("newChecklist", "New Checklist", "New Checklist", "Create"); });
-    $("#listData").on("click", "li.note", function(e) {
+    $("#listData").on("click", "li.elem", function(e) {
         switch($("#listData").attr("data-type")) {
             case "checklist":
                 ChecklistItemClick(e, $(this));

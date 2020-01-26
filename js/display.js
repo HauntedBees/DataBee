@@ -446,7 +446,7 @@ function GetRecipeHTML(e, i, isSearchQuery) {
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = GetTagsHTML(allTags, e.tags);
-    return ReplaceCommonHTML(Sanitize`<li id="recipeitem${i}" data-id="${i}" class="cbitem ritem ui-sortable-handle${e.important ? " important" : ""}">
+    return ReplaceCommonHTML(Sanitize`<li id="recipeitem${i}" data-id="${i}" class="cbitem elem ritem ui-sortable-handle${e.important ? " important" : ""}">
         <span class="itemContainer">
             {beeIMPORTANT}
             <div class="tagGroup">{beeTAGS}</div>
@@ -474,7 +474,7 @@ function GetNoteHTML(e, i, isSearchQuery) {
     const title = e.title === "" ? e.body.substring(0, 30) + (e.body.length > 30 ? "..." : "") : e.title;
     const body = e.title === "" ? "" : (e.body.length < 100 || isTileView ? e.body : e.body.substring(0, 100) + "...");
     if(e.locked) {
-        return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="locked note ui-sortable-handle${e.important ? " important" : ""}">
+        return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="locked elem note ui-sortable-handle${e.important ? " important" : ""}">
             <div class="note_title">
                 {beeIMPORTANT}
                 <div class="tagGroup">{beeTAGS}</div>
@@ -487,7 +487,7 @@ function GetNoteHTML(e, i, isSearchQuery) {
             {beeSOWNER}
         </li>`, e, showHandle, isSearchQuery, tagsHTML);
     } else {
-        return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
+        return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="note elem ui-sortable-handle${e.important ? " important" : ""}">
             <div class="note_title">
                 {beeIMPORTANT}
                 <div class="tagGroup">{beeTAGS}</div>
@@ -508,7 +508,7 @@ function GetCheckboxItemHTML(e, i, isSearchQuery) {
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = GetTagsHTML(allTags, e.tags);
-    return ReplaceCommonHTML(Sanitize`<li id="cbitem${i}" data-id="${i}" class="cbitem ui-sortable-handle${e.important && e.checked === false ? " important" : ""}">
+    return ReplaceCommonHTML(Sanitize`<li id="cbitem${i}" data-id="${i}" class="cbitem elem ui-sortable-handle${e.important && e.checked === false ? " important" : ""}">
         <input class="checkbox" type="checkbox"${e.checked ? " checked" : ""}>
         <span class="itemContainer">
             {beeIMPORTANT}
