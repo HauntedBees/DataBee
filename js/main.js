@@ -503,7 +503,7 @@ $(function() {
 
     // Checklist
     $("#btnAddChecklist").on("click", function() { ShowInputModal("newChecklist", "New Checklist", "New Checklist", "Create"); });
-    $("#listData").on("click", "li", function(e) {
+    $("#listData").on("click", "li.note", function(e) {
         switch($("#listData").attr("data-type")) {
             case "checklist":
                 ChecklistItemClick(e, $(this));
@@ -532,6 +532,13 @@ $(function() {
         $(this).closest("li").remove();
         ctx.stateForBackButton = "home";
     });
+    $("#listData").on("click", ".ci-lock", function(e) {
+        e.stopPropagation();
+        const idx = parseInt($(this).closest(".settings").attr("data-id"));
+        data.ToggleLockNoteListItem(dbData.currentScreen, idx);
+        DrawMain();
+        ctx.stateForBackButton = "home";
+    });
     $("#listData").on("click", ".ci-rename", function(e) {
         e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
@@ -554,7 +561,6 @@ $(function() {
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.ToggleDataItemImportance(dbData.currentScreen, idx);
         DrawMain();
-        $(this).closest("li").replaceWith(GetCheckboxItemHTML(CurList().data[idx], idx));
         ctx.stateForBackButton = "home";
     });
     $("#listData").on("click", ".ci-tags", function(e) {

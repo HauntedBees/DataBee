@@ -473,20 +473,35 @@ function GetNoteHTML(e, i, isSearchQuery) {
     const tagsHTML = GetTagsHTML(allTags, e.tags);
     const title = e.title === "" ? e.body.substring(0, 30) + (e.body.length > 30 ? "..." : "") : e.title;
     const body = e.title === "" ? "" : (e.body.length < 100 || isTileView ? e.body : e.body.substring(0, 100) + "...");
-    return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
-        <div class="note_title">
-            {beeIMPORTANT}
-            <div class="tagGroup">{beeTAGS}</div>
-            {beeTITLE}
-            {beeHANDLE}
-            {beeSQ}
-            <i class="edit material-icons">more_horiz</i>
-        </div>
-        <div class="note_body">{beeBODY}</div>
-        <div class="citem_cname">${FormatDate(e.date)}</div>
-        {beeSOWNER}
-    </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeTITLE}", BasicMarkdown(title))
-                                                   .replace("{beeBODY}", BasicMarkdown(body));
+    if(e.locked) {
+        return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="locked note ui-sortable-handle${e.important ? " important" : ""}">
+            <div class="note_title">
+                {beeIMPORTANT}
+                <div class="tagGroup">{beeTAGS}</div>
+                {beeHANDLE}
+                {beeSQ}
+                <i class="edit material-icons">more_horiz</i>
+            </div>
+            <div class="lock"><i class="material-icons">lock</i></div>
+            <div class="citem_cname">${FormatDate(e.date)}</div>
+            {beeSOWNER}
+        </li>`, e, showHandle, isSearchQuery, tagsHTML);
+    } else {
+        return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="note ui-sortable-handle${e.important ? " important" : ""}">
+            <div class="note_title">
+                {beeIMPORTANT}
+                <div class="tagGroup">{beeTAGS}</div>
+                {beeTITLE}
+                {beeHANDLE}
+                {beeSQ}
+                <i class="edit material-icons">more_horiz</i>
+            </div>
+            <div class="note_body">{beeBODY}</div>
+            <div class="citem_cname">${FormatDate(e.date)}</div>
+            {beeSOWNER}
+        </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeTITLE}", BasicMarkdown(title))
+                                                    .replace("{beeBODY}", BasicMarkdown(body));
+    }
 }
 function GetCheckboxItemHTML(e, i, isSearchQuery) {
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
@@ -552,6 +567,9 @@ function ToggleDataItemSettings($e, i, type) {
             settings.splice(3, 1); // remove NOTES
             settings.splice(1, 1); // remove RENAME
             settings.push(`<div class="btn option ci-edit"><i class="material-icons">edit</i><div>Edit</div></div>`);
+            if($e.hasClass("locked")) {
+            } else {
+            }
         } else if(type === "recipe") {
             settings.splice(3, 1); // remove NOTES
             settings[1] = settings[1].replace("<div>Edit</div>", "<div>Rename</div>");

@@ -45,6 +45,7 @@ class NoteListItem extends DataItem {
         this.title = title;
         this.body = body;
         this.val = title + body;
+        this.locked = false;
     }
 }
 class Recipe extends DataItem {
@@ -371,6 +372,13 @@ const data = {
         if(body !== undefined) { elem.body = body; }
         elem.val = elem.title + elem.body;
         data.SortDataItems(dataIdx);
+        if(dontSave !== true) { data.Save(); }
+    },
+    ToggleLockNoteListItem: function(dataIdx, elemIdx, dontSave) {
+        const list = dbData.dbList[dataIdx].data;
+        if(elemIdx < 0 || elemIdx >= list.length) { return; }
+        const elem = list[elemIdx];
+        elem.locked = !elem.locked;
         if(dontSave !== true) { data.Save(); }
     },
     ClearCompletedChecklistItems: function(dataIdx, dontSave) {

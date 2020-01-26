@@ -478,6 +478,7 @@ i.important { vertical-align: sub }
     margin-bottom: 5em;
     width: 100%;
 }
+.lock { text-align: center }
 .tileCol { margin: 0 !important }
 .tileColInner { margin: 0 }
 .tileView > li > ul > .note {
