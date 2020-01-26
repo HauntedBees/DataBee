@@ -475,9 +475,12 @@ i.important { vertical-align: sub }
     display: grid;
     grid-auto-rows: minmax(min-content, max-content);
     grid-template-columns: 50% 50%;
+    margin-bottom: 5em;
     width: 100%;
 }
-.tileView > .note {
+.tileCol { margin: 0 !important }
+.tileColInner { margin: 0 }
+.tileView > li > ul > .note {
     border: 1px solid var(--secondary-border-color);
     border-radius: 1em;
     margin: 0.15em;

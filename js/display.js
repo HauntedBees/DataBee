@@ -384,8 +384,15 @@ function DrawMain() {
         $("#listData").html(html.join(""));
     } else if(datalist.type === "notes") {
         if(datalist.displayType === "tiles") { $("#listData").addClass("tileView"); }
+        const isTileView =$("#listData").hasClass("tileView");
         const html = datalist.data.map((e, i) => GetNoteHTML(e, i));
-        $("#listData").html(html.join(""));
+        if(isTileView) {
+            $("#listData").html(`
+            <li class="tileCol"><ul class="tileColInner">${html.filter((e, i) => i % 2 === 0).join("")}</ul></li>
+            <li class="tileCol"><ul class="tileColInner">${html.filter((e, i) => i % 2 !== 0).join("")}</ul></li>`);
+        } else {
+            $("#listData").html(html.join(""));
+        }
     } else if(datalist.type === "recipe") {
         const html = datalist.data.map((e, i) => GetRecipeHTML(e, i));
         $("#listData").html(html.join(""));
