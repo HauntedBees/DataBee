@@ -230,7 +230,19 @@ function DrawSidebar() {
     const $data = $("#sidebarData");
     $data.empty();
     const current = dbData.currentScreen;
-    const html = dbData.dbList.map((e, i) => SanitizeException(1)`<li data-id="${i}"${current === i ? ` class="active"` : ""}><i class="material-icons handle">unfold_more</i><span class="by-icon">${e.name}</span></li>`);
+    const html = dbData.dbList.map((e, i) => {
+        let icon = "";
+        switch(e.type) {
+            case "checklist": icon = "check_box"; break;
+            case "notes": icon = "notes"; break;
+            case "recipe": icon = "kitchen"; break;
+        }
+        return Sanitize`
+    <li data-id="${i}"${current === i ? ` class="active"` : ""}>
+        <i class="material-icons handle">unfold_more</i>
+        <i class="material-icons">${icon}</i>
+        <span class="by-icon">${e.name}</span>
+    </li>`});
     $data.html(html.join(""));
 }
 function SelectDatalist() {
