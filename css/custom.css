@@ -43,6 +43,7 @@
     width: 80%;
 }
 #modalMove > div { margin: 30% auto }
+#modalAdvancedAdd > div { margin: 30% auto }
 .modalHeader { font-weight: bold }
 .modalContent { padding: 0.5em 0.5em 0 }
 #modalInfo .modalContent { padding-bottom: 0.5em; padding-top: 0 }
