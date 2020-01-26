@@ -52,6 +52,11 @@ function ShowInputModal(type, title, placeholder, buttonText, dataId) {
         $("#modalInput").attr("data-id", dataId);
     }
     $("#modalInput > div > .modalHeader").html(title);
+    if(title === "New Item") {
+        $("#btnCancelModalInput").text("Done");
+    } else {
+        $("#btnCancelModalInput").text("Cancel");
+    }
     $("#txtModalInput").attr("placeholder", placeholder);
     $("#txtModalInput").val("");
     $("#btnConfirmModalInput").text(buttonText);
