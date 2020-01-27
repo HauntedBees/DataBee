@@ -153,7 +153,11 @@ nav.active { left: 0; transition: 0.35s }
 .sideMore { float: right }
 
 /* Body Elements */
-#content.listView { padding: 0; width: 100% }
+#content.listView { 
+    padding: 0;
+    width: 100%;
+    max-width: unset;
+}
 .body { display: none }
 body { font-size: 2em }
 
