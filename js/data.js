@@ -78,7 +78,6 @@ class Ingredient {
             this.fraction = amt;
         }
         this.unit = unit;
-        this.checked = false;
         this.group = group;
     }
 }
@@ -556,7 +555,7 @@ const data = {
     ProcessBackupJSON: function(str) {
         try {
             const oldRev = dbData._rev;
-            const placeholder = JSON.parse(str);
+            const placeholder = JSON.parse(str.replace("javascript:", ""));
             if(!validation.EnsureValidDatabase(placeholder)) {
                 ShowAlert("Import Failed", "Invalid databee format.");
                 return;
@@ -584,7 +583,7 @@ const data = {
     },
     ProcessListJSON: function(str) {
         try {
-            const list = JSON.parse(str.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace("javascript:","").replace("data:", ""));
+            const list = JSON.parse(str.replace("javascript:", ""));
             if(!validation.EnsureValidList(list, false)) {
                 ShowAlert("Import Failed", "Invalid databee list format.");
                 return;
@@ -608,6 +607,34 @@ const data = {
                     ShowAlert("Import Succeeded!", Sanitize`Your list <em>${originalName}</em> has been imported as <em>${newName}</em>!`);
                 }
                 DrawSidebar();
+            });
+        } catch {
+            ShowAlert("Import Failed", "Invalid list json format.");
+        }
+    },
+    
+    ImportRecipeChooser: function(file) {
+        const decodedData = data.GetJSONFromChooser(file);
+        if(decodedData === false) { return; }
+        data.ProcessRecipeJSON(decodedData);
+    },
+    ImportRecipe: function(files) {
+        const reader = new FileReader();
+        reader.onload = function(e) { data.ProcessRecipeJSON(e.target.result); };
+        reader.onerror = function() { ShowAlert("Import Failed", "Reading file as text was unsuccessful."); };
+        reader.readAsText(files[0]);
+    },
+    ProcessRecipeJSON: function(str) {
+        try {
+            const recipe = JSON.parse(str.replace("javascript:", ""));
+            if(!validation.EnsureValidRecipe(recipe, false)) {
+                ShowAlert("Import Failed", "Invalid databee recipe format.");
+                return;
+            }
+            CurList().data.push(recipe);
+            data.Save(function() {
+                ShowAlert("Import Succeeded!", Sanitize`Your recipe <em>${recipe.name}</em> has been imported!`);
+                DrawMain();
             });
         } catch {
             ShowAlert("Import Failed", "Invalid list json format.");
@@ -798,13 +825,12 @@ const validation = {
         || typeof item.totalTime !== "string") {
             return false;
         }
-        const validIngKeys = ["ingredient", "amount", "unit", "checked", "group", "hiddenComment"];
+        const validIngKeys = ["ingredient", "amount", "unit", "group", "hiddenComment"];
         for(let i = 0; i < item.ingredience.length; i++) {
             const ing = item.ingredience[i];
             console.log(ing);
             if(typeof ing.ingredient !== "string"
             || typeof ing.unit !== "string"
-            || typeof ing.checked !== "boolean"
             || typeof ing.group !== "string") {
                 return false;
             }
@@ -817,12 +843,16 @@ const validation = {
         for(let i = 0; i < item.steps.length; i++) {
             const step = item.steps[i];
             console.log(step);
-            if(typeof step.step !== "string"
-            || typeof step.checked !== "boolean") {
-                return false;
-            }
-            for(const key in step) {
-                if(validStepKeys.indexOf(key) < 0) { delete step[key]; }
+            if(typeof step === "string") {
+                item.steps[i] = new Step(step);
+            } else {
+                if(typeof step.step !== "string"
+                || typeof step.checked !== "boolean") {
+                    return false;
+                }
+                for(const key in step) {
+                    if(validStepKeys.indexOf(key) < 0) { delete step[key]; }
+                }
             }
         }
         const validItemKeys = ["tags", "important", "date", "val", "name", "servings", "ingredience", "steps", "author", "notes", "source", "prepTime", "cookTime", "totalTime", "hiddenComment"];

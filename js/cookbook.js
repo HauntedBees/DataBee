@@ -237,6 +237,40 @@ function SetUpCookbook() {
         const newAmount = ConvertBetweenMetricAndImperial(unit, amount);
         $(this).replaceWith(GetAdjustableIngredientHTML(newAmount.amount, newAmount.unit, $(this).attr("data-tilde"), true));
     });
+
+    $("#listData").on("click", ".ci-export", function(e) {
+        e.stopPropagation();
+        const idx = parseInt($(this).closest(".settings").attr("data-id"));
+        const item = CurList().data[idx];
+        const b = new Blob([JSON.stringify(item, null, 2)], { type: "application/json" });
+        if(typeof cordova !== "undefined") {
+            window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory + "Download", function(entry) {
+                entry.getFile(`databee_recipe_${item.name}.json`, { create: true, exclusive: false }, function(file) {
+                    file.createWriter(function(writer) {
+                        writer.onwriteend = function() { ShowAlert("Export Successful!", "Check your Download folder!"); }
+                        writer.onerror = function(e) { ShowAlert("Export Failed", e); }
+                        writer.write(b);
+                    });
+                }, function(e) { ShowAlert("File Export Failed", e) });
+            }, function(e) { ShowAlert("Directory Export Failed", e)});
+        } else {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(b);
+            a.download = `databee_recipe_${item.name}.json`;
+            a.dispatchEvent(new MouseEvent("click"));
+        }
+    });
+    $("#importRecipe").on("click", function() {
+        if(typeof chooser !== "undefined") {
+            chooser.getFile().then(data.ImportRecipeChooser, function(e) { ShowAlert("Import Failed", e); });
+        } else {
+            const input = document.createElement("input");
+            input.setAttribute("type", "file");
+            input.setAttribute("accept", ".json");
+            input.setAttribute("onchange", "data.ImportRecipe(this.files)");
+            input.dispatchEvent(new MouseEvent("click"));
+        }
+    });
 }
 
 // Display
@@ -295,7 +329,7 @@ function DrawRecipe(recipe, servingsObj) {
         if(hasTilde) { adjustedRecipe.amount = adjustedRecipe.amount.substring(1); }
         if(typeof adjustedRecipe.fraction === "object") { 
             adjustedRecipe.fraction = new Fraction(adjustedRecipe.fraction);
-        } else {
+        } else if(typeof adjustedRecipe.fraction !== "undefined") {
             adjustedRecipe.fraction = new Fraction(adjustedRecipe.fraction.replace("~", "") || 0);
         }
         const amt = adjustedRecipe.fraction === undefined ? new Fraction(adjustedRecipe.amount || 0) : adjustedRecipe.fraction;

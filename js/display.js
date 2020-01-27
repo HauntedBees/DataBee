@@ -477,13 +477,10 @@ function GetRecipeHTML(e, i, isSearchQuery) {
         {beeHANDLE}
         {beeSQ}
         <i class="edit material-icons">more_horiz</i>
-        <div class="addtlRecipeDetails">
-            ${e.author ? `by ${e.author}`: ""}
-            {beeSOURCE}
-        </div>
+        <div class="addtlRecipeDetails">${e.author ? `by ${e.author}`: "{beeNBSP}"}{beeSOURCE}</div>
         <div class="addtlRecipeDetails">${e.notes.substring(0, 100) + (e.notes.length > 100 ? "..." : "")}</div>
         {beeSOWNER}
-    </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeSOURCE}", e.source ? `from ${
+    </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeNBSP}", "&nbsp;").replace("{beeSOURCE}", e.source ? `from ${
             e.source.indexOf("http") === 0 ? Sanitize`<a href="${e.source}">${e.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>` : Sanitize`${e.source}`
         }`: "");
 }
@@ -598,6 +595,7 @@ function ToggleDataItemSettings($e, i, type) {
         } else if(type === "recipe") {
             settings.splice(3, 1); // remove NOTES
             settings[1] = settings[1].replace("<div>Edit</div>", "<div>Rename</div>");
+            settings.push(`<div class="btn option ci-export"><i class="material-icons">share</i><div>Export</div></div>`);
         }
         if(dbData.settings.leftHanded) { settings.reverse(); }
         $(".elem > .settings").remove();
