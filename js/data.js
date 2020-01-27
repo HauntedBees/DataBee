@@ -554,13 +554,14 @@ const data = {
         reader.readAsText(files[0]);
     },
     ProcessBackupJSON: function(str) {
-        if(str.indexOf("databee") < 0) {
-            ShowAlert("Import Failed", "Invalid databee format.");
-            return;
-        }
         try {
             const oldRev = dbData._rev;
-            dbData = JSON.parse(str);
+            const placeholder = JSON.parse(str);
+            if(!validation.EnsureValidDatabase(placeholder)) {
+                ShowAlert("Import Failed", "Invalid databee format.");
+                return;
+            }
+            dbData = placeholder;
             dbData._rev = oldRev;
             data.Save(function() {
                 ShowAlert("Import Succeeded!", "Your database is now up-to-date!");
@@ -582,12 +583,12 @@ const data = {
         reader.readAsText(files[0]);
     },
     ProcessListJSON: function(str) {
-        if(str.indexOf("name") < 0) {
-            ShowAlert("Import Failed", "Invalid databee list format.");
-            return;
-        }
         try {
             const list = JSON.parse(str.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace("javascript:","").replace("data:", ""));
+            if(!validation.EnsureValidList(list, false)) {
+                ShowAlert("Import Failed", "Invalid databee list format.");
+                return;
+            }
             const originalName = list.name;
             let uniqueName = false, i = 0, newName = list.name;
             while(!uniqueName) {
@@ -635,18 +636,44 @@ const data = {
 };
 const validation = {
     EnsureValidDatabase: function(db) {
+        console.log(db);
+        if(typeof db._id !== "string"
+        || typeof db._rev !== "string"
+        || typeof db.dbList !== "object"
+        || typeof db.settings !== "object"
+        || typeof db.currentScreen !== "number") {
+            return false;
+        }
+        if(db._id !== "databee") { return false; }
+        for(let i = 0; i < db.dbList.length; i++) {
+            const valid = validation.EnsureValidList(db.dbList[i], true, db.dbList);
+            if(!valid) { return false; }
+        }
+        const validDBKeys = ["_id", "_rev", "dbList", "currentScreen", "settings", "hiddenComments"];
+        for(const key in db) {
+            if(validDBKeys.indexOf(key) < 0) { delete db[key]; }
+        }
+        const validSettings = ["theme", "leftHanded", "hiddenComments"];
+        for(const key in db.settings) {
+            if(validSettings.indexOf(key) < 0) { delete db.settings[key]; }
+        }
+        if(typeof db.settings.theme !== "number" || typeof db.settings.leftHanded !== "boolean") { return false; }
+        if(db.settings.theme < 0 || db.settings.theme >= themes.length) { return false; }
         return true;
     },
-    EnsureValidList: function(list) {
+    EnsureValidList: function(list, fromDB, dbList) {
+        console.log(list);
         if(typeof list.name !== "string"
         || typeof list.type !== "string"
         || typeof list.data !== "object"
         || typeof list.tags !== "object"
         || typeof list.sortDir !== "number"
         || typeof list.sortType !== "string"
-        || typeof list.date !== "number"
         || typeof list.carousel !== "boolean") {
             return false;
+        }
+        if(typeof list.date !== "number") {
+            list.date = +new Date();
         }
         switch(list.type) {
             case "checklist":
@@ -661,24 +688,147 @@ const validation = {
                 }
                 break;
             case "recipe":
+                if(fromDB) {
+                    const gIdx = list.groceryListIdx;
+                    console.log(gIdx);
+                    if(isNaN(gIdx) || gIdx < 0 || gIdx >= dbList.length) {
+                        list.groceryListIdx = -1;
+                    } else {
+                        const groceryList = dbList[gIdx];
+                        if(groceryList.type !== "checklist") {
+                            list.groceryListIdx = -1;
+                        }
+                    }
+                } else {
+                    delete list.groceryListIdx;
+                }
                 break;
             default: return false;
         }
+
         const validListKeys = ["name", "type", "data", "tags", "sortDir", "sortType", "date", "carousel",
-                               "filterChecks", "advancedView", "displayType", "hiddenComment"];
-        for(const key in list.keys) {
+                               "filterChecks", "advancedView", "displayType", "groceryListIdx", "hiddenComment"];
+        for(const key in list) {
             if(validListKeys.indexOf(key) < 0) { delete list[key]; }
         }
-        // TODO: validating individual items, tags, etc.
+        for(const key in list.tags) {
+            const valid = validation.EnsureValidTag(list.tags[key]);
+            if(!valid) { return false; }
+        }
+        for(let i = 0; i < list.data.length; i++) {
+            const valid = validation.EnsureValidDataItem(list.data[i], list);
+            if(!valid) { return false; }
+        }
         return true;
     },
+    EnsureValidTag: function(item) {
+        console.log(item);
+        if(typeof item.id !== "string"
+        || typeof item.tag !== "string"
+        || typeof item.color !== "number"
+        || typeof item.imgVal !== "string"
+        || typeof item.sortOrder !== "number") {
+            return false;
+        }
+        const validItemKeys = ["id", "tag", "color", "imgVal", "sortOrder", "hiddenComment"];
+        for(const key in item) {
+            if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
+        }
+        return true;
+    },
+    EnsureValidDataItem: function (item, list) {
+        console.log(item);
+        if(typeof item.tags !== "object"
+        || typeof item.important !== "boolean"
+        || typeof item.date !== "number") {
+            return false;
+        }
+        for(let i = item.tags.length - 1; i >= 0; i--) {
+            const tag = item.tags[i];
+            if(typeof list.tags[tag] === undefined) {
+                item.tags.splice(i, 1);
+            }
+        }
+        switch(list.type) {
+            case "checklist": return this.EnsureValidChecklistItem(item); 
+            case "notes": return this.EnsureValidNote(item); 
+            case "recipe": return this.EnsureValidRecipe(item);
+            default: return false;
+        }
+    },
     EnsureValidChecklistItem: function(item) {
+        console.log(item);
+        if(typeof item.val !== "string"
+        || typeof item.checked !== "boolean"
+        || typeof item.notes !== "string") {
+            return false;
+        }
+        const validItemKeys = ["tags", "important", "date", "val", "checked", "notes", "hiddenComment"];
+        for(const key in item) {
+            if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
+        }
         return true;
     },
     EnsureValidNote: function(item) {
+        console.log(item);
+        if(typeof item.val !== "string"
+        || typeof item.title !== "string"
+        || typeof item.body !== "string"
+        || (typeof item.locked !== "boolean" && typeof item.locked !== "undefined")) {
+            return false;
+        }
+        const validItemKeys = ["tags", "important", "date", "val", "title", "body", "locked", "hiddenComment"];
+        for(const key in item) {
+            if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
+        }
         return true;
     },
     EnsureValidRecipe: function(item) {
+        console.log(item);
+        if((typeof item.val !== "string" && typeof item.val !== "undefined")
+        || typeof item.name !== "string"
+        || isNaN(item.servings)
+        || typeof item.ingredience !== "object"
+        || typeof item.steps !== "object"
+        || typeof item.author !== "string"
+        || typeof item.notes !== "string"
+        || typeof item.source !== "string"
+        || typeof item.prepTime !== "string"
+        || typeof item.cookTime !== "string"
+        || typeof item.totalTime !== "string") {
+            return false;
+        }
+        const validIngKeys = ["ingredient", "amount", "unit", "checked", "group", "hiddenComment"];
+        for(let i = 0; i < item.ingredience.length; i++) {
+            const ing = item.ingredience[i];
+            console.log(ing);
+            if(typeof ing.ingredient !== "string"
+            || typeof ing.unit !== "string"
+            || typeof ing.checked !== "boolean"
+            || typeof ing.group !== "string") {
+                return false;
+            }
+            if(ing.amount !== "") { new Fraction(ing.amount); }
+            for(const key in ing) {
+                if(validIngKeys.indexOf(key) < 0) { delete ing[key]; }
+            }
+        }
+        const validStepKeys = ["step", "checked", "hiddenComment"];
+        for(let i = 0; i < item.steps.length; i++) {
+            const step = item.steps[i];
+            console.log(step);
+            if(typeof step.step !== "string"
+            || typeof step.checked !== "boolean") {
+                return false;
+            }
+            for(const key in step) {
+                if(validStepKeys.indexOf(key) < 0) { delete step[key]; }
+            }
+        }
+        const validItemKeys = ["tags", "important", "date", "val", "name", "servings", "ingredience", "steps", "author", "notes", "source", "prepTime", "cookTime", "totalTime", "hiddenComment"];
+        for(const key in item) {
+            if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
+        }
         return true;
     }
 };
