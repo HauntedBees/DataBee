@@ -477,7 +477,7 @@ $(function() {
 
     // Note List
     $("#btnAddNotes").on("click", function() { ShowInputModal("newNotes", "New Notes List", "New Notes List", "Create"); });
-    $("#btnEditNote").on("click", function() {
+    $("#btnEditNote, #noteBodyRead").on("click", function() {
         const idx = parseInt($("#bNoteEditor").attr("data-id"));
         ShowNoteEditor(idx, false);
     });
