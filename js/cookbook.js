@@ -286,7 +286,7 @@ function ViewRecipe(idx) {
         $("#recipeBy").show();
         if(recipe.source) {
             if(recipe.source.indexOf("http") === 0) {
-                $("#recipeBy").html(Sanitize`Recipe by: <a href="${recipe.source}">${recipe.author}</a>`);
+                $("#recipeBy").html(Sanitize`Recipe by: <a rel="noopener" target="_blank" href="${recipe.source}">${recipe.author}</a>`);
             } else {
                 $("#recipeBy").html(Sanitize`Recipe by: ${recipe.author}, ${recipe.source}`);
             }
@@ -295,7 +295,7 @@ function ViewRecipe(idx) {
         }
     } else if(recipe.source) {
         if(recipe.source.indexOf("http") === 0) {
-            $("#recipeBy").html(Sanitize`Recipe from: <a href="${recipe.source}">${recipe.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>`);
+            $("#recipeBy").html(Sanitize`Recipe from: <a rel="noopener" target="_blank" href="${recipe.source}">${recipe.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>`);
         } else {
             $("#recipeBy").html(Sanitize`Recipe from: ${recipe.source}`);
         }

@@ -297,7 +297,7 @@ function ShowCredits() {
     $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
     $("#bCredits, #backBtn").show();
     HideSidebars();
-    $("#title").text("DataBee v0JAN25");
+    $("#title").text("DataBee v0JAN27");
     ctx.stateForBackButton = "secondary";
 }
 function ShowSearch() {
@@ -481,7 +481,7 @@ function GetRecipeHTML(e, i, isSearchQuery) {
         <div class="addtlRecipeDetails">${e.notes.substring(0, 100) + (e.notes.length > 100 ? "..." : "")}</div>
         {beeSOWNER}
     </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeNBSP}", "&nbsp;").replace("{beeSOURCE}", e.source ? `from ${
-            e.source.indexOf("http") === 0 ? Sanitize`<a href="${e.source}">${e.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>` : Sanitize`${e.source}`
+            e.source.indexOf("http") === 0 ? Sanitize`<a rel="noopener" target="_blank" href="${e.source}">${e.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>` : Sanitize`${e.source}`
         }`: "");
 }
 function GetNoteHTML(e, i, isSearchQuery) {
@@ -565,7 +565,7 @@ function BasicMarkdown(s) {
             .replace(/\*(.*?)\*/g, `<em>$1</em>`)
             .replace(/_(.*?)_/g, `<em>$1</em>`)
             .replace(/~~(.*?)~~/g, `<span class="strikethru">$1</span>`)
-            .replace(/((http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?)/g, `<a href="$1">$1</a>`);
+            .replace(/((http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?)/g, `<a rel="noopener" target="blank" href="$1">$1</a>`);
 }
 function ToggleDataItemSettings($e, i, type) {
     const important = $e.hasClass("important");
