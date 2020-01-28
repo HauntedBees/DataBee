@@ -233,9 +233,10 @@ function SetUpCookbook() {
 
     $(document).on("click", ".step-unit", function() {
         const unit = $(this).attr("data-unit");
+        const rawunit = $(this).attr("data-rawunit");
         const amount = new Fraction($(this).attr("data-amount"));
-        const newAmount = ConvertBetweenMetricAndImperial(unit, amount);
-        $(this).replaceWith(GetAdjustableIngredientHTML(newAmount.amount, newAmount.unit, $(this).attr("data-tilde"), true));
+        const newAmount = ConvertBetweenMetricAndImperial(unit, amount, rawunit);
+        $(this).replaceWith(GetAdjustableIngredientHTML(newAmount.amount, newAmount.unit, $(this).attr("data-tilde"), true, rawunit));
     });
 
     $("#listData").on("click", ".ci-export", function(e) {
@@ -334,10 +335,10 @@ function DrawRecipe(recipe, servingsObj) {
         }
         const amt = adjustedRecipe.fraction === undefined ? new Fraction(adjustedRecipe.amount || 0) : adjustedRecipe.fraction;
         return SanitizeException(0, 2, 4)`${categoryPrefix}<li data-id="${i}" class="viewIngredient">
-            ${GetAdjustableIngredientHTML(amt, adjustedRecipe.unit, hasTilde ? "~" : "", adjustedRecipe.unit !== "")} ${adjustedRecipe.ingredient}
+            ${GetAdjustableIngredientHTML(amt, adjustedRecipe.unit, hasTilde ? "~" : "", adjustedRecipe.unit !== "", e.unit)} ${adjustedRecipe.ingredient}
             ${groceryListHTML}
         </li>`}).join(""));
-    $("#stepViewList").html(recipe.steps.map((e, i) => SanitizeException(2)`
+    $("#stepViewList").html(recipe.steps.map((e, i) => SanitizeException(4)`
     <li data-id="${i}" class="viewStep ${e.checked?"checked":""}">
         <span><input class="recipeStep checkbox" ${e.checked?"checked=checked":""} type="checkbox"> ${i + 1}. ${AdjustStep(e.step, recipe.servings, servingsObj)}</span>
     </li>`).join(""));
@@ -496,7 +497,7 @@ function ShiftFromMillimeter(amount) {
     if(amount >= 1000) { return { unit: "m", amount: amount.div(1000) }; }
     return { unit: "cm", amount: amount.div(10) };
 }
-function ConvertBetweenMetricAndImperial(unit, amount) {
+function ConvertBetweenMetricAndImperial(unit, amount, rawunit) {
     switch(unit) {
         // temperature
         case "ºF": return { unit: "ºC", amount: amount.add(-32).mul(5, 9) };
@@ -571,19 +572,37 @@ function ConvertBetweenMetricAndImperial(unit, amount) {
         case "mL":
             if(amount < 14.7868) { return {unit: "tspv", amount: amount.div(4.92892) }; }
             if(amount < 29.5735) { return {unit: "tbspv", amount: amount.div(14.7868) }; }
-            if(amount < 946.353) { return {unit: "fl oz", amount: amount.div(29.5735) }; }
+            if(amount < 946.353) {
+                if(rawunit === "cup") {
+                    return { unit: "cup", amount: amount.div(236.588) };
+                } else {
+                    return { unit: "fl oz", amount: amount.div(29.5735) };
+                }
+            }
             if(amount < 3785.41) { return {unit: "qt", amount: amount.div(946.353) }; }
             return {unit: "gal", amount: amount.div(3785.41) };
         case "dl":
         case "dL":
             if(amount < 0.147868) { return {unit: "tspv", amount: amount.mul(20.2884) }; }
             if(amount < 0.295735) { return {unit: "tbspv", amount: amount.mul(6.7628) }; }
-            if(amount < 9.46353) { return {unit: "fl oz", amount: amount.mul(3.3814) }; }
+            if(amount < 9.46353) {
+                if(rawunit === "cup") {
+                    return { unit: "cup", amount: amount.div(2.36588) };
+                } else {
+                    return { unit: "fl oz", amount: amount.mul(3.3814) };
+                }
+            }
             if(amount < 37.8541) { return {unit: "qt", amount: amount.div(9.46353) }; }
             return {unit: "gal", amount: amount.div(37.8541) };
         case "l":
         case "L":
-            if(amount < 1.05669) { return {unit: "fl oz", amount: amount.mul(33.814) }; }
+            if(amount < 1.05669) {
+                if(rawunit === "cup") {
+                    return { unit: "cup", amount: amount.mul(4.22675) };
+                } else {
+                    return {unit: "fl oz", amount: amount.mul(33.814) };
+                }
+            }
             if(amount < 3.78541) { return {unit: "qt", amount: amount.mul(1.05669) }; }
             return {unit: "gal", amount: amount.div(3.785) };
     }
@@ -596,7 +615,7 @@ function AdjustStep(step, baseServingSize, newServingSizeObj) {
         unit = CleanUserUnit(unit);
         const newAmount = originalAmount.fraction.mul(newServingSizeObj.fraction).div(baseServingSize);
         const finalUnitAndAmount = AdjustUnitToNewAmount(unit, originalAmount.fraction, newAmount);
-        return GetAdjustableIngredientHTML(finalUnitAndAmount.amount, finalUnitAndAmount.unit, tilde, finalUnitAndAmount.unit !== "");
+        return GetAdjustableIngredientHTML(finalUnitAndAmount.amount, finalUnitAndAmount.unit, tilde, finalUnitAndAmount.unit !== "", unit);
     }).replace(/\[([0-9]+(?:(?:\.|\/|,)[0-9]+)?)]/g, function(number) {
         const newAmount = new Fraction(number).mul(newServingSizeObj.fraction).div(baseServingSize);
         return newAmount;
@@ -609,14 +628,14 @@ const validUnits = ["ºF", "ºC",
                     "fl oz", "qt", "gal", "ml", "dl", "l", "mL", "dL", "L", 
                     "lb", "oz", "mg", "g", "kg", 
                     "mm", "cm", "m", "in", "ft"];
-function GetAdjustableIngredientHTML(amount, unit, tilde, isConvertible) {
+function GetAdjustableIngredientHTML(amount, unit, tilde, isConvertible, originalUnit) {
     if(validUnits.indexOf(unit) < 0) { isConvertible = false; }
     amount = amount.round(5);
     const showAsFraction = amount.d <= 10;
     const amountToStore = showAsFraction ? amount.toFraction() : amount.toString();
     let amountToShow = GetDisplayNumber(amount, showAsFraction);
     if(isConvertible) {
-        return SanitizeException(4)`<span class="unitInfo step-unit" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
+        return SanitizeException(5)`<span class="unitInfo step-unit" data-rawUnit="${originalUnit || ""}" data-tilde="${tilde}" data-amount="${amountToStore}" data-unit="${unit}">${tilde}${amountToShow}${GetUnitDisplay(unit, amount)}</span>`;
     } else if(unit === "toTaste" || unit === "none") {
         return "";
     } else {
