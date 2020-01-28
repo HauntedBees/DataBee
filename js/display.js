@@ -4,7 +4,7 @@ function Sanitize(strs, ...vals) {
     for(let i = 0; i < vals.length; i++) {
         finishedStr.push(strs[i]);
         const val = vals[i];
-        if(typeof val === "number") {
+        if(typeof val === "number" || typeof val === "boolean") {
             finishedStr.push(val);
         } else {
             finishedStr.push(he.encode(val, { useNamedReferences: true }));
