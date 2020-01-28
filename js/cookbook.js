@@ -573,7 +573,7 @@ function ConvertBetweenMetricAndImperial(unit, amount, rawunit) {
             if(amount < 14.7868) { return {unit: "tspv", amount: amount.div(4.92892) }; }
             if(amount < 29.5735) { return {unit: "tbspv", amount: amount.div(14.7868) }; }
             if(amount < 946.353) {
-                if(rawunit === "cup") {
+                if(rawunit === "cup" || rawunit === "cupv") {
                     return { unit: "cup", amount: amount.div(236.588) };
                 } else {
                     return { unit: "fl oz", amount: amount.div(29.5735) };
@@ -586,7 +586,7 @@ function ConvertBetweenMetricAndImperial(unit, amount, rawunit) {
             if(amount < 0.147868) { return {unit: "tspv", amount: amount.mul(20.2884) }; }
             if(amount < 0.295735) { return {unit: "tbspv", amount: amount.mul(6.7628) }; }
             if(amount < 9.46353) {
-                if(rawunit === "cup") {
+                if(rawunit === "cup" || rawunit === "cupv") {
                     return { unit: "cup", amount: amount.div(2.36588) };
                 } else {
                     return { unit: "fl oz", amount: amount.mul(3.3814) };
@@ -597,7 +597,7 @@ function ConvertBetweenMetricAndImperial(unit, amount, rawunit) {
         case "l":
         case "L":
             if(amount < 1.05669) {
-                if(rawunit === "cup") {
+                if(rawunit === "cup" || rawunit === "cupv") {
                     return { unit: "cup", amount: amount.mul(4.22675) };
                 } else {
                     return {unit: "fl oz", amount: amount.mul(33.814) };
