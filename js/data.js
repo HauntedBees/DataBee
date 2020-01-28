@@ -626,12 +626,13 @@ const data = {
     },
     ProcessRecipeJSON: function(str) {
         try {
+            const list = CurList();
             const recipe = JSON.parse(str.replace("javascript:", ""));
-            if(!validation.EnsureValidRecipe(recipe, false)) {
+            if(!validation.EnsureValidRecipe(recipe, true, list)) {
                 ShowAlert("Import Failed", "Invalid databee recipe format.");
                 return;
             }
-            CurList().data.push(recipe);
+            list.data.push(recipe);
             data.Save(function() {
                 ShowAlert("Import Succeeded!", Sanitize`Your recipe <em>${recipe.name}</em> has been imported!`);
                 DrawMain();
@@ -772,7 +773,7 @@ const validation = {
         }
         for(let i = item.tags.length - 1; i >= 0; i--) {
             const tag = item.tags[i];
-            if(typeof list.tags[tag] === undefined) {
+            if(typeof list.tags[tag] === "undefined") {
                 item.tags.splice(i, 1);
             }
         }
@@ -810,8 +811,30 @@ const validation = {
         }
         return true;
     },
-    EnsureValidRecipe: function(item) {
+    EnsureValidRecipe: function(item, isSoloImport, newList) {
         console.log(item);
+
+        if(isSoloImport) {
+            if(typeof item.tags !== "object" || typeof item.important !== "boolean" || typeof item.date !== "number") {
+                return false;
+            }
+            for(let i = item.tags.length - 1; i >= 0; i--) {
+                const tag = item.tags[i];
+                if(typeof newList.tags[tag] === "undefined") { // no ID match, try name match
+                    let found = false;
+                    for(const tagId in newList.tags) {
+                        const potentialTag = newList.tags[tagId];
+                        if(potentialTag.tag === tag) {
+                            item.tags[i] = tagId;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found) { item.tags.splice(i, 1); }
+                }
+            }
+        }
+
         if((typeof item.val !== "string" && typeof item.val !== "undefined")
         || typeof item.name !== "string"
         || isNaN(item.servings)
