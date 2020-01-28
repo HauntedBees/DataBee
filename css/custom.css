@@ -432,9 +432,12 @@ i.important { vertical-align: sub }
 
 .bottomElem {
     width: 55%;
+    left: -100%;
+    transition: 1s;
     bottom: 0;
     position: fixed;
 }
+nav.active .bottomElem { left: 0; transition: 0.35s }
 
 #noteTitle {
     background-color: var(--bg-color);
