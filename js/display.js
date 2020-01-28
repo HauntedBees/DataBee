@@ -233,7 +233,7 @@ function ShowRightbar() {
     ctx.stateForBackButton = "sidebar";
 }
 function HideSidebars(e) {
-    if(e !== undefined && (e.toElement.id === "menuBtn" || e.toElement.id === "menuRight")) { return; }
+    if(e !== undefined && (e.target.id === "menuBtn" || e.target.id === "menuRight")) { return; }
     $("#sidebar, #rightbar").removeClass("active");
     $("#sortTypes").hide().removeClass("active");
     $("#cover").hide();
@@ -244,7 +244,7 @@ function HideSidebars(e) {
     }
 }
 function BodyHideSidebars(e) {
-    if(e.toElement !== undefined && e.toElement.tagName.toLowerCase() === "html") {
+    if(e.target !== undefined && e.target.tagName.toLowerCase() === "html") {
         HideSidebars(e);
     }
 }
@@ -505,7 +505,7 @@ function GetNoteHTML(e, i, isSearchQuery) {
             <div class="lock"><i class="material-icons lockedIcon">lock</i></div>
             <div class="citem_cname">${FormatDate(e.date)}</div>
             {beeSOWNER}
-        </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeTITLE}", title.replace(/(?<=\b[^\s]+)[^\s]/g, "*"));
+        </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeTITLE}", title.split(" ").map(e => e[0] + e.substring(1).replace(/./g, "*")).join(" "));
     } else {
         return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="note elem ui-sortable-handle${e.important ? " important" : ""}">
             <div class="note_title">
