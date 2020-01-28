@@ -480,7 +480,7 @@ function GetRecipeHTML(e, i, isSearchQuery) {
         <div class="addtlRecipeDetails">${e.author ? `by ${e.author}`: "{beeNBSP}"}{beeSOURCE}</div>
         <div class="addtlRecipeDetails">${e.notes.substring(0, 100) + (e.notes.length > 100 ? "..." : "")}</div>
         {beeSOWNER}
-    </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeNBSP}", "&nbsp;").replace("{beeSOURCE}", e.source ? `from ${
+    </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeNBSP}", "&nbsp;").replace("{beeSOURCE}", e.source ? ` from ${
             e.source.indexOf("http") === 0 ? Sanitize`<a rel="noopener" target="_blank" href="${e.source}">${e.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>` : Sanitize`${e.source}`
         }`: "");
 }

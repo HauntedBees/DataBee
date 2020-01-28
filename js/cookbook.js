@@ -727,3 +727,45 @@ function CalibrateIngredientAmounts(recipe, amount) {
     $("#currentServingSize").val(amount.fraction.toString());
     DrawRecipe(recipe, amount);
 }
+
+const NQ = s => s.replace(/\"/g, "\\\"");
+function PrettyPrintRecipe(idx) {
+    const list = CurList();
+    const item = list.data[idx];
+    if(item === undefined) { return; }
+    const ings = item.ingredience.map(e => {
+        const groupVal = e.group === "" ? "" : `"group": "${NQ(e.group)}", `;
+        return `{ ${groupVal}"amount": "${e.amount}", "unit": "${e.unit}", "ingredient": "${NQ(e.ingredient)}" }`;
+    });
+    const json = `{
+    "name": "${NQ(item.name)}", "servings": "${NQ(item.servings)}",
+    "author": "${NQ(item.author)}", "source": "${NQ(item.source)}",
+    "prepTime": "${NQ(item.prepTime)}", "cookTime": "${NQ(item.cookTime)}", "totalTime": "${NQ(item.totalTime)}",
+    "notes": "${NQ(item.notes)}",
+    "tags": [${item.tags.map(e => `"${NQ(list.tags[e].tag)}"`).join(", ")}],
+    "ingredience": [
+        ${ings.join(",\n\t\t")}
+    ],
+    "steps": [
+        ${item.steps.map(e => `"${NQ(e.step)}"`).join(",\n\t\t")}
+    ],
+    "important": ${item.important}, "date": ${item.date}, "val": "${NQ(item.val)}"
+}`;
+    const b = new Blob([json], { type: "application/json" });
+    if(typeof cordova !== "undefined") {
+        window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory + "Download", function(entry) {
+            entry.getFile(`databee_recipe_${item.name}.json`, { create: true, exclusive: false }, function(file) {
+                file.createWriter(function(writer) {
+                    writer.onwriteend = function() { ShowAlert("Export Successful!", "Check your Download folder!"); }
+                    writer.onerror = function(e) { ShowAlert("Export Failed", e); }
+                    writer.write(b);
+                });
+            }, function(e) { ShowAlert("File Export Failed", e) });
+        }, function(e) { ShowAlert("Directory Export Failed", e)});
+    } else {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(b);
+        a.download = `databee_recipe_${item.name}.json`;
+        a.dispatchEvent(new MouseEvent("click"));
+    }
+}
