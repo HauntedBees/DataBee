@@ -369,7 +369,7 @@ const themes = [
     "--bg-color": "#000000",            "--text-color": "#B3B3B3",
     "--bg-color-important": "#660000",  "--text-color-brighter": "#DDDDDD",
     "--secondary-bg-color": "#FBFB07",  "--secondary-border-color": "#898937",
-    "--header-bg-color": "#B3B3B3",     "--header-text-color": "#FFFFFF",
+    "--header-bg-color": "#939393",     "--header-text-color": "#FFFFFF",
     "--button-text-color": "#4C4C4C"
   },
   {
