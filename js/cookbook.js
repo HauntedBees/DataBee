@@ -624,7 +624,7 @@ function GetAdjustableIngredientHTML(amount, unit, tilde, isConvertible, origina
 function GetUnitDisplay(unit, amount) {
     if(unit === "") { return " "; }
     if(["ºF", "ºC"].indexOf(unit) >= 0) { return unit; }
-    if(unit === "cup") { return amount === 1 ? " cup" : " cups"; }
+    if(unit === "cup") { return amount == 1 ? " cup" : " cups"; }
     if(unit === "tsp") { return "tsp"; }
     if(unit === "tbsp") { return "tbsp"; }
     if(unit === "ml") { return "mL"; }
