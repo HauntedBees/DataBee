@@ -297,7 +297,7 @@ function ShowCredits() {
     $(".body, #menuRight, #recipeTopBtns, #backBtn").hide();
     $("#bCredits, #menuBtn").show();
     HideSidebars();
-    $("#title").text("DataBee v0JAN");
+    $("#title").text("DataBee 0FEB01");
     ctx.stateForBackButton = "secondary";
 }
 function ShowHelp() {
