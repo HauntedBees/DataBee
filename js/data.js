@@ -1,5 +1,6 @@
 class DataObj {
     constructor(name, type) {
+        this.listVersion = 0;
         this.name = name;
         this.type = type;
         this.data = [];
@@ -31,6 +32,7 @@ class Cookbook extends DataObj {
 }
 class DataItem {
     constructor() {
+        this.itemVersion = 0;
         this.tags = [];
         this.important = false;
         this.date = +new Date();
@@ -89,6 +91,7 @@ class Step {
 }
 class Tag {
     constructor(tag, color, imgVal, sortOrder, id) {
+        this.tagVersion = 0;
         this.id = id || data.GetGUID();
         this.tag = tag;
         this.color = color;
@@ -99,6 +102,7 @@ class Tag {
 let dbData = {
     _id: "databee",
     dbList: [],
+    dbVersion: 0,
     currentScreen: -1,
     settings: {
         theme: 0, 
@@ -109,60 +113,16 @@ const data = {
     IsManualSorting: function(dataIdx) { return dbData.dbList[dataIdx || dbData.currentScreen].sortType === "manual"; },
     AddressVersionChanges: function() {
         let hasChanges = false;
-        if(dbData.leftHanded !== undefined) {               // 0JAN03 to 0JAN04
-            dbData.settings.leftHanded = dbData.leftHanded;
-            delete dbData.leftHanded;
-            hasChanges = true;
-        }
-        for(let i = 0; i < dbData.dbList.length; i++) {
-            const dObj = dbData.dbList[i];
-            if(dObj.sortType === undefined) {               // 0JAN03 to 0JAN04
-                dObj.sortType = 0;
-                dObj.filterChecks = true;
-                hasChanges = true;
-            } else if(typeof dObj.sortType === "number") {  // 0JAN05 to 0JAN12
-                dObj.sortType = "manual";
-                dObj.sortDir = 1;
-                hasChanges = true;
-            }
-            if(dObj.tags === undefined) {                   // 0JAN04 to 0JAN05
-                dObj.tags = {};
-                hasChanges = true;
-            }
-            if(dObj.carousel === undefined) {               // 0JAN19 to 0JAN20
-                dObj.carousel = true;
-                hasChanges = true;
-            }
-            const dTags = Object.keys(dObj.tags).map(key => dObj.tags[key]);
-            for(let j = 0; j < dTags.length; j++) {
-                const dTag = dTags[j];
-                if(dTag.imgVal === undefined) {             // 0JAN18 to 0JAN19
-                    dTag.imgVal = "";
-                    dTag.sortOrder = j;
-                    hasChanges = true;
-                }
-                if(typeof dTag.color === "string") {        // 0JAN18 to 0JAN19
-                    dTag.color = parseInt(dTag.color.replace("tagColor", ""));
-                    hasChanges = true;
-                }
-            }
-            const dData = dObj.data;
-            for(let j = 0; j < dData.length; j++) {
-                const dItem = dData[j];
-                if(dItem.tags === undefined) {              // 0JAN04 to 0JAN05
-                    dItem.tags = [];
-                    hasChanges = true;
-                }
-                if(dItem.date === undefined) {              // 0JAN05 to 0JAN12
-                    dItem.date = +new Date();
-                    hasChanges = true;
-                }
-                if(dItem.notes === undefined) {             // 0JAN13 to 0JAN17
-                    dItem.notes = "";
-                    hasChanges = true;
-                }
-            }
-        }
+        // dbVersion Changes
+        dbData.dbList.forEach(list => {
+            // listVersion changes
+            Object.keys(list.tags).map(key => list.tags[key]).forEach(tag => {
+                // tagVersion changes
+            });
+            list.data.forEach(item => {
+                // itemVersion changes
+            });
+        });
         if(hasChanges) {
             console.log("UPDATING!");
             data.Save();
