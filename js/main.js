@@ -95,6 +95,7 @@ $(function() {
     $("#sidebarData").on("click", "li", SelectDatalist);
     $("#btnSettings").on("click", ShowSettings);
     $("#btnCredits").on("click", ShowCredits);
+    $("#btnHelp").on("click", ShowHelp);
     $("#btnSearch").on("click", ShowSearch);
     $("#searchText").on("keyup", function() { DoSearch($(this).val().toLowerCase()); });
 

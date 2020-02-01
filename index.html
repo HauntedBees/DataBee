@@ -38,6 +38,7 @@
                 <li class="sidebar_header">DataBee</li>
                 <li id="btnSearch" class="sidebar_setting"><i class="material-icons">search</i><span class="by-icon">Search</span></li>
                 <li id="btnSettings" class="sidebar_setting"><i class="material-icons">settings</i><span class="by-icon">Settings</span></li>
+                <li id="btnHelp" class="sidebar_setting"><i class="material-icons">help_outline</i><span class="by-icon">Help</span></li>
                 <li id="btnCredits" class="sidebar_setting"><i class="material-icons">copyright</i><span class="by-icon">Credits</span></li>
             </ul>
             <ul id="sidebarData"></ul>
@@ -255,8 +256,126 @@
                         bottom to create a new list! From there you can add items, delete them, sort them, whatever!</p>
                     <p>Checklists behave like, well, checklists! Notes Lists are collections of notes, which can be arranged as 
                         tiles or in a list. Notes can have a little bit of styling applied to them to make them <span class="bold">**bold**</span>
-                        or <span class="italic">*italic*</span> or even <span class="strikethru">~~strikethrough'd~~</span>.</p>
-                    <p>I suppose it'd be polite of me to add, like, more instructions or whatever, but, counterpoint: I'm lazy.</p>
+                        or <span class="italic">*italic*</span> or even <span class="strikethru">~~strikethrough'd~~</span>. Cookbooks are for recipes.</p>
+                    <p>If you want to know more, check the Help section!</p>
+                </div>
+                <div id="bHelp" class="body">
+                    <h4>Contents (Tabled)</h4>
+                    <ol>
+                        <li><a href="#helpMainMenu">Main Menu</a></li>
+                        <li><a href="#helpListBasics">List Basics</a></li>
+                        <li><a href="#helpListChecklist">Checklists</a></li>
+                        <li><a href="#helpListNotesList">Note Lists</a></li>
+                        <li><a href="#helpListCookbook">Cookbooks</a></li>
+                        <li><a href="#helpTags">Tags</a></li>
+                    </ol>
+                    <br id="helpMainMenu">
+                    <h4><strong>Main Menu</strong></h4>
+                    <p>To access the main menu, tap the <i class="material-icons">view_headline</i> button in the upper left or swipe left. If you're here,
+                        you probably already know how to do that. From there, you've got some options:</p>
+                    <ul>
+                        <li><i class="material-icons">search</i><strong>Search:</strong> Search across all of your Lists. From the search
+                            results, you can interact with List Items, or jump directly to its place in its respective List by tapping <i class="material-icons">arrow_forward</i>.</li>
+                        <li><i class="material-icons">settings</i><strong>Settings:</strong> From here you can adjust the theme, toggle left-handed mode, back up or restore your
+                            entire everything, or erase all your data in the app and start from scratch. Not sure why you'd want to do that, though.</li>
+                        <li><i class="material-icons">help_outline</i><strong>Help:</strong> You are here.</li>
+                        <li><i class="material-icons">copyright</i><strong>Credits:</strong> I made this. This is where I tell you that.</li>
+                        <li><i class="material-icons">list</i><strong>Your Lists:</strong> All of the Lists you've created show up in the middle area. Tap one of them to go to that List.
+                            You can also sort your Lists by tapping and dragging on the <i class="material-icons">unfold_more</i> on the side.</li>
+                        <li id="helpImportList"><i class="material-icons">add</i><strong>New <em>Whatever</em>:</strong> Create a specific Type of List. More information about what each type does is below.</li name="helpExportList">
+                        <li><i class="material-icons">import_export</i><strong>Import List:</strong> Just select a valid <a href="#helpExportList">Databee List File</a> and bam, that list is your list now. Useful if you want to like, import a list from another instance of Databee or if someone else made a 
+                            useful List (like a "getting ready for a camping trip" Checklist or a "sugary recipes" Cookbook) and shared it online. List Importing will never replace an existing list - so if you import a List with the same
+                            name as a List you already have, you'll get a new List with a name like "List (0)" or "List (1)."</li>
+                    </ul>
+
+                    <br id="helpListBasics">
+                    <h4><strong>List Basics</strong></h4>
+                    <p>When viewing a List, most of the screen is dedicated to the content of the List - your checklist items, your notes, your recipes. At the bottom of the screen are
+                        two useful things: the <em><i class="material-icons">add</i> Add Button</em> and the <em>List Carousel</em>. Tap the <em>Add Button</em> to start creating new List Items.
+                        If you have more than one List, you can use the <em>List Carousel</em> to cycle through them quickly without having to open the Main Menu.</p>
+                    <p>You can view the List Settings by swiping right or tapping the <i class="material-icons">more_vert</i> icon in the upper right. The options will vary depending on the List Type, but some are universal:</p>
+                    <ul>
+                        <li><i class="material-icons">delete</i><strong>Delete List:</strong> Delete the List and all List Items in it. This is permanent, 
+                            so don't do this unless you have a backup or you're sick of that List.</li>
+                        <li id="helpExportList"><i class="material-icons">edit</i><strong>Rename List:</strong> Change the name of the List.</li>
+                        <li><i class="material-icons">share</i><strong>Export List:</strong> Create and download a Databee List File to your device. 
+                            List Files created this way can be kept as backups or shared with others, and can be imported with the <a href="#helpImportList">Import List</a>
+                            option in the Main Menu.</li>
+                        <li><i class="material-icons">label</i><strong>Tags:</strong> Add, edit, and delete <a href="#helpTags">Tags</a> for this List.</li>
+                        <li><i class="material-icons">sort</i><strong>Sort Order:</strong> Change how you want List Items in this List to be sorted. You can Sort in 
+                            ascending or descending order, toggling this by tapping the selected Sort Order again. List Items added to the List will automatically be
+                            sorted, or added to the bottom if the Sort Order is <em>Manual</em>.</li>
+                        <li><i class="material-icons">view_carousel</i><strong>Show in Carousel:</strong> Toggle whether or not to show this List in the List Carousel at the bottom of the screen.</li>
+                    </ul>
+                    <p>You can do different things with List Items depending on the Type of List, but a few things are the same across all Lists.
+                        If your List's Sort Order is <em>Manual</em>, you can re-order List Items by tapping and dragging on the <i class="material-icons">unfold_more</i> on the side.
+                        Meanwhile, you can tap the <i class="material-icons">more_horiz</i> to bring up its <em>List Item Settings</em>. The List Item Settings available vary depending 
+                        on the Type of List, but a few are shared across all Types:</p>
+                    <ul>
+                        <li><i class="material-icons">delete</i><strong>Delete:</strong> Sends the List Item to the Recycle Bin, where it will remain until it is pushed out.</li>
+                        <li><i class="material-icons">edit</i><strong>Edit/Rename:</strong> Change the name/content of the List Item.</li>
+                        <li><i class="material-icons">arrow_forward</i><strong>Move:</strong> Move this List Item to another List of the same Type.</li>
+                        <li><i class="material-icons">label</i><strong>Tags:</strong> Add or remove <a href="#helpTags">Tags</a> from the List Item.</li>
+                        <li><i class="material-icons">error_outline</i><strong>Important:</strong> Toggle the List Item's Importance. Important List Items have an 
+                            icon in front of them, a custom background color, and they'll be grouped together if the List's Sort Order is <em>Importance</em>.</li>
+                    </ul>
+                    
+                    <br id="helpListChecklist">
+                    <h4><strong>Checklists</strong></h4>
+                    <p>Checklists are straightforward. Create a List Item, then tap it or the checkbox next to it to toggle whether or not it's checked. Checklists only have 
+                        one unique List Item Option, <i class="material-icons">question_answer</i> <strong>Notes</strong>, which allows you to add additional notes that show up 
+                        below the List Item. Checklists also have the following unique List Settings and Actions:</p>
+                    <ul>
+                        <li><i class="material-icons">check_box</i><strong>Check All:</strong> Check all List Items.</li>
+                        <li><i class="material-icons">check_box_outline_blank</i><strong>Uncheck All:</strong> Uncheck all List Items. What did you expect?</li>
+                        <li><i class="material-icons">cancel</i><strong>Remove Completed:</strong> Permanently delete all List Items currently checked.</li>
+                        <li><i class="material-icons">check_box</i><strong>Checked Items:</strong> Toggle whether or not Checked List Items should remain below the unchecked ones.
+                            When <em>Keep Down</em> is selected, List Items will automatically be moved down when checked, or up when unchecked.</li>
+                        <li><i class="material-icons">library_add</i><strong>New Item Dialog:</strong> If you use the <em>Advanced</em> New Item Dialog, when you tap the 
+                            <i class="material-icons">add</i> <strong>Add Button</strong>, you'll be able to set the Checklist Item Name, its Notes, and <a href="#helpTags">Tags</a>, all right in the 
+                            New Item window. Everything except the Name is still optional, but if you frequently add Notes or <a href="#helpTags">Tags</a> to List Items, this might save some time.</li>
+                    </ul>
+                    
+                    <br id="helpListNotesList">
+                    <h4><strong>Note Lists</strong></h4>
+                    <p>Notes are notes. They can optionally be titled. Tap on a Note List Item to view the full note, then tap it again to edit it. Again, nothing too fancy here.
+                        Note Lists have one unique List Setting, <i class="material-icons">view_list</i> <strong>View Type</strong>. In the <em>List View</em>, all of the List Items 
+                        are arranged one by one on your screen. In the <em>Tile View</em>, a two-column grid of tiles with your Notes in them fill the screen. You can scroll through
+                        your Notes, or scroll through individual Notes, allowing you to see the entire Note on the viewing screen. Note List Items also have one custom List Item Setting:
+                        <i class="material-icons">lock</i> <strong>Hide/Show Info</strong>. When this is enabled, the contents of the Note will not show up in the List View. They'll still 
+                        be easily visible by tapping on the Note, but for information you want to keep away from casual shoulder surfers, this is vaguely handy.</p>
+
+                    <br id="helpListCookbook">
+                    <h4><strong>Cookbooks</strong></h4>
+                    <p>Cookbooks contain recipes. When you create a new Cookbook List Item, you'll be brought to the Recipe Editor, where you can specify how many servings your
+                        recipe makes, ingredients, recipe steps, and optional metadata. There are three views for the Recipe Editor and Recipe Viewer: <em>Full</em>, <em>Ingredients</em>,
+                        and <em>Steps</em>. These three options, unsurprisingly, show everything, just the ingredients, and just the recipe steps, respectively. Recipe metadata and the 
+                        Serving Size will only be shown in the Full view.</p>
+                    <p>Ingredients have four parts: the ingredient itself, the quantity, the unit, and an optional Grouping. The Grouping option allows you to group ingredients together; 
+                        for example if your recipe is fresh pasta with pasta sauce, you may group your ingredients like flour and egg in the "Pasta" group, and ingredients like tomato and 
+                        basil in the "Sauce" group. In the Recipe Viewer, all ingredient amounts will be scaled based on the Serving Size, and can also be converted between Metric and Imperial
+                        Units on the fly by tapping on them.</p>
+                    <p>Steps are just text. If you wrap an amount in brackets like <em>[2 cups]</em> or <em>[5] eggs</em>, it'll show up in the Recipe Viewer like <span class="help-step">2 cups</span>
+                        or <span class="help-step">5</span> <em>eggs</em> and the value will be adjusted when you change the Serving Size, and can be converted between Metric and Imperial
+                        Units by tapping on it.</p>
+                    <p>Cookbooks have one unique List Action and one unique List Setting:</p>
+                    <ul>
+                        <li><i class="material-icons">import_export</i><strong>Import Recipe:</strong> Import an individual Databee Recipe File and add it to this Cookbook.</li>
+                        <li><i class="material-icons">arrow_forward</i><strong>Grocery List:</strong> With this option, you can select a Checklist to designate as a Grocery List.
+                            If a Grocery List is set, ingredients will show up with a <i class="material-icons">shopping_cart</i> <strong>Shopping Cart</strong> icon next to them 
+                            in the Recipe Viewer. Tapping this will immediately add the ingredient as a List Item to the specified Checklist, complete with the amount you'll need.</li>
+                    </ul>
+                    <p>Recipes also have one custom List Item Action: <i class="material-icons">share</i> <strong>Export</strong>, which will download the recipe in the Databee 
+                        Recipe Format, allowing you to share it with others or just back it up somewhere else.</p>
+
+                    <br id="helpTags">
+                    <h4><strong>Tags</strong></h4>
+                    <p>Tags are List-specific, and any number of them can be applied to any List Items in that List. A Tag consists of a Tag Name, Color, and Display Icon.
+                        The first Display Icon is <em>none</em>, and just shows up as a colored square. The second Display Icon is <em>hidden</em>. Items tagged with hidden 
+                        Tags won't look any different in the List View, but they'll still affect Search Results, and if the List is being Sorted by Tags, hidden Tags will 
+                        still affect Sort Order.</p>
+                    <p>Much like Lists and List Items, you can tap and drag the <i class="material-icons handle">unfold_more</i> to sort Tags, which will affect the Sort 
+                        Order of items when sorting by Tag. Additionally, tapping <i class="material-icons">more_horiz</i> will allow you to edit or delete a Tag.</p>
                 </div>
             </div>
         </div>

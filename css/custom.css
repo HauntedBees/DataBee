@@ -108,6 +108,7 @@ header {
 #bMain > h4, #bCredits > p:first-child { padding-top: 1em }
 #bCredits { padding: 0 1em }
 #bCredits > * { font-size: 0.8em }
+#bHelp .material-icons { vertical-align: middle }
 * { -webkit-tap-highlight-color: rgba(255, 255, 255, 0) }
 #front {
     background-color: #000000;
@@ -683,7 +684,7 @@ input, option, select, textarea { color: #000000 }
 .viewIngredient { padding: 0 0.5em 0 1em }
 #stepViewList { padding: 0 0.75em }
 #matterType { text-align: center }
-.step-unit {
+.step-unit, .help-step {
     border: 1px dashed var(--bg-color-important);
     border-radius: 0.35em;
     padding: 0.15em;

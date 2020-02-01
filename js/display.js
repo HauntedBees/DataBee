@@ -204,7 +204,7 @@ function ShowSidebar() {
     ctx.stateForBackButton = "sidebar";
 }
 function ShowRightbar() {
-    if(dbData.currentScreen < 0) { return; }
+    if(ctx.stateForBackButton !== "home" || dbData.currentScreen < 0) { return; }
     switch(CurList().type) {
         case "checklist":
             $(".note-only, .recipe-only").hide();
@@ -287,17 +287,25 @@ function ShowSettings() {
         $setting.attr("data-val", value).text(value ? "Enabled" : "Disabled");
         if(value) { $setting.addClass("button-primary"); }
     }
-    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
-    $("#bSettings, #backBtn").show();
+    $(".body, #menuRight, #recipeTopBtns, #backBtn").hide();
+    $("#bSettings, #menuBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Settings");
     ctx.stateForBackButton = "secondary";
 }
 function ShowCredits() {
-    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
-    $("#bCredits, #backBtn").show();
+    $(".body, #menuRight, #recipeTopBtns, #backBtn").hide();
+    $("#bCredits, #menuBtn").show();
     HideSidebars();
-    $("#title").text("DataBee v0JAN27");
+    $("#title").text("DataBee v0JAN");
+    ctx.stateForBackButton = "secondary";
+}
+function ShowHelp() {
+    $(".body, #menuRight, #recipeTopBtns, #backBtn").hide();
+    $("#bHelp, #menuBtn").show();
+    $("#content").removeClass("listView");
+    HideSidebars();
+    $("#title").text("DataBee - Help");
     ctx.stateForBackButton = "secondary";
 }
 function ShowSearch() {
@@ -403,12 +411,13 @@ function ReturnToMain() {
 function DrawMain() {
     if(dbData.currentScreen === -1) {
         $("#title").text("DataBee - Welcome!");
-        $(".body").hide();
+        $("#content").removeClass("listView");
+        $(".body, #menuRight").hide();
         $("#bMain").show();
         return;
     } else if(dbData.currentScreen < 0 || dbData.currentScreen >= dbData.dbList.length) { return; }
     $(".body").hide();
-    $("#bChecklist").show();
+    $("#bChecklist, #menuRight").show();
     $("#content").addClass("listView");
     const datalist = CurList();
     $("#listData").empty().attr("data-type", datalist.type).removeClass("tileView");
