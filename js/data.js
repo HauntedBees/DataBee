@@ -845,6 +845,13 @@ const validation = {
         || typeof item.totalTime !== "string") {
             return false;
         }
+        if(typeof item.groupSortOrder === "undefined") {
+            item.groupSortOrder = [];
+        } else if(typeof item.groupSortOrder === "object") {
+            if(item.groupSortOrder.some(e => typeof e !== "string")) {
+                return false;
+            }
+        } else { return false; }
         const validIngKeys = ["ingredient", "amount", "unit", "group", "hiddenComment"];
         for(let i = 0; i < item.ingredience.length; i++) {
             const ing = item.ingredience[i];
@@ -875,7 +882,7 @@ const validation = {
                 }
             }
         }
-        const validItemKeys = ["tags", "important", "date", "val", "name", "servings", "ingredience", "steps", "author", "notes", "source", "prepTime", "cookTime", "totalTime", "hiddenComment"];
+        const validItemKeys = ["tags", "important", "date", "val", "name", "servings", "ingredience", "steps", "author", "notes", "source", "prepTime", "cookTime", "totalTime", "hiddenComment", "groupSortOrder"];
         for(const key in item) {
             if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
         }
