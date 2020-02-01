@@ -109,6 +109,7 @@ class Tag {
 let dbData = {
     _id: "databee",
     dbList: [],
+    recycleBin: [], 
     dbVersion: 0,
     currentScreen: -1,
     settings: {
@@ -197,6 +198,10 @@ const data = {
         dbData.dbList.splice(dataIdx, 1);
         dbData.currentScreen = dataIdx - 1;
         if(dbData.currentScreen < 0 && dbData.dbList.length > 0) { dbData.currentScreen = 0; }
+        dbData.dbList.forEach(e => {
+            if(e.type === "recipe" && e.groceryListIdx === dataIdx) { e.groceryListIdx = -1; }
+        });
+        dbData.recycleBin = dbData.recycleBin.filter(e => e.ownerIdx !== dataIdx);
         if(dontSave !== true) { data.Save(DrawSidebar); }
     },
     SwapDatas: function(oldIdx, newIdx, dontSave) {
@@ -207,6 +212,7 @@ const data = {
                                                             : dbData.dbList[e.groceryListIdx].name]
                                                         : [i, undefined])
                                                 .filter(e => e[1] !== undefined);
+        const trashInfo = dbData.recycleBin.map((e, i) => [i, dbData.dbList[e.ownerIdx].name]);
         const currentName = CurList().name;
         const elem = dbData.dbList[oldIdx];
         dbData.dbList.splice(oldIdx, 1);
@@ -220,6 +226,10 @@ const data = {
             affectedCookbooks.forEach(e => {
                 dbData.dbList[e[0]].groceryListIdx = i;
             });
+            const affectedTrash = trashInfo.filter(e => e[1] === list.name);
+            affectedTrash.forEach(e => {
+                dbData.recycleBin[e[0]].ownerIdx = i;
+            });
         }
         if(dontSave !== true) { data.Save(); }
     },
@@ -229,7 +239,19 @@ const data = {
         if(dontSave !== true) { data.Save(); }
     },
     DeleteDataItem: function(dataIdx, elemIdx, dontSave) {
-        dbData.dbList[dataIdx].data.splice(elemIdx, 1);
+        const oldItem = dbData.dbList[dataIdx].data.splice(elemIdx, 1)[0];
+        if(oldItem.divider !== true) {
+            oldItem.ownerIdx = dataIdx;
+            if(dbData.recycleBin.length === 30) { dbData.recycleBin.shift(); }
+            dbData.recycleBin.push(oldItem);
+        }
+        if(dontSave !== true) { data.Save(); }
+    },
+    RestoreDataItem: function(dataIdx, elemIdx, dontSave) {
+        const oldItem = dbData.recycleBin.splice(elemIdx, 1)[0];
+        delete oldItem.ownerIdx;
+        delete oldItem.ownerName;
+        dbData.dbList[dataIdx].data.push(oldItem);
         if(dontSave !== true) { data.Save(); }
     },
     SwapDataItems: function(dataIdx, oldElemIdx, newElemIdx, dontSave) {

@@ -202,7 +202,7 @@ body { font-size: 2em }
     max-width: 75%;
     word-break: break-word;
 }
-.cbitem > .edit, .cbitem > .handle, .cbitem > .goToResult {
+.cbitem > .edit, .cbitem > .handle, .cbitem > .goToResult, .cbitem > .restoreItem {
     float: right;
     font-size: 1.25em;
     padding: 0.25em;
@@ -219,7 +219,7 @@ body { font-size: 2em }
     margin-top: 0.5em;
 }
 
-.note .edit, .note .handle, .note .goToResult {
+.note .edit, .note .handle, .note .goToResult, .note .restoreItem {
     float: right;
     font-size: 1.25em;
 }

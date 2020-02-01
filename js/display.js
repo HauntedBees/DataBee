@@ -314,9 +314,34 @@ function ShowSearch() {
     $("#bSearch, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Search");
-    $("#searchText").val("").focus();
+    $("#searchText").show().val("").focus();
     ctx.stateForBackButton = "secondary";
     DoSearch("");
+}
+function ShowRecycleBin() {
+    $("#searchData").empty();
+    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
+    $("#bSearch, #backBtn").show();
+    HideSidebars();
+    $("#title").text("DataBee - Recycle Bin");
+    $("#searchText").hide();
+    ctx.stateForBackButton = "secondary";
+    if(dbData.recycleBin.length === 0) {
+        $("#searchData").html(`<li class="citem-text">Your Recycle Bin is empty right now. Up to 30 deleted items can stay in the Recycle Bin.</li>`);
+    } else {
+        const html = dbData.recycleBin.map((e, i) => {
+            const list = dbData.dbList[e.ownerIdx];
+            e.ownerName = list.name;
+            if(list.type === "checklist") {
+                return GetCheckboxItemHTML(e, i, "bin");
+            } else if(list.type === "notes") {
+                return GetNoteHTML(e, i, "bin");
+            } else if(list.type === "recipe") {
+                return GetRecipeHTML(e, i, "bin");
+            } else { return ""; }
+        });
+        $("#searchData").html(html.join(""));
+    }
 }
 function DoSearch(searchQuery) {
     $("#searchData").empty();
@@ -331,11 +356,11 @@ function DoSearch(searchQuery) {
         const html = results.map(re => {
             const e = re.elem;
             if(e.listType === "checklist") {
-                return GetCheckboxItemHTML(e, e.myIdx, true);
+                return GetCheckboxItemHTML(e, e.myIdx, "search");
             } else if(e.listType === "notes") {
-                return GetNoteHTML(e, e.myIdx, true);
+                return GetNoteHTML(e, e.myIdx, "search");
             } else if(e.listType === "recipe") {
-                return GetRecipeHTML(e, e.myIdx, true);
+                return GetRecipeHTML(e, e.myIdx, "search");
             } else { return ""; }
         });
         $("#searchData").html(html.join(""));
@@ -423,7 +448,7 @@ function DrawMain() {
     $("#listData").empty().attr("data-type", datalist.type).removeClass("tileView");
     $("#title").text(datalist.name);
     if(datalist.type === "checklist") {
-        const html = datalist.data.map((e, i) => GetCheckboxItemHTML(e, i, false, datalist));
+        const html = datalist.data.map((e, i) => GetCheckboxItemHTML(e, i, undefined, datalist));
         $("#listData").html(html.join(""));
     } else if(datalist.type === "notes") {
         if(datalist.displayType === "tiles") { $("#listData").addClass("tileView"); }
@@ -465,17 +490,24 @@ function SetScroller(elemId, currIdx, dir, origIdx) {
 }
 // beeIMPORTANT, beeTAGS, beeHANDLE, beeSQ, beeSOWNER
 // TODO: can probably merge a fair amount of these 3 GetThingHTML functions
-function ReplaceCommonHTML(str, e, showHandle, isSearchQuery, tagsHTML) {
+function ReplaceCommonHTML(str, e, showHandle, extraType, tagsHTML) {
+    let sq = "";
+    if(extraType === "search") {
+        sq = Sanitize`<i data-parent="${e.ownerIdx}" class="goToResult material-icons">arrow_forward</i>`;
+    } else if(extraType === "bin") {
+        sq = Sanitize`<i data-parent="${e.ownerIdx}" class="restoreItem material-icons">restore_from_trash</i>`;
+    }
     return str.replace("{beeIMPORTANT}", e.important ? "<i class='important material-icons'>error_outline</i>" : "")
               .replace("{beeTAGS}", tagsHTML)
               .replace("{beeHANDLE}", showHandle ? `<i class="material-icons handle">unfold_more</i>` : "")
-              .replace("{beeSOWNER}", isSearchQuery === true ? Sanitize`<div class="citem_cname">${e.ownerName}</div>` : ``)
-              .replace("{beeSQ}", isSearchQuery === true ? Sanitize`<i data-parent="${e.ownerIdx}" class="goToResult material-icons">arrow_forward</i>` : "");
+              .replace("{beeSOWNER}", extraType !== undefined ? Sanitize`<div class="citem_cname">${e.ownerName}</div>` : ``)
+              .replace("{beeSQ}", sq)
+              .replace("{beeEDIT}", extraType === "bin" ? "w" : `<i class="edit material-icons">more_horiz</i>`);
 }
-function GetRecipeHTML(e, i, isSearchQuery) {
-    const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
+function GetRecipeHTML(e, i, extraType) {
+    const dbListIdx = extraType !== undefined ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
-    const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
+    const showHandle = extraType !== undefined ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = GetTagsHTML(allTags, e.tags);
     return ReplaceCommonHTML(Sanitize`<li id="recipeitem${i}" data-id="${i}" class="cbitem elem ritem ui-sortable-handle${e.important ? " important" : ""}">
         <span class="itemContainer">
@@ -485,19 +517,19 @@ function GetRecipeHTML(e, i, isSearchQuery) {
         </span>
         {beeHANDLE}
         {beeSQ}
-        <i class="edit material-icons">more_horiz</i>
+        {beeEDIT}
         <div class="addtlRecipeDetails">${e.author ? `by ${e.author}`: "{beeNBSP}"}{beeSOURCE}</div>
         <div class="addtlRecipeDetails">${e.notes.substring(0, 100) + (e.notes.length > 100 ? "..." : "")}</div>
         {beeSOWNER}
-    </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeNBSP}", "&nbsp;").replace("{beeSOURCE}", e.source ? ` from ${
+    </li>`, e, showHandle, extraType, tagsHTML).replace("{beeNBSP}", "&nbsp;").replace("{beeSOURCE}", e.source ? ` from ${
             e.source.indexOf("http") === 0 ? Sanitize`<a rel="noopener" target="_blank" href="${e.source}">${e.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>` : Sanitize`${e.source}`
         }`: "");
 }
-function GetNoteHTML(e, i, isSearchQuery) {
-    const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
+function GetNoteHTML(e, i, extraType) {
+    const dbListIdx = extraType !== undefined ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
     const isTileView =$("#listData").hasClass("tileView");
-    const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
+    const showHandle = extraType !== undefined ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = GetTagsHTML(allTags, e.tags);
     const title = e.title === "" ? e.body.substring(0, 30) + (e.body.length > 30 ? "..." : "") : e.title;
     const body = e.title === "" ? "" : (e.body.length < 100 || isTileView ? e.body : e.body.substring(0, 100) + "...");
@@ -509,12 +541,12 @@ function GetNoteHTML(e, i, isSearchQuery) {
                 {beeTITLE}
                 {beeHANDLE}
                 {beeSQ}
-                <i class="edit material-icons">more_horiz</i>
+                {beeEDIT}
             </div>
             <div class="lock"><i class="material-icons lockedIcon">lock</i></div>
             <div class="citem_cname">${FormatDate(e.date)}</div>
             {beeSOWNER}
-        </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeTITLE}", title.split(" ").map(e => e[0] + e.substring(1).replace(/./g, "*")).join(" "));
+        </li>`, e, showHandle, extraType, tagsHTML).replace("{beeTITLE}", title.split(" ").map(e => e[0] + e.substring(1).replace(/./g, "*")).join(" "));
     } else {
         return ReplaceCommonHTML(Sanitize`<li id="note${i}" data-id="${i}" class="note elem ui-sortable-handle${e.important ? " important" : ""}">
             <div class="note_title">
@@ -523,24 +555,24 @@ function GetNoteHTML(e, i, isSearchQuery) {
                 {beeTITLE}
                 {beeHANDLE}
                 {beeSQ}
-                <i class="edit material-icons">more_horiz</i>
+                {beeEDIT}
             </div>
             <div class="note_body">{beeBODY}</div>
             <div class="citem_cname">${FormatDate(e.date)}</div>
             {beeSOWNER}
-        </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeTITLE}", BasicMarkdown(title))
+        </li>`, e, showHandle, extraType, tagsHTML).replace("{beeTITLE}", BasicMarkdown(title))
                                                     .replace("{beeBODY}", BasicMarkdown(body));
     }
 }
-function GetCheckboxItemHTML(e, i, isSearchQuery, parentList) {
+function GetCheckboxItemHTML(e, i, extraType, parentList) {
     if(e.divider === true) {
         if(parentList.sortType === "manual") {
-            return Sanitize`<li id="cbitem${i}" data-id="${i}" class="cbitem divider"><span class="itemContainer"></span><i class="material-icons handle">unfold_more</i></li>`;
+            return Sanitize`<li id="cbitem${i}" data-id="${i}" class="cbitem divider"><span class="itemContainer"><i class="material-icons deleteDivider">delete</i></span><i class="material-icons handle">unfold_more</i></li>`;
         } else { return ""; }
     }
-    const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
+    const dbListIdx = extraType !== undefined ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
-    const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
+    const showHandle = extraType !== undefined ? false : dbData.dbList[dbListIdx].sortType === "manual";
     const tagsHTML = GetTagsHTML(allTags, e.tags);
     return ReplaceCommonHTML(Sanitize`<li id="cbitem${i}" data-id="${i}" class="cbitem elem ui-sortable-handle${e.important && e.checked === false ? " important" : ""}">
         <input class="checkbox" type="checkbox"${e.checked ? " checked" : ""}>
@@ -551,10 +583,10 @@ function GetCheckboxItemHTML(e, i, isSearchQuery, parentList) {
         </span>
         {beeHANDLE}
         {beeSQ}
-        <i class="edit material-icons">more_horiz</i>
+        {beeEDIT}
         {beeNOTES}
         {beeSOWNER}
-        </li>`, e, showHandle, isSearchQuery, tagsHTML).replace("{beeNOTES}", e.notes !== "" ? Sanitize`<div class="citem_notes">${e.notes}</div>` : ``);
+        </li>`, e, showHandle, extraType, tagsHTML).replace("{beeNOTES}", e.notes !== "" ? Sanitize`<div class="citem_notes">${e.notes}</div>` : ``);
 }
 function GetTagsHTML(allTags, myTags) {
     const tags = myTags.map(t => allTags[t]).sort((a, b) => {

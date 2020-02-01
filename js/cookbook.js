@@ -376,7 +376,12 @@ function RecipeClick(e, $t) {
     const $clicked = $(e.target);
     if(targType === "i") { // button
         if($clicked.closest(".settings").length) { return; } // settings
-        if($clicked.hasClass("goToResult")) { // Search
+        if($clicked.hasClass("restoreItem")) { // Recover From Recycle Bin
+            const listIdx = $clicked.attr("data-parent");
+            data.RestoreDataItem(listIdx, idx);
+            ShowRecycleBin();
+            return;
+        } else if($clicked.hasClass("goToResult")) { // Search
             const listIdx = $clicked.attr("data-parent");
             SelectDatalist.call($(Sanitize`#sidebarData > li[data-id='${listIdx}']`));
             $(Sanitize`#recipeitem${idx} .edit`).click();

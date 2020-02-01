@@ -94,6 +94,7 @@ $(function() {
     $("#cover").on("click", HideSidebars);
     $("#sidebarData").on("click", "li", SelectDatalist);
     $("#btnSettings").on("click", ShowSettings);
+    $("#btnBin").on("click", ShowRecycleBin);
     $("#btnCredits").on("click", ShowCredits);
     $("#btnHelp").on("click", ShowHelp);
     $("#btnSearch").on("click", ShowSearch);
@@ -535,11 +536,20 @@ $(function() {
             ChecklistItemClick(e, $(this));
         }
     });
+    $("#listData").on("click", ".deleteDivider", function(e) {
+        e.stopPropagation();
+        const idx = parseInt($(this).closest(".settings").attr("data-id"));
+        data.DeleteDataItem(dbData.currentScreen, idx);
+        $(this).closest("li").remove();
+        DrawMain();
+        ctx.stateForBackButton = "home";
+    });
     $("#listData").on("click", ".ci-delete", function(e) {
         e.stopPropagation();
         const idx = parseInt($(this).closest(".settings").attr("data-id"));
         data.DeleteDataItem(dbData.currentScreen, idx);
         $(this).closest("li").remove();
+        DrawMain();
         ctx.stateForBackButton = "home";
     });
     $("#listData").on("click", ".ci-lock", function(e) {
@@ -647,7 +657,12 @@ function NoteClick(e, $t) {
             return;
         }
         if($clicked.closest(".settings").length) { return; } // settings
-        if($clicked.hasClass("goToResult")) { // Search
+        if($clicked.hasClass("restoreItem")) { // Recover From Recycle Bin
+            const listIdx = $clicked.attr("data-parent");
+            data.RestoreDataItem(listIdx, idx);
+            ShowRecycleBin();
+            return;
+        } else if($clicked.hasClass("goToResult")) { // Search
             const listIdx = $clicked.attr("data-parent");
             SelectDatalist.call($(Sanitize`#sidebarData > li[data-id='${listIdx}']`));
             $(`#note${idx} .edit`).click();
@@ -669,7 +684,12 @@ function ChecklistItemClick(e, $t) {
         $i.prop("checked", !$i.prop("checked"));
     } else if(targType === "i") { // button
         if($clicked.closest(".settings").length) { return; } // settings
-        if($clicked.hasClass("goToResult")) { // Search
+        if($clicked.hasClass("restoreItem")) { // Recover From Recycle Bin
+            const listIdx = $clicked.attr("data-parent");
+            data.RestoreDataItem(listIdx, idx);
+            ShowRecycleBin();
+            return;
+        } else if($clicked.hasClass("goToResult")) { // Search
             const listIdx = $clicked.attr("data-parent");
             SelectDatalist.call($(Sanitize`#sidebarData > li[data-id='${listIdx}']`));
             $(`#cbitem${idx} .edit`).click();
