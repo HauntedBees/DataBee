@@ -67,6 +67,7 @@ class Recipe extends DataItem {
         super();
         this.name = name;
         this.servings = 1;
+        this.groupSortOrder = [];
         this.ingredience = [];
         this.steps = [];
         this.author = "";

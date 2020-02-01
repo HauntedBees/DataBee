@@ -694,6 +694,10 @@ input, option, select, textarea { color: #000000 }
     height: 100vh;
     max-height: 100vh;
 }
+#ingredientEditList.full {
+    height: 50vh;
+    max-height: 50vh;
+}
 #recipeMetadata {
     display: grid;
     grid-template-columns: 30% 70%;
@@ -735,3 +739,5 @@ input, option, select, textarea { color: #000000 }
     color: var(--header-text-color);
     font-size: 0.75em;
 }
+#ingredientGroups > li { padding: 0 0.5em }
+.ingGroup .handle { vertical-align: middle }

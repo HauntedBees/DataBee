@@ -278,6 +278,24 @@ function SetUpCookbook() {
             input.dispatchEvent(new MouseEvent("click"));
         }
     });
+
+    $("#ingredientGroups").sortable({
+        delay: 100,
+        handle: ".handle",
+        start: StartSort, stop: EndSort,
+        update: function(e) {
+            if(e === undefined || e.originalEvent === undefined || e.originalEvent.target === undefined) { return; }
+            const $me = $(e.originalEvent.target).closest("li");
+            const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
+            const list = CurList().data[recipeIdx].groupSortOrder;
+            const oldIdx = parseInt($me.attr("data-id"));
+            const newIdx = $("#ingredientGroups > li").index($me[0]);
+            const elem = list[oldIdx];
+            list.splice(oldIdx, 1);
+            list.splice(newIdx, 0, elem);
+            data.Save();
+        }
+    });
 }
 
 // Display
@@ -326,10 +344,14 @@ function ViewRecipe(idx) {
 function DrawRecipe(recipe, servingsObj) {
     const groceryListIdx = parseInt(CurList().groceryListIdx);
     const groceryListHTML = (isNaN(groceryListIdx) || groceryListIdx < 0) ? "" : `<i data-grocery="${groceryListIdx}" class="material-icons addToCart">shopping_cart</i>`;
-    recipe.ingredience.sort((a, b) => a.group.localeCompare(b.group));
+    if(recipe.groupSortOrder !== undefined && recipe.groupSortOrder.length > 0) {
+        recipe.ingredience.sort((a, b) => recipe.groupSortOrder.indexOf(a.group) - recipe.groupSortOrder.indexOf(b.group));
+    } else {
+        recipe.ingredience.sort((a, b) => a.group.localeCompare(b.group));
+    }
     $("#ingredientViewList").html(recipe.ingredience.map((e, i) => {
         const lastGroup = (i === 0 ? "" : recipe.ingredience[i - 1].group);
-        const categoryPrefix = (lastGroup !== e.group) ? Sanitize`<li class="ingredientHeader">${e.group}</li>` : "";
+        const categoryPrefix = (lastGroup !== e.group) ? Sanitize`<li class="ingredientHeader">${e.group || "No Group"}</li>` : "";
         if(e.unit === "toTaste") { return SanitizeException(0, 3)`${categoryPrefix}<li data-id="${i}" class="viewIngredient">${e.ingredient}, to taste ${groceryListHTML}</li>`; }
         const adjustedRecipe = GetServingSizeAdjustedIngredient(e, recipe.servings, servingsObj);
         const hasTilde = adjustedRecipe.amount[0] === "~";
@@ -375,6 +397,27 @@ function EditRecipe(idx) {
         <i class="material-icons recipeEditBtn recipeEdit">edit</i>
         <i class="material-icons recipeEditBtn recipeDel">delete</i>
     </li>`).join(""));
+    let ingredientGroups = [...new Set(recipe.ingredience.map(e => e.group))];
+    if(ingredientGroups.length > 1) {
+        if(recipe.groupSortOrder === undefined || recipe.groupSortOrder.length === 0) {
+            recipe.groupSortOrder = ingredientGroups;
+        } else {
+            recipe.groupSortOrder = ingredientGroups.sort((a, b) => {
+                const aIdx = recipe.groupSortOrder.indexOf(a);
+                const bIdx = recipe.groupSortOrder.indexOf(b);
+                if(aIdx === bIdx) { return 0; }
+                if(aIdx < 0) { return 1; }
+                if(bIdx < 0) { return -1; }
+                return aIdx - bIdx;
+            });
+        }
+        const html = recipe.groupSortOrder.map((e, i) => Sanitize`<li class="ingGroup" data-id="${i}"><i class="material-icons handle">unfold_more</i> ${e || "[blank]"}</li>`);
+        $("#ingredientGroups").html(html.join(""));
+    } else if(ingredientGroups[0] === "") {
+        $("#ingredientGroups").html(`<li>This recipe has no ingredient groups to sort. Add some when creating/editing ingredients if you want to sort them.</li>`);
+    } else {
+        $("#ingredientGroups").html(`<li>This recipe only has one ingredient group, so there's no need to sort it.</li>`);
+    }
 }
 
 // Actions
