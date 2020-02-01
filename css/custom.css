@@ -741,3 +741,4 @@ input, option, select, textarea { color: #000000 }
 }
 #ingredientGroups > li { padding: 0 0.5em }
 .ingGroup .handle { vertical-align: middle }
+.recipeStep { outline: none }
