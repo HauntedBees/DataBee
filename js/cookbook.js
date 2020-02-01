@@ -428,20 +428,17 @@ function AdjustUnitToNewAmount(unit, oldAmount, newAmount) {
     }
     switch(unit) {
         // Volume - Imperial
-        case "tspv": return ShiftFromTsp(newAmount, true);
-        case "tbspv": return ShiftFromTsp(newAmount.mul(3), true);
-        case "fl oz": return ShiftFromTsp(newAmount.mul(6), true);
-        case "cupv": return ShiftFromTsp(newAmount.mul(48), true);
-        case "qt": return ShiftFromTsp(newAmount.mul(192), true);
-        case "gal": return ShiftFromTsp(newAmount.mul(768), true);
+        case "tsp": return ShiftFromTsp(newAmount);
+        case "tbsp": return ShiftFromTsp(newAmount.mul(3));
+        case "fl oz": return ShiftFromTsp(newAmount.mul(6));
+        case "cup": return ShiftFromTsp(newAmount.mul(48));
+        case "qt": return ShiftFromTsp(newAmount.mul(192));
+        case "gal": return ShiftFromTsp(newAmount.mul(768));
         // Volume - Metric
         case "mL": return ShiftFromMilliliter(newAmount);
         case "dL": return ShiftFromMilliliter(newAmount.mul(100));
         case "L": return ShiftFromMilliliter(newAmount.mul(1000));
         // Weight - Imperial
-        case "tspm": return ShiftFromTsp(newAmount, false);
-        case "tbspm": return ShiftFromTsp(newAmount.mul(3), false);
-        case "cupm": return ShiftFromTsp(newAmount.mul(48), false);
         case "oz":
             if(newAmount >= 16) {
                 return { unit: "lb", amount: newAmount.div(16) };
@@ -470,17 +467,13 @@ function AdjustUnitToNewAmount(unit, oldAmount, newAmount) {
     }
     return obj;
 }
-function ShiftFromTsp(amount, isVolume) {
-    if(amount < 3) { return { unit: `tsp${isVolume?"v":"m"}`, amount: amount }; }
-    if(amount < 12) { return { unit: `tbsp${isVolume?"v":"m"}`, amount: amount.div(3) } };
-    if(isVolume) {
-        if(amount < 16) { return { unit: "fl oz", amount: amount.div(6) }; }
-        if(amount < 192) { return { unit: "cupv", amount: amount.div(48) }; }
-        if(amount < 768) { return { unit: "qt", amount: amount.div(192) }; }
-        return { unit: "gal", amount: amount.div(768) };
-    } else {
-        return { unit: "cupm", amount: amount.div(48) };
-    }
+function ShiftFromTsp(amount) {
+    if(amount < 3) { return { unit: "tsp", amount: amount }; }
+    if(amount < 12) { return { unit: "tbsp", amount: amount.div(3) } };
+    if(amount < 16) { return { unit: "fl oz", amount: amount.div(6) }; }
+    if(amount < 192) { return { unit: "cup", amount: amount.div(48) }; }
+    if(amount < 768) { return { unit: "qt", amount: amount.div(192) }; }
+    return { unit: "gal", amount: amount.div(768) };
 }
 function ShiftFromMilliliter(amount) {
     if(amount < 200) { return { unit: "mL", amount: amount }; }
@@ -503,15 +496,6 @@ function ConvertBetweenMetricAndImperial(unit, amount, rawunit) {
         case "ºF": return { unit: "ºC", amount: amount.add(-32).mul(5, 9) };
         case "ºC": return { unit: "ºF", amount: amount.mul(9, 5).add(32) };
         // weight/mass
-        case "tspm":
-            if(amount >= 202.8841362) { return { unit: "kg", amount: amount.div(202.8841362) }; }
-            else { return { unit: "g", amount: amount.mul(4.928921594) }; }
-        case "tbspm":
-            if(amount >= 67.6280454) { return { unit: "kg", amount: amount.div(67.6280454) }; }
-            else { return { unit: "g", amount: amount.mul(14.7867648) }; }
-        case "cupm":
-            if(amount >= 4.226752838) { return { unit: "kg", amount: amount.div(4.226752838) }; }
-            else { return { unit: "g", amount: amount.mul(136) }; }
         case "oz":
             if(amount >= 35.274) { return { unit: "kg", amount: amount.div(35.274) }; }
             else { return { unit: "g", amount: amount.mul(28.35) }; }
@@ -545,12 +529,10 @@ function ConvertBetweenMetricAndImperial(unit, amount, rawunit) {
             return { unit: "ft", amount: amount.mul(3.281) };
         // volume
         case "tsp":
-        case "tspv":
             if(amount < 20.2884) { return {unit: "mL", amount: amount.mul(4.92892) }; }
             if(amount < 202.884) { return {unit: "dL", amount: amount.div(20.2884) }; }
             return {unit: "L", amount: amount.div(202.884) };
         case "tbsp":
-        case "tbspv":
             if(amount < 6.7628) { return {unit: "mL", amount: amount.mul(14.7868) }; }
             if(amount < 67.628) { return {unit: "dL", amount: amount.div(6.7628) }; }
             return {unit: "L", amount: amount.div(67.628) };
@@ -559,7 +541,6 @@ function ConvertBetweenMetricAndImperial(unit, amount, rawunit) {
             if(amount < 33.814) { return {unit: "dL", amount: amount.div(3.3814) }; }
             return {unit: "L", amount: amount.div(33.814) };
         case "cup":
-        case "cupv":
             if(amount < 4.22675) { return {unit: "dL", amount: amount.mul(2.36588) }; }
             return {unit: "L", amount: amount.div(4.22675) };
         case "qt":
@@ -570,10 +551,10 @@ function ConvertBetweenMetricAndImperial(unit, amount, rawunit) {
             return {unit: "L", amount: amount.mul(3.785) };
         case "ml":
         case "mL":
-            if(amount < 14.7868) { return {unit: "tspv", amount: amount.div(4.92892) }; }
-            if(amount < 29.5735) { return {unit: "tbspv", amount: amount.div(14.7868) }; }
+            if(amount < 14.7868) { return {unit: "tsp", amount: amount.div(4.92892) }; }
+            if(amount < 29.5735) { return {unit: "tbsp", amount: amount.div(14.7868) }; }
             if(amount < 946.353) {
-                if(rawunit === "cup" || rawunit === "cupv") {
+                if(rawunit === "cup") {
                     return { unit: "cup", amount: amount.div(236.588) };
                 } else {
                     return { unit: "fl oz", amount: amount.div(29.5735) };
@@ -583,10 +564,10 @@ function ConvertBetweenMetricAndImperial(unit, amount, rawunit) {
             return {unit: "gal", amount: amount.div(3785.41) };
         case "dl":
         case "dL":
-            if(amount < 0.147868) { return {unit: "tspv", amount: amount.mul(20.2884) }; }
-            if(amount < 0.295735) { return {unit: "tbspv", amount: amount.mul(6.7628) }; }
+            if(amount < 0.147868) { return {unit: "tsp", amount: amount.mul(20.2884) }; }
+            if(amount < 0.295735) { return {unit: "tbsp", amount: amount.mul(6.7628) }; }
             if(amount < 9.46353) {
-                if(rawunit === "cup" || rawunit === "cupv") {
+                if(rawunit === "cup") {
                     return { unit: "cup", amount: amount.div(2.36588) };
                 } else {
                     return { unit: "fl oz", amount: amount.mul(3.3814) };
@@ -597,7 +578,7 @@ function ConvertBetweenMetricAndImperial(unit, amount, rawunit) {
         case "l":
         case "L":
             if(amount < 1.05669) {
-                if(rawunit === "cup" || rawunit === "cupv") {
+                if(rawunit === "cup") {
                     return { unit: "cup", amount: amount.mul(4.22675) };
                 } else {
                     return {unit: "fl oz", amount: amount.mul(33.814) };
@@ -622,9 +603,7 @@ function AdjustStep(step, baseServingSize, newServingSizeObj) {
     });
 }
 const validUnits = ["ºF", "ºC", 
-                    "tsp", "tbsp", "cup", 
-                    "tspv", "tbspv", "cupv", 
-                    "tspm", "tbspm", "cupm", 
+                    "tsp", "tbsp", "cup",  
                     "fl oz", "qt", "gal", "ml", "dl", "l", "mL", "dL", "L", 
                     "lb", "oz", "mg", "g", "kg", 
                     "mm", "cm", "m", "in", "ft"];
@@ -645,9 +624,9 @@ function GetAdjustableIngredientHTML(amount, unit, tilde, isConvertible, origina
 function GetUnitDisplay(unit, amount) {
     if(unit === "") { return " "; }
     if(["ºF", "ºC"].indexOf(unit) >= 0) { return unit; }
-    if(["cup", "cupv", "cupm"].indexOf(unit) >= 0) { return amount === 1 ? " cup" : " cups"; }
-    if(unit === "tspv" || unit === "tspm") { return "tsp"; }
-    if(unit === "tbspv" || unit === "tbspm") { return "tbsp"; }
+    if(unit === "cup") { return amount === 1 ? " cup" : " cups"; }
+    if(unit === "tsp") { return "tsp"; }
+    if(unit === "tbsp") { return "tbsp"; }
     if(unit === "ml") { return "mL"; }
     if(unit === "dl") { return "dL"; }
     if(unit === "l") { return "L"; }
@@ -663,16 +642,16 @@ const unitSynonyms = {
     "ºf": "ºF",
     "c": "ºC",
     "ºc": "ºC",
-    "teaspoon": "tspv",
-    "teaspoons": "tspv",
-    "tablespoon": "tbspv",
-    "tablespoons": "tbspv",
+    "teaspoon": "tsp",
+    "teaspoons": "tsp",
+    "tablespoon": "tbsp",
+    "tablespoons": "tbsp",
     "fl. oz": "fl oz",
     "floz": "fl oz",
     "fluid oz": "fl oz",
     "fluid ounce": "fl oz",
     "fluid ounces": "fl oz",
-    "cups": "cupv",
+    "cups": "cup",
     "quart": "qt",
     "quarts": "qt",
     "gallon": "gal",
