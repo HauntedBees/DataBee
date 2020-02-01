@@ -314,7 +314,7 @@ function ViewRecipe(idx) {
     if(recipe.totalTime) { recipeTimeHTML.push(Sanitize`<div class="timeInfo"><span>Total Time</span><span>${recipe.totalTime}</span></div>`); }
     $("#recipeTimeInfo").html(recipeTimeHTML.join(""));
     $("#recipeHeader > div").removeClass("active");
-    $("#btnRecipeFull").addClass("active");
+    $("#btnRecipeFull").addClass("active").click();
     DrawRecipe(recipe, StringToNumber(`${recipe.servings}`));
 }
 function DrawRecipe(recipe, servingsObj) {
