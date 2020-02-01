@@ -301,7 +301,7 @@ function SetUpCookbook() {
 // Display
 function ViewRecipe(idx) {
     const recipe = CurList().data[idx];
-    $(".body, #menuBtn, #menuRight, #recipeEdit").hide();
+    $(".body, #menuBtn, #menuRight, #recipeEdit, #tagFilter").hide();
     $("#bRecipeEditor, #backBtn, #recipeRead, #recipeTopBtns").show();
     $("#title").text(recipe.name);
     ctx.stateForBackButton = "recipeviewer";
@@ -373,7 +373,7 @@ function DrawRecipe(recipe, servingsObj) {
 }
 function EditRecipe(idx) {
     const recipe = CurList().data[idx];
-    $(".body, #menuBtn, #menuRight, #recipeRead, #recipeTopBtns").hide();
+    $(".body, #menuBtn, #menuRight, #recipeRead, #recipeTopBtns, #tagFilter").hide();
     $("#bRecipeEditor, #backBtn, #recipeEdit").show();
     $("#title").text(recipe.name);
     ctx.stateForBackButton = "recipeeditor";
@@ -425,6 +425,7 @@ function RecipeClick(e, $t) {
     const targType = e.target.tagName.toLowerCase();
     const idx = parseInt($t.attr("data-id"));
     const $clicked = $(e.target);
+    if($t.find(".restoreItem").length > 0 && targType !== "i") { return; }
     if(targType === "i") { // button
         if($clicked.closest(".settings").length) { return; } // settings
         if($clicked.hasClass("restoreItem")) { // Recover From Recycle Bin

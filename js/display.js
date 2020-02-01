@@ -109,7 +109,7 @@ function ShowAdvancedAddModal() {
     $("#txtAdvName").focus();
 }
 function ShowTagEditor() {
-    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
+    $(".body, #menuBtn, #menuRight, #recipeTopBtns, #tagFilter").hide();
     $("#bTagEditor, #backBtn").show();
     HideSidebars();
     const currentList = CurList();
@@ -172,6 +172,11 @@ function ShowGrocerySelectModal() {
     html.unshift(`<li data-id="-1"><em>None</em></li>`);
     $("#moveChecklists").html(html.join(""));
     ShowModal("modalMove");
+}
+function ShowTagFilterModal() {
+    const currlist = CurList();
+    $("#advTagFilters").html(GetTogglingTagListHTML(currlist.tags, currlist.tagFilters));
+    ShowModal("modalTagFilter");
 }
 
 function ResetElements(elem) {
@@ -288,21 +293,21 @@ function ShowSettings() {
         $setting.attr("data-val", value).text(value ? "Enabled" : "Disabled");
         if(value) { $setting.addClass("button-primary"); }
     }
-    $(".body, #menuRight, #recipeTopBtns, #backBtn").hide();
+    $(".body, #menuRight, #recipeTopBtns, #backBtn, #tagFilter").hide();
     $("#bSettings, #menuBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Settings");
     ctx.stateForBackButton = "secondary";
 }
 function ShowCredits() {
-    $(".body, #menuRight, #recipeTopBtns, #backBtn").hide();
+    $(".body, #menuRight, #recipeTopBtns, #backBtn, #tagFilter").hide();
     $("#bCredits, #menuBtn").show();
     HideSidebars();
     $("#title").text("DataBee 0FEB01");
     ctx.stateForBackButton = "secondary";
 }
 function ShowHelp() {
-    $(".body, #menuRight, #recipeTopBtns, #backBtn").hide();
+    $(".body, #menuRight, #recipeTopBtns, #backBtn, #tagFilter").hide();
     $("#bHelp, #menuBtn").show();
     $("#content").removeClass("listView");
     HideSidebars();
@@ -311,7 +316,7 @@ function ShowHelp() {
 }
 function ShowSearch() {
     $("#searchData").empty();
-    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
+    $(".body, #menuBtn, #menuRight, #recipeTopBtns, #tagFilter").hide();
     $("#bSearch, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Search");
@@ -321,7 +326,7 @@ function ShowSearch() {
 }
 function ShowRecycleBin() {
     $("#searchData").empty();
-    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
+    $(".body, #menuBtn, #menuRight, #recipeTopBtns, #tagFilter").hide();
     $("#bSearch, #backBtn").show();
     HideSidebars();
     $("#title").text("DataBee - Recycle Bin");
@@ -334,11 +339,11 @@ function ShowRecycleBin() {
             const list = dbData.dbList[e.ownerIdx];
             e.ownerName = list.name;
             if(list.type === "checklist") {
-                return GetCheckboxItemHTML(e, i, "bin");
+                return GetCheckboxItemHTML(e, i, list, "bin");
             } else if(list.type === "notes") {
-                return GetNoteHTML(e, i, "bin");
+                return GetNoteHTML(e, i, list, "bin");
             } else if(list.type === "recipe") {
-                return GetRecipeHTML(e, i, "bin");
+                return GetRecipeHTML(e, i, list, "bin");
             } else { return ""; }
         });
         $("#searchData").html(html.join(""));
@@ -357,11 +362,11 @@ function DoSearch(searchQuery) {
         const html = results.map(re => {
             const e = re.elem;
             if(e.listType === "checklist") {
-                return GetCheckboxItemHTML(e, e.myIdx, "search");
+                return GetCheckboxItemHTML(e, e.myIdx, undefined, "search");
             } else if(e.listType === "notes") {
-                return GetNoteHTML(e, e.myIdx, "search");
+                return GetNoteHTML(e, e.myIdx, undefined, "search");
             } else if(e.listType === "recipe") {
-                return GetRecipeHTML(e, e.myIdx, "search");
+                return GetRecipeHTML(e, e.myIdx, undefined, "search");
             } else { return ""; }
         });
         $("#searchData").html(html.join(""));
@@ -372,7 +377,7 @@ function ShowNoteEditor(idx, readView) {
     const elem = isNew ? {} : CurList().data[idx];
     const title = elem.title || "";
     const body = elem.body || "";
-    $(".body, #menuBtn, #menuRight, #recipeTopBtns").hide();
+    $(".body, #menuBtn, #menuRight, #recipeTopBtns, #tagFilter").hide();
     $("#bNoteEditor, #backBtn").show();
     $("#noteTitle").val(title);
     $("#noteBody").val(body);
@@ -448,13 +453,14 @@ function DrawMain() {
     const datalist = CurList();
     $("#listData").empty().attr("data-type", datalist.type).removeClass("tileView");
     $("#title").text(datalist.name);
+    SetTagFilter();
     if(datalist.type === "checklist") {
-        const html = datalist.data.map((e, i) => GetCheckboxItemHTML(e, i, undefined, datalist));
+        const html = datalist.data.map((e, i) => GetCheckboxItemHTML(e, i, datalist));
         $("#listData").html(html.join(""));
     } else if(datalist.type === "notes") {
         if(datalist.displayType === "tiles") { $("#listData").addClass("tileView"); }
         const isTileView =$("#listData").hasClass("tileView");
-        const html = datalist.data.map((e, i) => GetNoteHTML(e, i));
+        const html = datalist.data.map((e, i) => GetNoteHTML(e, i, datalist));
         if(isTileView) {
             $("#listData").html(`
             <li class="tileCol"><ul class="tileColInner">${html.filter((e, i) => i % 2 === 0).join("")}</ul></li>
@@ -463,7 +469,7 @@ function DrawMain() {
             $("#listData").html(html.join(""));
         }
     } else if(datalist.type === "recipe") {
-        const html = datalist.data.map((e, i) => GetRecipeHTML(e, i));
+        const html = datalist.data.map((e, i) => GetRecipeHTML(e, i, datalist));
         $("#listData").html(html.join(""));
     }
     SetScroller("prevScroller", dbData.currentScreen, -1);
@@ -489,6 +495,21 @@ function SetScroller(elemId, currIdx, dir, origIdx) {
         $("#checklistScroller").show();
     }
 }
+function SetTagFilter() {
+    const datalist = CurList();
+    if(Object.keys(datalist.tags).length <= 1) {
+        $("#tagFilter").hide();
+        return;
+    }
+    $("#tagFilter").show();
+    if(datalist.tagFilters.length === 0) {
+        $("#tagFilter").html(`<i class="material-icons">label</i><span>No Filters</span><button class='tfButton applyTagFilters button-primary'>Apply Filters</button>`);
+    } else {
+        const tags = GetTagsHTML(datalist.tags, datalist.tagFilters, true);
+        $("#tagFilter").html(`<i class="material-icons">label</i><span class="filterDisplay">Filters: ${tags}</span>
+        <button class='tfButton applyTagFilters button-primary'>Edit</button><button class='tfButton clearTagFilters button'>Clear</button>`);
+    }
+}
 // beeIMPORTANT, beeTAGS, beeHANDLE, beeSQ, beeSOWNER
 // TODO: can probably merge a fair amount of these 3 GetThingHTML functions
 function ReplaceCommonHTML(str, e, showHandle, extraType, tagsHTML) {
@@ -505,7 +526,12 @@ function ReplaceCommonHTML(str, e, showHandle, extraType, tagsHTML) {
               .replace("{beeSQ}", sq)
               .replace("{beeEDIT}", extraType === "bin" ? "w" : `<i class="edit material-icons">more_horiz</i>`);
 }
-function GetRecipeHTML(e, i, extraType) {
+function GetRecipeHTML(e, i, parentList, extraType) {
+    if(extraType === undefined && parentList.tagFilters.length > 0) {
+        const filters = parentList.tagFilters;
+        const isMatch = filters.every(f => e.tags.indexOf(f) >= 0);
+        if(!isMatch) { return ""; }
+    }
     const dbListIdx = extraType !== undefined ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = extraType !== undefined ? false : dbData.dbList[dbListIdx].sortType === "manual";
@@ -526,7 +552,12 @@ function GetRecipeHTML(e, i, extraType) {
             e.source.indexOf("http") === 0 ? Sanitize`<a rel="noopener" target="_blank" href="${e.source}">${e.source.replace(/^(?:https?:\/\/)(?:www.)?([a-zA-Z0-9_\-.]+)\/.*$/g, "$1")}</a>` : Sanitize`${e.source}`
         }`: "");
 }
-function GetNoteHTML(e, i, extraType) {
+function GetNoteHTML(e, i, parentList, extraType) {
+    if(extraType === undefined && parentList.tagFilters.length > 0) {
+        const filters = parentList.tagFilters;
+        const isMatch = filters.every(f => e.tags.indexOf(f) >= 0);
+        if(!isMatch) { return ""; }
+    }
     const dbListIdx = extraType !== undefined ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
     const isTileView =$("#listData").hasClass("tileView");
@@ -565,7 +596,12 @@ function GetNoteHTML(e, i, extraType) {
                                                     .replace("{beeBODY}", BasicMarkdown(body));
     }
 }
-function GetCheckboxItemHTML(e, i, extraType, parentList) {
+function GetCheckboxItemHTML(e, i, parentList, extraType) {
+    if(extraType === undefined && parentList.tagFilters.length > 0) {
+        const filters = parentList.tagFilters;
+        const isMatch = filters.every(f => e.tags.indexOf(f) >= 0);
+        if(!isMatch) { return ""; }
+    }
     if(e.divider === true) {
         if(parentList.sortType === "manual") {
             return Sanitize`<li id="cbitem${i}" data-id="${i}" class="cbitem divider"><span class="itemContainer"><i class="material-icons deleteDivider">delete</i></span><i class="material-icons handle">unfold_more</i></li>`;
@@ -589,19 +625,23 @@ function GetCheckboxItemHTML(e, i, extraType, parentList) {
         {beeSOWNER}
         </li>`, e, showHandle, extraType, tagsHTML).replace("{beeNOTES}", e.notes !== "" ? Sanitize`<div class="citem_notes">${e.notes}</div>` : ``);
 }
-function GetTagsHTML(allTags, myTags) {
+function GetTagsHTML(allTags, myTags, showHidden) {
     const tags = myTags.map(t => allTags[t]).sort((a, b) => {
         if(a.sortOrder < b.sortOrder) { return -1; }
         if(a.sortOrder > b.sortOrder) { return 1; }
         return 0;
     });
-    return tags.map(t => GetTagHTML(t)).join("");
+    return tags.map(t => GetTagHTML(t, showHidden)).join("");
 }
-function GetTagHTML(tag) {
+function GetTagHTML(tag, showHidden) {
     if(tag.imgVal === "") {
         return Sanitize`<div class="editorTagBox editorTagBoxSm tc${tag.color}" data-id="${tag.id}"></div>`;
     } else if(tag.imgVal === "border_clear") {
-        return "";
+        if(showHidden === true) {
+            return Sanitize`<i class="material-icons dispTag hiddenTag" data-id="${tag.id}">${tag.imgVal}</i>`;
+        } else {
+            return "";
+        }
     } else {
         return Sanitize`<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
     }

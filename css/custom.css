@@ -67,7 +67,7 @@ input.comeOn { border: 1px solid #FF0000 !important }
 }
 
 /* Header */
-header {
+#head {
     left: 0;
     top: 0;
     padding-top: 0.25rem;
@@ -341,7 +341,7 @@ button { color: var(--text-color) !important }
     border: 1px solid var(--secondary-border-color) !important;
     color: var(--button-text-color) !important;
 }
-header { background: var(--header-bg-color); color: var(--header-text-color) }
+#head { background: var(--header-bg-color); color: var(--header-text-color) }
 .addBtn, .recipeBtn {
     background-color: var(--secondary-bg-color);
     border: 1px solid var(--secondary-border-color);
@@ -741,4 +741,29 @@ input, option, select, textarea { color: #000000 }
 }
 #ingredientGroups > li { padding: 0 0.5em }
 .ingGroup .handle { vertical-align: middle }
-.recipeStep { outline: none }
+.checkbox { outline: none }
+
+#tagFilter {
+    padding-top: 0.25em;
+    padding-left: 0.125em;
+    border-bottom: 1px solid var(--header-bg-color);
+}
+.tfButton {
+    float: right;
+    font-size: 0.5em;
+    height: 3em;
+    line-height: 0.5em;
+    padding: 0 1em;
+    margin-right: 0.4em;
+    margin-top: -0.125em;
+}
+#advTagFilters { margin-bottom: 1em }
+#tagFilter i, #tagFilter .editorTagBox { vertical-align: middle }
+.filterDisplay {
+    overflow-x: scroll;
+    white-space: nowrap;
+    width: 50vw;
+    display: inline-block;
+    vertical-align: middle;
+    text-overflow: ellipsis;
+}

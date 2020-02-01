@@ -1,10 +1,11 @@
 class DataObj {
     constructor(name, type) {
-        this.listVersion = 0;
+        this.listVersion = 1;
         this.name = name;
         this.type = type;
         this.data = [];
         this.tags = {};
+        this.tagFilters = [];
         this.sortType = "manual";
         this.sortDir = 1;
         this.date = +new Date();
@@ -127,18 +128,7 @@ let dbData = {
 const data = {
     IsManualSorting: function(dataIdx) { return dbData.dbList[dataIdx || dbData.currentScreen].sortType === "manual"; },
     AddressVersionChanges: function() {
-        let hasChanges = false;
-        // dbVersion Changes
-        dbData.dbList.forEach(list => {
-            // listVersion changes
-            Object.keys(list.tags).map(key => list.tags[key]).forEach(tag => {
-                // tagVersion changes
-            });
-            list.data.forEach(item => {
-                // itemVersion changes
-            });
-        });
-        if(hasChanges) {
+        if(upgrades.UpgradeDatabase(dbData)) {
             console.log("UPDATING!");
             data.Save();
         }
@@ -581,6 +571,7 @@ const data = {
     ProcessListJSON: function(str) {
         try {
             const list = JSON.parse(str.replace("javascript:", ""));
+            upgrades.UpgradeList(list);
             if(!validation.EnsureValidList(list, false)) {
                 ShowAlert("Import Failed", "Invalid databee list format.");
                 return;
@@ -625,6 +616,7 @@ const data = {
         try {
             const list = CurList();
             const recipe = JSON.parse(str.replace("javascript:", ""));
+            upgrades.UpgradeDataItem(recipe);
             if(!validation.EnsureValidDataItem(recipe, list, true)) {
                 ShowAlert("Import Failed", "Invalid databee recipe format.");
                 return;
@@ -670,13 +662,7 @@ const validation = {
             return false;
         }
         if(db._id !== "databee") { return false; }
-        for(let i = 0; i < db.dbList.length; i++) {
-            const valid = validation.EnsureValidList(db.dbList[i], true, db.dbList);
-            if(!valid) { return false; }
-        }
-        if(typeof db.dbVersion === "undefined") {
-            db.dbVersion = 0;
-        } else if(typeof db.dbVersion !== "number") { return false; }
+        upgrades.UpgradeDatabase(db);
         const validDBKeys = ["_id", "_rev", "dbVersion", "dbList", "currentScreen", "settings", "hiddenComments"];
         for(const key in db) {
             if(validDBKeys.indexOf(key) < 0) { delete db[key]; }
@@ -687,6 +673,10 @@ const validation = {
         }
         if(typeof db.settings.theme !== "number" || typeof db.settings.leftHanded !== "boolean") { return false; }
         if(db.settings.theme < 0 || db.settings.theme >= themes.length) { return false; }
+        for(let i = 0; i < db.dbList.length; i++) {
+            const valid = validation.EnsureValidList(db.dbList[i], true, db.dbList);
+            if(!valid) { return false; }
+        }
         return true;
     },
     EnsureValidList: function(list, fromDB, dbList) {
@@ -697,15 +687,16 @@ const validation = {
         || typeof list.tags !== "object"
         || typeof list.sortDir !== "number"
         || typeof list.sortType !== "string"
-        || typeof list.carousel !== "boolean") {
+        || typeof list.carousel !== "boolean"
+        || typeof list.tagFilters !== "object") {
+            return false;
+        }
+        if(list.tagFilters.some(e => (typeof e !== "string"))) {
             return false;
         }
         if(typeof list.date !== "number") {
             list.date = +new Date();
         }
-        if(typeof list.listVersion === "undefined") {
-            list.listVersion = 0;
-        } else if(typeof list.listVersion !== "number") { return false; }
         switch(list.type) {
             case "checklist":
                 if(typeof list.filterChecks !== "boolean" 
@@ -737,7 +728,7 @@ const validation = {
             default: return false;
         }
 
-        const validListKeys = ["listVersion", "name", "type", "data", "tags", "sortDir", "sortType", "date", "carousel",
+        const validListKeys = ["listVersion", "tagFilters", "name", "type", "data", "tags", "sortDir", "sortType", "date", "carousel",
                                "filterChecks", "advancedView", "displayType", "groceryListIdx", "hiddenComment"];
         for(const key in list) {
             if(validListKeys.indexOf(key) < 0) { delete list[key]; }
@@ -761,7 +752,7 @@ const validation = {
         || typeof item.sortOrder !== "number") {
             return false;
         }
-        const validItemKeys = ["id", "tag", "color", "imgVal", "sortOrder", "hiddenComment"];
+        const validItemKeys = ["tagVersion", "id", "tag", "color", "imgVal", "sortOrder", "hiddenComment"];
         for(const key in item) {
             if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
         }
@@ -774,9 +765,6 @@ const validation = {
         || typeof item.date !== "number") {
             return false;
         }
-        if(typeof item.itemVersion === "undefined") {
-            item.itemVersion = 0;
-        } else if(typeof item.itemVersion !== "number") { return false; }
         for(let i = item.tags.length - 1; i >= 0; i--) {
             const tag = item.tags[i];
             if(typeof list.tags[tag] === "undefined") {
@@ -906,5 +894,46 @@ const validation = {
             if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
         }
         return true;
+    }
+};
+const upgrades = {
+    UpgradeDatabase: function(db) {
+        let hasChanges = false;
+        if(typeof db.dbVersion === "undefined" || typeof db.dbVersion !== "number") {
+            db.dbVersion = 0;
+        }
+        // db changes
+        hasChanges |= db.dbList.some(upgrades.UpgradeList);
+        return hasChanges;
+    },
+    UpgradeList: function(list) {
+        let hasChanges = false;
+        if(typeof list.listVersion === "undefined" || typeof list.listVersion !== "number") {
+            list.listVersion = 0;
+        }
+        if(list.listVersion < 1) {
+            list.listVersion = 1;
+            list.tagFilters = [];
+            hasChanges = true;
+        }
+        hasChanges |= Object.keys(list.tags).map(key => list.tags[key]).some(upgrades.UpgradeTag);
+        hasChanges |= list.data.some(upgrades.UpgradeDataItem);
+        return hasChanges;
+    },
+    UpgradeTag: function(tag) {
+        let hasChanges = false;
+        if(typeof tag.tagVersion === "undefined" || typeof tag.tagVersion !== "number") {
+            tag.tagVersion = 0;
+        }
+        // tag changes
+        return hasChanges;
+    },
+    UpgradeDataItem: function(item) {
+        let hasChanges = false;
+        if(typeof item.itemVersion === "undefined" || typeof item.itemVersion !== "number") {
+            item.itemVersion = 0;
+        }
+        // item changes
+        return hasChanges;
     }
 };

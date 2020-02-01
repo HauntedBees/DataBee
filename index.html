@@ -33,6 +33,9 @@
                 </div>
             </div>
         </header>
+        <header id="tagFilter">
+            <i class="material-icons">label</i><span class="by-icon">No Filters</span>
+        </header>
         <nav id="sidebar">
             <ul>
                 <li class="sidebar_header">DataBee</li>
@@ -384,6 +387,11 @@
                         still affect Sort Order.</p>
                     <p>Much like Lists and List Items, you can tap and drag the <i class="material-icons handle">unfold_more</i> to sort Tags, which will affect the Sort 
                         Order of items when sorting by Tag. Additionally, tapping <i class="material-icons">more_horiz</i> will allow you to edit or delete a Tag.</p>
+                    <p>If a List has two or more Tags in it, the List View will display a Tag Filter below the List's name. Tap the <em>Apply Filters</em> button to see all 
+                        of the List's Tags. Select which ones you want to filter by, then click <em>Apply</em> to apply them. After applying a Tag Filter, only List Items
+                        that have all of the selected Tags will show up in your results. After applying Filters, you can click <em>Edit</em> to change the applied filters, 
+                        or <em>Clear</em> to remove all active Tag Filters. When using the <em>Manual</em> Sort Order, sorting List Items while filtering may result in 
+                        List Items being sorted in unexpected ways, but that's just showbiz, baby.</p>
                 </div>
             </div>
         </div>
@@ -423,7 +431,7 @@
                     <input id="txtAdvName" type="text" placeholder="New Entry">
                     <input id="txtAdvNote" type="text" placeholder="Notes (optional)">
                     <label id="advTagsLabel" for="advTags">Tags</label>
-                    <div id="advTags" class="tagDisp"></div>
+                    <div id="advTags" class="tagToggle tagDisp"></div>
                 </div>
                 <div class="modalFooter">
                     <button id="btnConfirmModalAdv" class="button-primary">Add</button>
@@ -604,6 +612,18 @@
                 <div class="modalContent"><textarea id="txtStep" placeholder="Recipe Step" rows="6"></textarea></div>
                 <div class="modalFooter">
                     <button id="btnConfirmStep" class="button-primary">Add</button>
+                    <button class="btnCancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div id="modalTagFilter" class="modal">
+            <div>
+                <div class="modalHeader">Apply Filters</div>
+                <div class="modalContent">
+                    <div id="advTagFilters" class="tagToggle tagDisp"></div>
+                </div>
+                <div class="modalFooter">
+                    <button id="btnConfirmTagFilter" class="button-primary">Apply</button>
                     <button class="btnCancel">Cancel</button>
                 </div>
             </div>

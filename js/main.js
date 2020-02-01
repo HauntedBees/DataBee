@@ -443,6 +443,38 @@ $(function() {
         data.DeleteTag(dbData.currentScreen, id);
         ShowTagEditor();
     });
+    $(document).on("click", ".tagList > .tag", function(e) {
+        e.stopPropagation();
+        const $parent = $(this).closest("li");
+        const elemIdx = parseInt($parent.attr("data-id"));
+        const tagId = $(this).attr("data-id");
+        data.ToggleTag(dbData.currentScreen, elemIdx, tagId);
+        if($(this).hasClass("active")) {
+            $(Sanitize`[data-id="${tagId}"]`, $parent.find(".tagGroup")).remove();
+        } else {
+            const allTags = CurList().tags;
+            $parent.find(".tagGroup").html(GetTagsHTML(allTags, CurList().data[elemIdx].tags));
+        }
+        $(this).toggleClass("active");
+    });
+    $(".tagToggle").on("click", ".tag", function(e) {
+        e.stopPropagation();
+        $(this).toggleClass("active");
+    });
+    $("#btnConfirmTagFilter").on("click", function() {
+        const list = CurList();
+        list.tagFilters = $("#advTagFilters > .tag.active").toArray().map(e => $(e).attr("data-id"));
+        data.Save();
+        CloseModal("modalTagFilter");
+        DrawMain();
+    });
+    $("#tagFilter").on("click", ".applyTagFilters", ShowTagFilterModal);
+    $("#tagFilter").on("click", ".clearTagFilters", function() {
+        const list = CurList();
+        list.tagFilters = [];
+        data.Save();
+        DrawMain();
+    });
     
     // Main
     document.addEventListener("backbutton", BackButtonPress, false);
@@ -597,24 +629,6 @@ $(function() {
         const myTags = CurList().data[idx].tags;
         SetSettingsTagSelectionHTML($(this), $parent, allTags, myTags);
     });
-    $(document).on("click", ".tagList > .tag", function(e) {
-        e.stopPropagation();
-        const $parent = $(this).closest("li");
-        const elemIdx = parseInt($parent.attr("data-id"));
-        const tagId = $(this).attr("data-id");
-        data.ToggleTag(dbData.currentScreen, elemIdx, tagId);
-        if($(this).hasClass("active")) {
-            $(Sanitize`[data-id="${tagId}"]`, $parent.find(".tagGroup")).remove();
-        } else {
-            const allTags = CurList().tags;
-            $parent.find(".tagGroup").html(GetTagsHTML(allTags, CurList().data[elemIdx].tags));
-        }
-        $(this).toggleClass("active");
-    });
-    $(document).on("click", "#advTags > .tag", function(e) {
-        e.stopPropagation();
-        $(this).toggleClass("active");
-    });
     $("#listData").on("click", ".ci-move", function(e) {
         e.stopPropagation();
         const $parent = $(this).closest(".settings");
@@ -656,6 +670,7 @@ function NoteClick(e, $t) {
     const idx = parseInt($t.attr("data-id"));
     const $clicked = $(e.target);
     if($clicked.hasClass("tag")) { return; }
+    if($t.find(".restoreItem").length > 0 && targType !== "i") { return; }
     if(targType === "i") { // button
         if($clicked.hasClass("lockedIcon")) {
             ShowNoteEditor(idx, true);
@@ -685,6 +700,7 @@ function ChecklistItemClick(e, $t) {
     const $i = $t.find("input");
     const idx = parseInt($t.attr("data-id"));
     const $clicked = $(e.target);
+    if($t.find(".restoreItem").length > 0 && targType !== "i") { return; }
     if(targType === "span" || targType === "li") { // text or main area
         $i.prop("checked", !$i.prop("checked"));
     } else if(targType === "i") { // button
