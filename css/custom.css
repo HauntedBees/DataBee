@@ -730,3 +730,8 @@ input, option, select, textarea { color: #000000 }
     margin-right: 0.25em;
 }
 .addToCart.alreadyAdded { color: var(--secondary-border-color) }
+.divider {
+    background-color: var(--header-bg-color);
+    color: var(--header-text-color);
+    font-size: 0.75em;
+}

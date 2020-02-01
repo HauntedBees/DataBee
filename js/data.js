@@ -46,6 +46,13 @@ class ChecklistItem extends DataItem {
         this.notes = "";
     }
 }
+class ChecklistDivider extends DataItem {
+    constructor() {
+        super();
+        this.val = "-------------------------";
+        this.divider = true;
+    }  
+}
 class NoteListItem extends DataItem {
     constructor(title, body) {
         super();
@@ -411,6 +418,7 @@ const data = {
             arr.data.forEach((elem, elemIdx) => {
                 if(elem.val === undefined) { elem.val = elem.name; } // lazy hack for recipes
                 let rank = 0;
+                if(elem.divider === true) { return; }
                 const arrName = arr.name.toLowerCase();
                 if(arrName.indexOf(query) >= 0) {
                     rank += 50;

@@ -142,8 +142,11 @@ $(function() {
                 DrawMain();
                 break;
             case "newItem":
-                const newItem = new ChecklistItem(val);
-                data.AddDataItem(dbData.currentScreen, newItem);
+                if(val.match(/^-+$/g) !== null) {
+                    data.AddDataItem(dbData.currentScreen, new ChecklistDivider());
+                } else {
+                    data.AddDataItem(dbData.currentScreen, new ChecklistItem(val));
+                }
                 DrawMain();
                 $txtBox.val("");
                 $txtBox.focus();
@@ -201,10 +204,14 @@ $(function() {
             $txtBox.addClass("comeOn");
             return;
         }
-        const newItem = new ChecklistItem(val);
-        newItem.notes = $("#txtAdvNote").val();
-        newItem.tags = $("#advTags > .tag.active").toArray().map(e => $(e).attr("data-id"));
-        data.AddDataItem(dbData.currentScreen, newItem);
+        if(val.match(/^-+$/g) !== null) {
+            data.AddDataItem(dbData.currentScreen, new ChecklistDivider());
+        } else {
+            const newItem = new ChecklistItem(val);
+            newItem.notes = $("#txtAdvNote").val();
+            newItem.tags = $("#advTags > .tag.active").toArray().map(e => $(e).attr("data-id"));
+            data.AddDataItem(dbData.currentScreen, newItem);
+        }
         DrawMain();
         $txtBox.val("");
         $("#txtAdvNote").val("");

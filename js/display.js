@@ -423,7 +423,7 @@ function DrawMain() {
     $("#listData").empty().attr("data-type", datalist.type).removeClass("tileView");
     $("#title").text(datalist.name);
     if(datalist.type === "checklist") {
-        const html = datalist.data.map((e, i) => GetCheckboxItemHTML(e, i));
+        const html = datalist.data.map((e, i) => GetCheckboxItemHTML(e, i, false, datalist));
         $("#listData").html(html.join(""));
     } else if(datalist.type === "notes") {
         if(datalist.displayType === "tiles") { $("#listData").addClass("tileView"); }
@@ -532,7 +532,12 @@ function GetNoteHTML(e, i, isSearchQuery) {
                                                     .replace("{beeBODY}", BasicMarkdown(body));
     }
 }
-function GetCheckboxItemHTML(e, i, isSearchQuery) {
+function GetCheckboxItemHTML(e, i, isSearchQuery, parentList) {
+    if(e.divider === true) {
+        if(parentList.sortType === "manual") {
+            return Sanitize`<li id="cbitem${i}" data-id="${i}" class="cbitem divider"><span class="itemContainer"></span><i class="material-icons handle">unfold_more</i></li>`;
+        } else { return ""; }
+    }
     const dbListIdx = isSearchQuery === true ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
     const showHandle = isSearchQuery === true ? false : dbData.dbList[dbListIdx].sortType === "manual";
