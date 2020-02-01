@@ -674,7 +674,10 @@ const validation = {
             const valid = validation.EnsureValidList(db.dbList[i], true, db.dbList);
             if(!valid) { return false; }
         }
-        const validDBKeys = ["_id", "_rev", "dbList", "currentScreen", "settings", "hiddenComments"];
+        if(typeof db.dbVersion === "undefined") {
+            db.dbVersion = 0;
+        } else if(typeof db.dbVersion !== "number") { return false; }
+        const validDBKeys = ["_id", "_rev", "dbVersion", "dbList", "currentScreen", "settings", "hiddenComments"];
         for(const key in db) {
             if(validDBKeys.indexOf(key) < 0) { delete db[key]; }
         }
@@ -700,6 +703,9 @@ const validation = {
         if(typeof list.date !== "number") {
             list.date = +new Date();
         }
+        if(typeof list.listVersion === "undefined") {
+            list.listVersion = 0;
+        } else if(typeof list.listVersion !== "number") { return false; }
         switch(list.type) {
             case "checklist":
                 if(typeof list.filterChecks !== "boolean" 
@@ -731,7 +737,7 @@ const validation = {
             default: return false;
         }
 
-        const validListKeys = ["name", "type", "data", "tags", "sortDir", "sortType", "date", "carousel",
+        const validListKeys = ["listVersion", "name", "type", "data", "tags", "sortDir", "sortType", "date", "carousel",
                                "filterChecks", "advancedView", "displayType", "groceryListIdx", "hiddenComment"];
         for(const key in list) {
             if(validListKeys.indexOf(key) < 0) { delete list[key]; }
@@ -768,6 +774,9 @@ const validation = {
         || typeof item.date !== "number") {
             return false;
         }
+        if(typeof item.itemVersion === "undefined") {
+            item.itemVersion = 0;
+        } else if(typeof item.itemVersion !== "number") { return false; }
         for(let i = item.tags.length - 1; i >= 0; i--) {
             const tag = item.tags[i];
             if(typeof list.tags[tag] === "undefined") {
@@ -788,7 +797,7 @@ const validation = {
         || typeof item.notes !== "string") {
             return false;
         }
-        const validItemKeys = ["tags", "important", "date", "val", "checked", "notes", "hiddenComment"];
+        const validItemKeys = ["itemVersion", "tags", "important", "date", "val", "checked", "notes", "hiddenComment"];
         for(const key in item) {
             if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
         }
@@ -802,7 +811,7 @@ const validation = {
         || (typeof item.locked !== "boolean" && typeof item.locked !== "undefined")) {
             return false;
         }
-        const validItemKeys = ["tags", "important", "date", "val", "title", "body", "locked", "hiddenComment"];
+        const validItemKeys = ["itemVersion", "tags", "important", "date", "val", "title", "body", "locked", "hiddenComment"];
         for(const key in item) {
             if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
         }
@@ -882,7 +891,7 @@ const validation = {
                 }
             }
         }
-        const validItemKeys = ["tags", "important", "date", "val", "name", "servings", "ingredience", "steps", "author", "notes", "source", "prepTime", "cookTime", "totalTime", "hiddenComment", "groupSortOrder"];
+        const validItemKeys = ["itemVersion", "tags", "important", "date", "val", "name", "servings", "ingredience", "steps", "author", "notes", "source", "prepTime", "cookTime", "totalTime", "hiddenComment", "groupSortOrder"];
         for(const key in item) {
             if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
         }
