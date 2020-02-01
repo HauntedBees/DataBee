@@ -7,6 +7,11 @@ const ctx = {
 $(function() {
     data.Load(DrawAll);
 
+    if(window.innerHeight < window.innerWidth && navigator.userAgent.indexOf("Firefox") >= 0) {
+        ShowAlert("Firefox Mysteries", "Heads up, this app is geared towards mobile devices. It technically works on PCs, too, but it behaves a bit strangely in Firefox. You're doing the right thing by using Firefox over other, less privacy-respecting, browsers, but in the case of this specific app, try using a mobile device or another browser. If you REALLY want to use this app in Firefox on PC, let me know and if enough people complain I might just try to fix things up for y'all. Until then, tread carefully and expect some weird visual bugs.");
+        $(".modal > div").css("margin-top", "10%");
+    }
+
     // Settings
     $(".box").on("click", function() {
         const newTheme = parseInt($(this).attr("data-id"));
