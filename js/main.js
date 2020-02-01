@@ -723,7 +723,7 @@ function BackButtonPress() {
     switch(ctx.stateForBackButton) {
         case "recipeeditor":
             const recipeIdx = parseInt($("#bRecipeEditor").attr("data-id"));
-            EditRecipe(recipeIdx);
+            ViewRecipe(recipeIdx);
             break;
         case "noteEditor":
             const idx = parseInt($("#bNoteEditor").attr("data-id"));

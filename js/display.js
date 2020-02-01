@@ -198,6 +198,7 @@ function DrawAll() {
 
 /* Sidebar */
 function ShowSidebar() {
+    if(ctx.stateForBackButton.indexOf("recipe") === 0) { return; }
     $("#sidebar").addClass("active");
     $("#rightbar").removeClass("active");
     $("#cover").show();
