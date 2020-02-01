@@ -607,7 +607,7 @@ function ToggleDataItemSettings($e, i, type) {
             settings.push(`<div class="btn option ci-export"><i class="material-icons">share</i><div>Export</div></div>`);
         }
         if(dbData.settings.leftHanded) { settings.reverse(); }
-        $(".elem > .settings").remove();
+        $(".elem > .settings, .elem > .tagList").remove();
         $e.append(`<div class="settings" data-id="${i}">${settings.join("")}</div>`);
     }
 }
