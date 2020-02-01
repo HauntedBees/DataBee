@@ -79,7 +79,7 @@ $(function() {
     });
     $("#btnImport").on("click", function() {
         if(typeof chooser !== "undefined") {
-            chooser.getFile().then(data.ImportBackupChooser, function(e) { ShowAlert("Import Failed", e); });
+            chooser.getFile("application/octet-stream").then(data.ImportBackupChooser, function(e) { ShowAlert("Import Failed", e); });
         } else {
             const input = document.createElement("input");
             input.setAttribute("type", "file");
@@ -363,7 +363,7 @@ $(function() {
     });
     $("#btnImportList").on("click", function() {
         if(typeof chooser !== "undefined") {
-            chooser.getFile().then(data.ImportListChooser, function(e) { ShowAlert("Import Failed", e); });
+            chooser.getFile("application/octet-stream").then(data.ImportListChooser, function(e) { ShowAlert("Import Failed", e); });
         } else {
             const input = document.createElement("input");
             input.setAttribute("type", "file");

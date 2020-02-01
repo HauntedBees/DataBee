@@ -269,7 +269,7 @@ function SetUpCookbook() {
     });
     $("#importRecipe").on("click", function() {
         if(typeof chooser !== "undefined") {
-            chooser.getFile().then(data.ImportRecipeChooser, function(e) { ShowAlert("Import Failed", e); });
+            chooser.getFile("application/octet-stream").then(data.ImportRecipeChooser, function(e) { ShowAlert("Import Failed", e); });
         } else {
             const input = document.createElement("input");
             input.setAttribute("type", "file");
