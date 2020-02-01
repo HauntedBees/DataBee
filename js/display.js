@@ -176,6 +176,12 @@ function ShowGrocerySelectModal() {
 function ShowTagFilterModal() {
     const currlist = CurList();
     $("#advTagFilters").html(GetTogglingTagListHTML(currlist.tags, currlist.tagFilters));
+    $("#tagFilterType > button").removeClass("button-primary");
+    if(currlist.tagFilterAnd) {
+        $("#tagFilterType > button[data-val='true']").addClass("button-primary");
+    } else {
+        $("#tagFilterType > button[data-val='false']").addClass("button-primary");
+    }
     ShowModal("modalTagFilter");
 }
 
@@ -528,9 +534,7 @@ function ReplaceCommonHTML(str, e, showHandle, extraType, tagsHTML) {
 }
 function GetRecipeHTML(e, i, parentList, extraType) {
     if(extraType === undefined && parentList.tagFilters.length > 0) {
-        const filters = parentList.tagFilters;
-        const isMatch = filters.every(f => e.tags.indexOf(f) >= 0);
-        if(!isMatch) { return ""; }
+        if(!IsTagMatch(parentList, e)) { return ""; }
     }
     const dbListIdx = extraType !== undefined ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
@@ -554,9 +558,7 @@ function GetRecipeHTML(e, i, parentList, extraType) {
 }
 function GetNoteHTML(e, i, parentList, extraType) {
     if(extraType === undefined && parentList.tagFilters.length > 0) {
-        const filters = parentList.tagFilters;
-        const isMatch = filters.every(f => e.tags.indexOf(f) >= 0);
-        if(!isMatch) { return ""; }
+        if(!IsTagMatch(parentList, e)) { return ""; }
     }
     const dbListIdx = extraType !== undefined ? e.ownerIdx : dbData.currentScreen;
     const allTags = dbData.dbList[dbListIdx].tags;
@@ -598,9 +600,7 @@ function GetNoteHTML(e, i, parentList, extraType) {
 }
 function GetCheckboxItemHTML(e, i, parentList, extraType) {
     if(extraType === undefined && parentList.tagFilters.length > 0) {
-        const filters = parentList.tagFilters;
-        const isMatch = filters.every(f => e.tags.indexOf(f) >= 0);
-        if(!isMatch) { return ""; }
+        if(!IsTagMatch(parentList, e)) { return ""; }
     }
     if(e.divider === true) {
         if(parentList.sortType === "manual") {
@@ -624,6 +624,14 @@ function GetCheckboxItemHTML(e, i, parentList, extraType) {
         {beeNOTES}
         {beeSOWNER}
         </li>`, e, showHandle, extraType, tagsHTML).replace("{beeNOTES}", e.notes !== "" ? Sanitize`<div class="citem_notes">${e.notes}</div>` : ``);
+}
+function IsTagMatch(list, item) {
+    const filters = list.tagFilters;
+    if(list.tagFilterAnd) {
+        return filters.every(f => item.tags.indexOf(f) >= 0);
+    } else {
+        return item.tags.some(tag => filters.indexOf(tag) >= 0);
+    }
 }
 function GetTagsHTML(allTags, myTags, showHidden) {
     const tags = myTags.map(t => allTags[t]).sort((a, b) => {
@@ -721,7 +729,7 @@ function GetTogglingTagListHTML(allTags, myTags) {
         } else {
             innerHTML = Sanitize`<i class="material-icons dispTag tc${tag.color}" data-id="${tag.id}">${tag.imgVal}</i>`;
         }
-        return SanitizeException(2)`<div class="tag${myTags.indexOf(tag.id) < 0 ? "" : " active"}" data-id="${tag.id}">${innerHTML} ${tag.tag}</div>`
+        return SanitizeException(2)`<div class="tag${myTags.indexOf(tag.id) < 0 ? "" : " active"}" data-id="${tag.id}">${innerHTML}<div>${tag.tag}</div></div>`
     });
     return tagHTML.join("");
 }

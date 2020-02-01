@@ -1,11 +1,12 @@
 class DataObj {
     constructor(name, type) {
-        this.listVersion = 1;
+        this.listVersion = 2;
         this.name = name;
         this.type = type;
         this.data = [];
         this.tags = {};
         this.tagFilters = [];
+        this.tagFilterAnd = false;
         this.sortType = "manual";
         this.sortDir = 1;
         this.date = +new Date();
@@ -916,6 +917,11 @@ const upgrades = {
         if(list.listVersion < 1) {
             list.listVersion = 1;
             list.tagFilters = [];
+            hasChanges = true;
+        }
+        if(list.listVersion < 2) {
+            list.listVersion = 2;
+            list.tagFilterAnd = false;
             hasChanges = true;
         }
         Object.keys(list.tags).forEach(key => {

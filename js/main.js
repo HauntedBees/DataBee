@@ -464,11 +464,16 @@ $(function() {
     $("#btnConfirmTagFilter").on("click", function() {
         const list = CurList();
         list.tagFilters = $("#advTagFilters > .tag.active").toArray().map(e => $(e).attr("data-id"));
+        list.tagFilterAnd = $("#tagFilterType > .button-primary").attr("data-val") === "true";
         data.Save();
         CloseModal("modalTagFilter");
         DrawMain();
     });
     $("#tagFilter").on("click", ".applyTagFilters", ShowTagFilterModal);
+    $("#tagFilterType > button").on("click", function() {
+        $("#tagFilterType > button").removeClass("button-primary");
+        $(this).addClass("button-primary");
+    });
     $("#tagFilter").on("click", ".clearTagFilters", function() {
         const list = CurList();
         list.tagFilters = [];
