@@ -625,7 +625,7 @@ const data = {
         try {
             const list = CurList();
             const recipe = JSON.parse(str.replace("javascript:", ""));
-            if(!validation.EnsureValidRecipe(recipe, true, list)) {
+            if(!validation.EnsureValidDataItem(recipe, list, true)) {
                 ShowAlert("Import Failed", "Invalid databee recipe format.");
                 return;
             }
@@ -767,7 +767,7 @@ const validation = {
         }
         return true;
     },
-    EnsureValidDataItem: function (item, list) {
+    EnsureValidDataItem: function (item, list, isSoloImport) {
         console.log(item);
         if(typeof item.tags !== "object"
         || typeof item.important !== "boolean"
@@ -783,27 +783,37 @@ const validation = {
                 item.tags.splice(i, 1);
             }
         }
+        const validItemKeys = ["itemVersion", "tags", "important", "date", "val", "hiddenComment"];
         switch(list.type) {
-            case "checklist": return this.EnsureValidChecklistItem(item); 
-            case "notes": return this.EnsureValidNote(item); 
-            case "recipe": return this.EnsureValidRecipe(item);
+            case "checklist": return this.EnsureValidChecklistItem(item, validItemKeys); 
+            case "notes": return this.EnsureValidNote(item, validItemKeys); 
+            case "recipe": return this.EnsureValidRecipe(item, validItemKeys, isSoloImport, list);
             default: return false;
         }
     },
-    EnsureValidChecklistItem: function(item) {
-        console.log(item);
-        if(typeof item.val !== "string"
-        || typeof item.checked !== "boolean"
-        || typeof item.notes !== "string") {
-            return false;
+    EnsureValidChecklistItem: function(item, parentKeys) {
+        if(typeof item.divider === "boolean") {
+            if(item.divider === false
+            || typeof item.val !== "string"
+            || typeof item.checked !== "undefined"
+            || typeof item.notes !== "undefined") {
+                return false;
+            }
+        } else {
+            if(typeof item.val !== "string"
+            || typeof item.checked !== "boolean"
+            || typeof item.notes !== "string"
+            || typeof item.divider !== "undefined") {
+                return false;
+            }
         }
-        const validItemKeys = ["itemVersion", "tags", "important", "date", "val", "checked", "notes", "hiddenComment"];
+        const validItemKeys = ["checked", "notes", "divider", ...parentKeys];
         for(const key in item) {
             if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
         }
         return true;
     },
-    EnsureValidNote: function(item) {
+    EnsureValidNote: function(item, parentKeys) {
         console.log(item);
         if(typeof item.val !== "string"
         || typeof item.title !== "string"
@@ -811,13 +821,13 @@ const validation = {
         || (typeof item.locked !== "boolean" && typeof item.locked !== "undefined")) {
             return false;
         }
-        const validItemKeys = ["itemVersion", "tags", "important", "date", "val", "title", "body", "locked", "hiddenComment"];
+        const validItemKeys = ["title", "body", "locked", ...parentKeys];
         for(const key in item) {
             if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
         }
         return true;
     },
-    EnsureValidRecipe: function(item, isSoloImport, newList) {
+    EnsureValidRecipe: function(item, parentKeys, isSoloImport, newList) {
         console.log(item);
 
         if(isSoloImport) {
@@ -891,7 +901,7 @@ const validation = {
                 }
             }
         }
-        const validItemKeys = ["itemVersion", "tags", "important", "date", "val", "name", "servings", "ingredience", "steps", "author", "notes", "source", "prepTime", "cookTime", "totalTime", "hiddenComment", "groupSortOrder"];
+        const validItemKeys = ["name", "servings", "ingredience", "steps", "author", "notes", "source", "prepTime", "cookTime", "totalTime", "groupSortOrder", ...parentKeys];
         for(const key in item) {
             if(validItemKeys.indexOf(key) < 0) { delete item[key]; }
         }
