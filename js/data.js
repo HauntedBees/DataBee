@@ -80,7 +80,13 @@ class Recipe extends DataItem {
 class Ingredient {
     constructor(item, amt, unit, group) {
         this.ingredient = item;
-        if(typeof amt === "number") {
+        if(typeof amt === "string") {
+            const split = amt.split("-");
+            this.amount = split[0].trim();
+            if(split.length === 2) {
+                this.range = split[1].trim();
+            }
+        } else if(typeof amt === "number") {
             this.amount = amt;
         } else {
             this.amount = amt.valueOf();
