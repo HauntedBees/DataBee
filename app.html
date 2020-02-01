@@ -237,12 +237,12 @@
                             <label for="txtNotes">Notes</label><textarea data-val="notes" class="rMetadata" id="txtNotes" placeholder="Notes (optional)"></textarea>
                         </div>
                         <h4 class="showIng">
-                            Ingredience
-                            <div id="btnAddIngredient" class="recipeBtn">
-                                <i class="material-icons">add</i>
-                            </div>
+                            Ingredients
+                            <div id="btnAddIngredient" class="recipeBtn"><i class="material-icons">add</i></div>
                         </h4>
                         <ul id="ingredientEditList" class="showIng recipeSection recipeSection-small"></ul>
+                        <h4 class="showIng">Ingredient Group Sorting</h4>
+                        <ul id="ingredientGroups" class="showIng"></ul>
                         <h4 class="showStep">
                             Steps
                             <div id="btnAddStep" class="recipeBtn">
@@ -360,9 +360,13 @@
                         recipe makes, ingredients, recipe steps, and optional metadata. There are three views for the Recipe Editor and Recipe Viewer: <em>Full</em>, <em>Ingredients</em>,
                         and <em>Steps</em>. These three options, unsurprisingly, show everything, just the ingredients, and just the recipe steps, respectively. Recipe metadata and the 
                         Serving Size will only be shown in the Full view.</p>
-                    <p>Ingredients have four parts: the ingredient itself, the quantity, the unit, and an optional Grouping. The Grouping option allows you to group ingredients together; 
-                        for example if your recipe is fresh pasta with pasta sauce, you may group your ingredients like flour and egg in the "Pasta" group, and ingredients like tomato and 
-                        basil in the "Sauce" group. In the Recipe Viewer, all ingredient amounts will be scaled based on the Serving Size, and can also be converted between Metric and Imperial
+                    <p>Ingredients have four parts: the ingredient itself, the quantity, the unit, and an optional Grouping.</p>
+                    <p>Quantities can be whole numbers, approximations, fractions, decimals, and/or ranges. All of the following are valid values for ingredient quantities: 
+                        5, 2/3, 1.5, 0.75, 4/3, ~3, 3-4, ~1 - 2.
+                    </p>
+                    <p></p>The Grouping option allows you to group ingredients together; for example if your recipe is fresh pasta with pasta sauce, you may group your ingredients 
+                        like flour and egg in the "Pasta" group, and ingredients like tomato and basil in the "Sauce" group.</p>
+                    <p>In the Recipe Viewer, all ingredient amounts will be scaled based on the Serving Size, and can also be converted between Metric and Imperial
                         Units on the fly by tapping on them.</p>
                     <p>Steps are just text. If you wrap an amount in brackets like <em>[2 cups]</em> or <em>[5] eggs</em>, it'll show up in the Recipe Viewer like <span class="help-step">2 cups</span>
                         or <span class="help-step">5</span> <em>eggs</em> and the value will be adjusted when you change the Serving Size, and can be converted between Metric and Imperial
