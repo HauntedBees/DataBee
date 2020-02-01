@@ -903,7 +903,9 @@ const upgrades = {
             db.dbVersion = 0;
         }
         // db changes
-        hasChanges |= db.dbList.some(upgrades.UpgradeList);
+        db.dbList.forEach(list => {
+            hasChanges |= upgrades.UpgradeList(list);
+        });
         return hasChanges;
     },
     UpgradeList: function(list) {
@@ -916,8 +918,13 @@ const upgrades = {
             list.tagFilters = [];
             hasChanges = true;
         }
-        hasChanges |= Object.keys(list.tags).map(key => list.tags[key]).some(upgrades.UpgradeTag);
-        hasChanges |= list.data.some(upgrades.UpgradeDataItem);
+        Object.keys(list.tags).forEach(key => {
+            const tag = list.tags[key];
+            hasChanges |= upgrades.UpgradeTag(tag);
+        });
+        list.data.forEach(item => {
+            hasChanges |= upgrades.UpgradeDataItem(item);
+        });
         return hasChanges;
     },
     UpgradeTag: function(tag) {
