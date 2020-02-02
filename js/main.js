@@ -713,6 +713,7 @@ function NoteClick(e, $t) {
             return;
         }
         if($clicked.closest(".settings").length) { return; } // settings
+        if($clicked.closest(".tagList").length) { return; } // tags
         if($clicked.hasClass("restoreItem")) { // Recover From Recycle Bin
             const listIdx = $clicked.attr("data-parent");
             data.RestoreDataItem(listIdx, idx);
