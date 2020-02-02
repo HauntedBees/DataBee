@@ -875,10 +875,10 @@ const validation = {
             const ing = item.ingredience[i];
             console.log(ing);
             if(typeof ing.ingredient !== "string"
-            || typeof ing.unit !== "string"
-            || typeof ing.group !== "string") {
+            || typeof ing.unit !== "string") {
                 return false;
             }
+            if(typeof ing.group !== "string") { ing.group = ""; }
             if(ing.amount !== "") { new Fraction(ing.amount); }
             for(const key in ing) {
                 if(validIngKeys.indexOf(key) < 0) { delete ing[key]; }
