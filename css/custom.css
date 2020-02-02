@@ -316,6 +316,7 @@ input.checkbox {
     display: inline-block;
     height: 1.25em;
     margin-top: 0.5em;
+    outline: none;
     padding-left: 1em;
     position: relative;
     vertical-align: middle;
@@ -740,7 +741,6 @@ input, option, select, textarea { color: #000000 }
 }
 #ingredientGroups > li { padding: 0 0.5em }
 .ingGroup .handle { vertical-align: middle }
-.checkbox { outline: none }
 
 #tagFilter {
     padding-top: 0.25em;
