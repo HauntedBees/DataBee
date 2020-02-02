@@ -784,7 +784,7 @@ const validation = {
         }
         for(let i = item.tags.length - 1; i >= 0; i--) {
             const tag = item.tags[i];
-            if(typeof list.tags[tag] === "undefined") {
+            if(typeof list.tags[tag] === "undefined" && !isSoloImport) {
                 item.tags.splice(i, 1);
             }
         }
@@ -819,7 +819,6 @@ const validation = {
         return true;
     },
     EnsureValidNote: function(item, parentKeys) {
-        console.log(item);
         if(typeof item.val !== "string"
         || typeof item.title !== "string"
         || typeof item.body !== "string"
@@ -833,12 +832,7 @@ const validation = {
         return true;
     },
     EnsureValidRecipe: function(item, parentKeys, isSoloImport, newList) {
-        console.log(item);
-
         if(isSoloImport) {
-            if(typeof item.tags !== "object" || typeof item.important !== "boolean" || typeof item.date !== "number") {
-                return false;
-            }
             for(let i = item.tags.length - 1; i >= 0; i--) {
                 const tag = item.tags[i];
                 if(typeof newList.tags[tag] === "undefined") { // no ID match, try name match
