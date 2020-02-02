@@ -543,7 +543,7 @@ const data = {
     ProcessBackupJSON: function(str) {
         try {
             const oldRev = dbData._rev;
-            const placeholder = JSON.parse(str.replace("javascript:", ""));
+            const placeholder = typeof str === "object" ? str :JSON.parse(str.replace("javascript:", ""));
             if(!validation.EnsureValidDatabase(placeholder)) {
                 ShowAlert("Import Failed", "Invalid databee format.");
                 return;
@@ -571,7 +571,7 @@ const data = {
     },
     ProcessListJSON: function(str) {
         try {
-            const list = JSON.parse(str.replace("javascript:", ""));
+            const list = typeof str === "object" ? str :JSON.parse(str.replace("javascript:", ""));
             upgrades.UpgradeList(list);
             if(!validation.EnsureValidList(list, false)) {
                 ShowAlert("Import Failed", "Invalid databee list format.");
@@ -615,20 +615,36 @@ const data = {
     },
     ProcessRecipeJSON: function(str) {
         try {
+            let msg = "Your recipes have been imported!";
             const list = CurList();
-            const recipe = JSON.parse(str.replace("javascript:", ""));
-            upgrades.UpgradeDataItem(recipe);
-            if(!validation.EnsureValidDataItem(recipe, list, true)) {
-                ShowAlert("Import Failed", "Invalid databee recipe format.");
-                return;
+            const recipeResponse = typeof str === "object" ? str : JSON.parse(str.replace("javascript:", ""));
+            if(Array.isArray(recipeResponse)) { // more than one
+                let success = true;
+                recipeResponse.forEach(recipe => {
+                    upgrades.UpgradeDataItem(recipe);
+                    success &= validation.EnsureValidDataItem(recipe, list, true);
+                });
+                if(!success) {
+                    ShowAlert("Import Failed", "Invalid databee recipe format.");
+                    return;
+                }
+                console.log(recipeResponse);
+                list.data.push(...recipeResponse);
+            } else { // just one recipe
+                upgrades.UpgradeDataItem(recipeResponse);
+                if(!validation.EnsureValidDataItem(recipeResponse, list, true)) {
+                    ShowAlert("Import Failed", "Invalid databee recipe format.");
+                    return;
+                }
+                list.data.push(recipeResponse);
+                msg = Sanitize`Your recipe <em>${recipeResponse.name}</em> have been imported!`;
             }
-            list.data.push(recipe);
             data.Save(function() {
-                ShowAlert("Import Succeeded!", Sanitize`Your recipe <em>${recipe.name}</em> has been imported!`);
+                ShowAlert("Import Succeeded!", msg);
                 DrawMain();
             });
         } catch {
-            ShowAlert("Import Failed", "Invalid list json format.");
+            ShowAlert("Import Failed", "Invalid recipe json format.");
         }
     },
     GetJSONFromChooser: function(file) {

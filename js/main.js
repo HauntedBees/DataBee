@@ -77,17 +77,7 @@ $(function() {
             a.dispatchEvent(new MouseEvent("click"));
         }
     });
-    $("#btnImport").on("click", function() {
-        if(typeof chooser !== "undefined") {
-            chooser.getFile("application/octet-stream").then(data.ImportBackupChooser, function(e) { ShowAlert("Import Failed", e); });
-        } else {
-            const input = document.createElement("input");
-            input.setAttribute("type", "file");
-            input.setAttribute("accept", ".json");
-            input.setAttribute("onchange", "data.ImportBackup(this.files)");
-            input.dispatchEvent(new MouseEvent("click"));
-        }
-    });
+    $("#btnImport").on("click", function() { ShowImportModal("Backup"); });
 
     $("#nextScroller, #prevScroller").on("click", function() {
         const listIdx = $(this).attr("data-idx");
@@ -361,16 +351,55 @@ $(function() {
             a.dispatchEvent(new MouseEvent("click"));
         }
     });
-    $("#btnImportList").on("click", function() {
+    $("#btnImportList").on("click", function() { ShowImportModal("List"); });
+    $("#btnImportFile").on("click", function() {
+        const type = $("#modalFileImport").attr("data-type");
+        let chooserFunc = null, inputFuncStr = null;
+        switch(type) {
+            case "Backup":
+                chooserFunc = data.ImportBackupChooser;
+                inputFuncStr = "data.ImportBackup(this.files)";
+                break;
+            case "List":
+                chooserFunc = data.ImportListChooser;
+                inputFuncStr = "data.ImportList(this.files)";
+                break;
+            case "Recipe":
+                chooserFunc = data.ImportRecipeChooser;
+                inputFuncStr = "data.ImportRecipe(this.files)";
+                break;
+            default: return;
+        }
         if(typeof chooser !== "undefined") {
-            chooser.getFile("application/octet-stream").then(data.ImportListChooser, function(e) { ShowAlert("Import Failed", e); });
+            chooser.getFile("application/octet-stream").then(chooserFunc, function(e) { ShowAlert("Import Failed", e); });
         } else {
             const input = document.createElement("input");
             input.setAttribute("type", "file");
             input.setAttribute("accept", ".json");
-            input.setAttribute("onchange", "data.ImportList(this.files)");
+            input.setAttribute("onchange", inputFuncStr);
             input.dispatchEvent(new MouseEvent("click"));
         }
+        CloseModal("modalFileImport");
+    });
+    $("#btnImportURL").on("click", function() {
+        $("#txtImportURL").removeClass("comeOn");
+        const url = $("#txtImportURL").val();
+        if(url === "") {
+            $("#txtImportURL").addClass("comeOn").val("Please enter a value.").focus().select();
+            return;
+        }
+        if(url.indexOf("https://") !== 0) {
+            $("#txtImportURL").addClass("comeOn").val("Only https URLs are supported.").focus().select();
+            return;
+        }
+        const type = $("#modalFileImport").attr("data-type");
+        switch(type) {
+            case "Backup": online.GetBackupFromURL(url); break;
+            case "List": online.GetListFromURL(url); break;
+            case "Recipe": online.GetRecipeFromURL(url); break;
+            default: return;
+        }
+        CloseModal("modalFileImport");
     });
 
     // Tags

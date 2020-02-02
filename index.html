@@ -424,7 +424,7 @@
                 </div>
             </div>
         </div>
-        <div id="modalAdvancedAdd" class="modal">
+        <div id="modalAdvancedAdd" class="tallmodal modal">
             <div>
                 <div class="modalHeader">Add Item</div>
                 <div class="modalContent">
@@ -542,7 +542,7 @@
                 </div>
             </div>
         </div>
-        <div id="modalMove" class="modal">
+        <div id="modalMove" class="tallmodal modal">
             <div>
                 <div class="modalHeader">Move <em>Item</em> to...</div>
                 <div class="modalContent">
@@ -616,7 +616,7 @@
                 </div>
             </div>
         </div>
-        <div id="modalTagFilter" class="modal">
+        <div id="modalTagFilter" class="tallmodal modal">
             <div>
                 <div class="modalHeader">Apply Filters</div>
                 <div class="modalContent">
@@ -635,6 +635,23 @@
                 </div>
             </div>
         </div>
+        <div id="modalFileImport" class="tallmodal modal">
+            <div>
+                <div id="fileImportHeader" class="modalHeader">Import File</div>
+                <div class="modalContent">
+                    <div class="center">
+                        <button id="btnImportFile" class="button-primary">Import from File</button>
+                        <div class="smallOr">&mdash; or &mdash;</div>
+                    </div>
+                    <p class="smallOr"><strong>Import from a URL.</strong> This will connect to the internet; this is the only time DataBee connects to the internet.
+                        This will use data if you are on a data plan. Only use URLs from trusted sources that return data in a valid DataBee format.</p>
+                    <div class="center">
+                        <input id="txtImportURL" type="text" placeholder="Type a URL here">
+                        <button id="btnImportURL" class="button-primary">Import from URL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/he.js"></script>
         <script type="text/javascript" src="js/pouchdb.js"></script>
@@ -646,5 +663,6 @@
         <script type="text/javascript" src="js/display.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
         <script type="text/javascript" src="js/cookbook.js"></script>
+        <script type="text/javascript" src="js/online.js"></script>
     </body>
 </html>

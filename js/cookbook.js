@@ -267,17 +267,7 @@ function SetUpCookbook() {
             a.dispatchEvent(new MouseEvent("click"));
         }
     });
-    $("#importRecipe").on("click", function() {
-        if(typeof chooser !== "undefined") {
-            chooser.getFile("application/octet-stream").then(data.ImportRecipeChooser, function(e) { ShowAlert("Import Failed", e); });
-        } else {
-            const input = document.createElement("input");
-            input.setAttribute("type", "file");
-            input.setAttribute("accept", ".json");
-            input.setAttribute("onchange", "data.ImportRecipe(this.files)");
-            input.dispatchEvent(new MouseEvent("click"));
-        }
-    });
+    $("#importRecipe").on("click", function() { ShowImportModal("Recipe"); });
 
     $("#ingredientGroups").sortable({
         delay: 100,

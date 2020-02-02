@@ -184,6 +184,12 @@ function ShowTagFilterModal() {
     }
     ShowModal("modalTagFilter");
 }
+function ShowImportModal(type) {
+    $("#modalFileImport").attr("data-type", type);
+    $("#fileImportHeader").text(`Import ${type} File`);
+    $("#txtImportURL").removeClass("comeOn").val("");
+    ShowModal("modalFileImport");
+}
 
 function ResetElements(elem) {
     elem.find("input").each(function() {
