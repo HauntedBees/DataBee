@@ -781,3 +781,17 @@ input, option, select, textarea { color: #000000 }
      font-size: 0.75em;
      margin-bottom: 0.5em;
 }
+.bee {
+    animation: 0.1s linear 0s infinite alternate wiggle;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    position: fixed;
+    vertical-align: middle;
+    -webkit-text-stroke: 0.5px var(--text-color);
+    z-index: 1000000;
+}
+@keyframes wiggle {
+    from { font-size: 1em }
+    to { font-size: 0.95em }
+}

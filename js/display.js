@@ -207,6 +207,7 @@ function DrawAll() {
     if(dbData.settings.leftHanded) { $("body").addClass("lefty"); }
     else { $("body").removeClass("lefty"); }
     SetTheme();
+    ReadyTheBees();
     $("#front").hide();
     DrawSidebar();
     DrawMain();

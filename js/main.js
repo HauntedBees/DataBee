@@ -2,7 +2,8 @@ const db = new PouchDB("databee");
 const ctx = {
     stateForBackButton: "home",
     isSorting: false, 
-    tagsToDelete: []
+    tagsToDelete: [],
+    beeIdx: 0, bees: []
 };
 $(function() {
     data.Load(DrawAll);
@@ -39,6 +40,7 @@ $(function() {
         } else {
             $(this).removeClass("button-primary").text("Disabled").attr("data-val", newVal);
         }
+        if($(this).attr("data-setting") === "showBees") { ReadyTheBees(); }
     });
     $("#btnDeleteAll").on("click", function() {
         ShowInfoModal("deleteAll", "Erase All Data", "Are you sure you want to delete <em>everything</em>? This cannot be undone. As a reminder, this app shares no data with the internet or cloud or whatever; only you can access this data.", "Delete");
@@ -837,4 +839,70 @@ function TouchMove(e) {
 function TouchRelease() {
     potentialSwitch = false;
 }
+
+// Other
 function CurList() { return dbData.dbList[dbData.currentScreen]; }
+const rWidth = () => window.innerWidth * Math.random();
+const rHeight = () => window.innerHeight * Math.random();
+function ReadyTheBees() {
+    clearInterval(ctx.beeIdx);
+    if(dbData.settings.showBees) {
+        ctx.beeIdx = setInterval(BeeAnim, 10);
+    } else {
+        $(".bee").remove();
+        ctx.bees = [];
+    }
+}
+function Bee() {
+    const dir = Math.floor(Math.random() * 12);
+    let sx = 0, sy = 0, ex = 0, ey = 0;
+    const gap = -10;
+    switch(dir) {
+        case 0: sx = -gap; sy = rHeight(); ex = rWidth(); ey = -gap; break; // left to top
+        case 1: sx = -gap; sy = rHeight(); ex = window.innerWidth + gap; ey = rHeight(); break; // left to right
+        case 2: sx = -gap; sy = rHeight(); ex = rWidth(); ey = window.innerHeight + gap; break; // left to bottom
+
+        case 3: sx = rWidth(); sy = -gap; ex = -gap; ey = rHeight(); break; // top to left
+        case 4: sx = rWidth(); sy = -gap; ex = rWidth(); ey = window.innerHeight + gap; break; // top to bottom
+        case 5: sx = rWidth(); sy = -gap; ex = window.innerWidth + gap; ey = rHeight(); break; // top to right
+        
+        case 6: sx = window.innerWidth + gap; sy = rHeight(); ex = rWidth(); ey = -gap; break; // right to top
+        case 7: sx = window.innerWidth + gap; sy = rHeight(); ex = -gap; ey = rHeight(); break; // right to left
+        case 8: sx = window.innerWidth + gap; sy = rHeight(); ex = rWidth(); ey = window.innerHeight + gap; break; // right to bottom
+
+        case 9: sx = rWidth(); sy = window.innerHeight + gap; ex = -gap; ey = rHeight(); break; // bottom to left
+        case 10: sx = rWidth(); sy = window.innerHeight + gap; ex = rWidth(); ey = -gap; break; // bottom to top
+        case 11: sx = rWidth(); sy = window.innerHeight + gap; ex = window.innerWidth + gap; ey = rHeight(); break; // bottom to right
+    }
+    sx -= 10; sy -= 15; ex -= 10; ey -= 15;
+    const rads = Math.atan2(ey - sy, ex - sx);
+    const drawAngle = 90 + (rads * 180 / Math.PI);
+    const $bee = $(`<div class="bee">&#x1F41D</div>`);
+    $bee.css("top", sy).css("left", sx).css("transform", `rotate(${drawAngle}deg)`);
+    $("body").append($bee);
+    ctx.bees.push({ 
+        sx: sx, sy: sy,
+        distance: 0, rads: rads, 
+        speed: 1 + Math.random() * 2, 
+        amplitude: 4 + Math.floor(Math.random() * 8),
+        period: 50 + Math.floor(Math.random() * 150),
+        $obj: $bee
+    });
+}
+function BeeAnim() {
+    if(ctx.bees.length < 100 && Math.random() < 0.05) { Bee(); }
+    for(let i = ctx.bees.length - 1; i >= 0; i--) {
+        const bee = ctx.bees[i];
+        bee.distance += bee.speed;
+        let x = bee.sx + Math.cos(bee.rads) * bee.distance;
+        let y = bee.sy + Math.sin(bee.rads) * bee.distance;
+        const deviation = Math.sin(bee.distance * Math.PI / bee.period) * bee.amplitude;
+        x += Math.sin(bee.rads) * deviation;
+        y -= Math.cos(bee.rads) * deviation;
+        if(bee.distance > (window.innerHeight * 1.25)) {
+            bee.$obj.remove();
+            ctx.bees.splice(i, 1);
+        }
+        bee.$obj.css("top", y).css("left", x);
+    }
+}
