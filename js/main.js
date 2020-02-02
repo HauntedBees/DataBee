@@ -876,7 +876,12 @@ function Bee() {
     }
     sx -= 10; sy -= 15; ex -= 10; ey -= 15;
     const rads = Math.atan2(ey - sy, ex - sx);
-    const drawAngle = 90 + (rads * 180 / Math.PI);
+    let drawAngle = (rads * 180 / Math.PI);
+    if(navigator.userAgent.indexOf("SM-") >= 0 || navigator.platform.indexOf("iP") === 0) {
+        drawAngle += 180; // bee emoji on Samsung and Apple devices faces left
+    } else if(navigator.platform.indexOf("Win") === 0 || navigator.platform === "Linux" || navigator.platform === "Android") { // doesn't work on Windows 10 but I'm on 8.1 so bleh
+        drawAngle += 90; // bee emoji on Androids and Windows 8.1 faces up
+    }   
     const $bee = $(`<div class="bee">&#x1F41D</div>`);
     $bee.css("top", sy).css("left", sx).css("transform", `rotate(${drawAngle}deg)`);
     $("body").append($bee);
@@ -890,7 +895,8 @@ function Bee() {
     });
 }
 function BeeAnim() {
-    if(ctx.bees.length < 100 && Math.random() < 0.05) { Bee(); }
+    if(ctx.bees.length < 5) { Bee(); }
+    if(ctx.bees.length < 10 && Math.random() < 0.05) { Bee(); }
     for(let i = ctx.bees.length - 1; i >= 0; i--) {
         const bee = ctx.bees[i];
         bee.distance += bee.speed;
