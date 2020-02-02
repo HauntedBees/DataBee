@@ -1,5 +1,5 @@
-const cacheVersion = "cachev2";
-const files = ["app.html", "js/cookbook.js", "js/data.js", "js/display.js", "js/main.js", "css/custom.css",
+const cacheVersion = "cachev3";
+const files = ["app.html", "js/cookbook.js", "js/data.js", "js/display.js", "js/main.js", "js/online.js", "css/custom.css",
                  "css/normalize.css", "css/skeleton.css", "js/fraction.js", "js/he.js", "js/jquery.js", "js/jquery-ui.js",
                  "js/jquery.ui.touch-punch.js", "js/pouchdb.js", "font/MaterialIcons.woff2"
 ];
